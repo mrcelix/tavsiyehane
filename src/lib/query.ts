@@ -1,0 +1,195 @@
+import type { DataBundle, Item, ItemType } from "./types";
+import { slugify } from "./format";
+
+export interface ItemFilters {
+  q?: string;
+  type?: ItemType;
+  categorySlug?: string;
+  city?: string;
+  district?: string;
+  brand?: string;
+  minScore?: number;
+  maxPrice?: number;
+  minPrice?: number;
+  badge?: string;
+  maxPriceLevel?: number;
+}
+
+export type SortKey = "puan" | "fiyat-artan" | "fiyat-azalan" | "yorum" | "yeni";
+
+/** Bütçe karşılaştırması için tekil fiyat: ürün fiyatı ya da hizmet başlangıç fiyatı. */
+export function effectivePrice(item: Item): number | undefined {
+  return item.price ?? item.priceMin;
+}
+
+/** Arama sorgularında anlam taşımayan ekler/bağlaçlar. */
+const STOPWORDS = new Set([
+  "tl", "₺", "lira", "bin", "altı", "alti", "altında", "altinda", "üstü", "ustu", "kadar",
+  "için", "icin", "ile", "ve", "veya", "en", "iyi", "iyisi", "uygun", "bir", "mi", "mı",
+  "alınabilecek", "alinabilecek", "arıyorum", "ariyorum", "istiyorum", "lazım", "lazim", "olan",
+]);
+
+/** "25.000 TL altı telefon" gibi sorgulardan bütçe + anahtar kelimeleri ayıklar. */
+export function parseSearchQuery(q: string): { words: string[]; maxPrice?: number } {
+  let maxPrice: number | undefined;
+  const cleaned = q.toLocaleLowerCase("tr").replace(/(\d[\d.,]*)\s*(bin)?/g, (_, num: string, bin?: string) => {
+    const n = Number(num.replace(/\./g, "").replace(",", "."));
+    if (Number.isFinite(n) && n >= (bin ? 1 : 500)) {
+      maxPrice = Math.round(n * (bin ? 1000 : 1));
+      return " ";
+    }
+    return _;
+  });
+  const words = cleaned.split(/[\s,]+/).filter((w) => w && !STOPWORDS.has(w));
+  return { words, maxPrice };
+}
+
+function wordMatches(hay: string, haySlug: string, word: string): boolean {
+  if (hay.includes(word) || haySlug.includes(slugify(word))) return true;
+  // Kaba Türkçe ek toleransı: "kediler" -> "kedi", "çalışmaya" -> "çalışma"
+  if (word.length > 4) {
+    const stem = word.slice(0, word.length - 2);
+    return hay.includes(stem) || haySlug.includes(slugify(stem));
+  }
+  return false;
+}
+
+function matchesQuery(item: Item, q: string, categoryName: string): boolean {
+  const hay = [item.title, item.brand, item.description, item.city, item.district, categoryName, ...Object.values(item.attrs), ...item.suitableFor]
+    .join(" ")
+    .toLocaleLowerCase("tr");
+  const haySlug = slugify(hay);
+  const { words } = parseSearchQuery(q);
+  if (words.length === 0) return true;
+  return words.every((word) => wordMatches(hay, haySlug, word));
+}
+
+/**
+ * Serbest metin araması: bütçeyi ayıklar, kalan kelimeleri alan ağırlığıyla eşleştirir.
+ * Başlık/kategori eşleşmesi açıklama veya özellik alanı eşleşmesinden üstte sıralanır.
+ */
+export function searchItems(bundle: DataBundle, q: string): Item[] {
+  const { words, maxPrice } = parseSearchQuery(q);
+  const catName = new Map(bundle.categories.map((c) => [c.slug, c.name]));
+
+  const scored: { item: Item; relevance: number }[] = [];
+  for (const item of bundle.items) {
+    const price = effectivePrice(item);
+    if (maxPrice && price !== undefined && price > maxPrice) continue;
+
+    if (words.length === 0) {
+      scored.push({ item, relevance: 1 });
+      continue;
+    }
+
+    const tiers: { text: string; weight: number }[] = [
+      { text: [item.title, item.brand, catName.get(item.categorySlug) ?? ""].join(" ").toLocaleLowerCase("tr"), weight: 3 },
+      { text: [item.description, item.city, item.district, ...item.suitableFor].join(" ").toLocaleLowerCase("tr"), weight: 2 },
+      { text: Object.values(item.attrs).join(" ").toLocaleLowerCase("tr"), weight: 1 },
+    ].map((t) => ({ ...t, slug: slugify(t.text) })) as { text: string; weight: number; slug: string }[];
+
+    let relevance = 0;
+    let allMatched = true;
+    for (const word of words) {
+      const tier = tiers.find((t) => wordMatches(t.text, (t as { slug: string }).slug, word));
+      if (!tier) {
+        allMatched = false;
+        break;
+      }
+      relevance += tier.weight;
+    }
+    if (allMatched) scored.push({ item, relevance });
+  }
+
+  return scored
+    .sort((a, b) => b.relevance - a.relevance || b.item.score - a.item.score)
+    .map((s) => s.item);
+}
+
+export function filterItems(bundle: DataBundle, f: ItemFilters): Item[] {
+  const catName = new Map(bundle.categories.map((c) => [c.slug, c.name]));
+  return bundle.items.filter((it) => {
+    if (f.type && it.type !== f.type) return false;
+    if (f.categorySlug && it.categorySlug !== f.categorySlug) return false;
+    if (f.city && slugify(it.city ?? "") !== slugify(f.city)) return false;
+    if (f.district && slugify(it.district ?? "") !== slugify(f.district)) return false;
+    if (f.brand && it.brand !== f.brand) return false;
+    if (f.minScore && it.score < f.minScore) return false;
+    if (f.badge && !it.badges.includes(f.badge as Item["badges"][number])) return false;
+    if (f.maxPriceLevel && (it.priceLevel ?? 0) > f.maxPriceLevel) return false;
+    const price = effectivePrice(it);
+    if (f.maxPrice && price !== undefined && price > f.maxPrice) return false;
+    if (f.minPrice && price !== undefined && price < f.minPrice) return false;
+    if (f.q && !matchesQuery(it, f.q, catName.get(it.categorySlug) ?? "")) return false;
+    return true;
+  });
+}
+
+export function sortItems(items: Item[], sort: SortKey = "puan"): Item[] {
+  const arr = [...items];
+  switch (sort) {
+    case "fiyat-artan":
+      arr.sort((a, b) => (effectivePrice(a) ?? a.priceLevel ?? 0) - (effectivePrice(b) ?? b.priceLevel ?? 0));
+      break;
+    case "fiyat-azalan":
+      arr.sort((a, b) => (effectivePrice(b) ?? b.priceLevel ?? 0) - (effectivePrice(a) ?? a.priceLevel ?? 0));
+      break;
+    case "yorum":
+      arr.sort((a, b) => b.ratingCount - a.ratingCount || b.score - a.score);
+      break;
+    case "yeni":
+      arr.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+      break;
+    default:
+      arr.sort((a, b) => b.score - a.score);
+  }
+  return arr;
+}
+
+/** Aynı kategorideki en yüksek puanlı alternatifler. */
+export function alternativesFor(bundle: DataBundle, item: Item, limit = 4): Item[] {
+  return sortItems(
+    bundle.items.filter((i) => i.categorySlug === item.categorySlug && i.id !== item.id),
+    "puan"
+  ).slice(0, limit);
+}
+
+/** İhtiyaç sihirbazı: cevaplara göre filtrele + önceliğe göre sırala. */
+export interface WizardAnswers {
+  type?: ItemType;
+  categorySlug?: string;
+  budget?: number; // TL üst sınır (mekânda 1-4 seviye)
+  priority?: string; // puan bileşeni anahtarı veya "puan"
+  city?: string;
+}
+
+export function wizardResults(bundle: DataBundle, w: WizardAnswers): Item[] {
+  let items = filterItems(bundle, {
+    type: w.type,
+    categorySlug: w.categorySlug,
+    city: w.city || undefined,
+    maxPrice: w.type !== "mekan" ? w.budget : undefined,
+    maxPriceLevel: w.type === "mekan" && w.budget ? Math.min(4, Math.max(1, Math.round(w.budget))) : undefined,
+  });
+  if (w.priority && w.priority !== "puan") {
+    items = [...items].sort(
+      (a, b) => (b.scoreBreakdown[w.priority!] ?? 0) - (a.scoreBreakdown[w.priority!] ?? 0) || b.score - a.score
+    );
+  } else {
+    items = sortItems(items, "puan");
+  }
+  return items;
+}
+
+export function uniqueCities(bundle: DataBundle, type?: ItemType): string[] {
+  const set = new Set<string>();
+  for (const it of bundle.items) {
+    if (type && it.type !== type) continue;
+    if (it.city) set.add(it.city);
+  }
+  return [...set].sort((a, b) => a.localeCompare(b, "tr"));
+}
+
+export function uniqueBrands(items: Item[]): string[] {
+  return [...new Set(items.map((i) => i.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
+}
