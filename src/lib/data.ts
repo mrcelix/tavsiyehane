@@ -1,9 +1,22 @@
 import { cache } from "react";
 import type { Category, DataBundle, Item, ListDef, Offer, PricePoint, Review } from "./types";
 import { getDemoBundle } from "@/data/demo";
+import { scoreAll } from "./scoring";
+import { computeBadges } from "./badges";
 import { createSupabaseServer } from "./supabase/server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+const BOS_SINYAL = {
+  interest30: 0,
+  interestPrev30: 0,
+  votesUp: 0,
+  votesDown: 0,
+  votesInterest: 0,
+  weeksTracked: 0,
+  weeksTop: 0,
+  editor: 50,
+};
 
 function mapItem(r: any): Item {
   return {
@@ -20,8 +33,12 @@ function mapItem(r: any): Item {
     priceMin: r.price_min ?? undefined,
     priceMax: r.price_max ?? undefined,
     priceLevel: r.price_level ?? undefined,
-    score: r.score ?? 0,
-    scoreBreakdown: r.score_breakdown ?? {},
+    signals: { ...BOS_SINYAL, ...(r.signals ?? {}) },
+    // Puan ve rozetler okumadan sonra kohort üzerinden yeniden hesaplanır.
+    score: 0,
+    scoreBreakdown: {},
+    categoryRank: 0,
+    categorySize: 0,
     whyRecommended: r.why_recommended ?? "",
     attrs: r.attrs ?? {},
     pros: r.pros ?? [],
@@ -117,7 +134,8 @@ export const getBundle = cache(async (): Promise<DataBundle> => {
 
     return {
       categories,
-      items: mappedItems,
+      // Puan göreli olduğu için kohort üzerinden hesaplanır; rozetler koşullardan türer.
+      items: scoreAll(mappedItems).map((it) => ({ ...it, badges: computeBadges(it) })),
       reviews: (reviews.data ?? []).map(mapReview),
       offers: mappedOffers,
       priceHistory,

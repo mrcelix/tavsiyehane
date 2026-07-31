@@ -33,6 +33,7 @@ import { ReviewForm } from "./ReviewForm";
 import { QuoteForm } from "./QuoteForm";
 import { CompareButton } from "./CompareButton";
 import { FavoriteButton } from "./FavoriteButton";
+import { VoteButtons } from "./VoteButtons";
 import { Badge } from "./ui/Badge";
 import { Overline } from "./ui/Card";
 
@@ -129,8 +130,17 @@ export async function ItemDetail({ item }: { item: Item }) {
           </div>
         </div>
 
+        {/* Topluluk oyu — puanın en ağır bileşeni */}
+        <div className="mt-5 rounded-xl border border-[var(--line)] bg-[var(--mist)] p-4">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">Sen ne dersin?</p>
+          <VoteButtons
+            itemId={item.id}
+            counts={{ up: item.signals.votesUp, down: item.signals.votesDown, interest: item.signals.votesInterest }}
+          />
+        </div>
+
         {/* Neden tavsiye ediyoruz */}
-        <div className="mt-5 rounded-xl bg-[var(--brand-soft)] p-4 text-sm leading-relaxed text-[var(--brand-ink)]">
+        <div className="mt-4 rounded-xl bg-[var(--brand-soft)] p-4 text-sm leading-relaxed text-[var(--brand-ink)]">
           <span className="font-bold">Neden tavsiye ediyoruz? </span>
           {item.whyRecommended}
         </div>

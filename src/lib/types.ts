@@ -19,17 +19,41 @@ export interface Category {
   description: string;
 }
 
+/**
+ * Rozetler koşullardan otomatik hesaplanır (bkz. lib/badges.ts) — `sponsorlu` hariç,
+ * o tek elle işaretlenen alandır. Elle rozet takılamaması bilinçli bir karardır.
+ */
 export type BadgeKey =
-  | "editor-secimi"
-  | "kullanici-tercihi"
-  | "fiyat-performans"
-  | "premium"
-  | "en-ekonomik"
-  | "en-cok-tercih"
-  | "yeni-yukselen"
-  | "dogrulanmis"
-  | "en-iyi-alternatif"
+  | "yukselen"
+  | "kategori-lideri"
+  | "toplulugun-secimi"
+  | "yeni-kesif"
+  | "zamana-direnen"
+  | "hype-tutmadi"
   | "sponsorlu";
+
+/**
+ * Puanlamayı besleyen ham sinyaller. Puan bunlardan doğrudan değil,
+ * her birinin kendi kategorisi içindeki yüzdelik diliminden hesaplanır.
+ */
+export interface ItemSignals {
+  /** Son 30 günde toplanan ilgi (görüntülenme + 3×favori + 5×karşılaştırma) */
+  interest30: number;
+  /** Önceki 30 günün aynı ölçüsü — ivme bu ikisinin oranıdır */
+  interestPrev30: number;
+  /** "Denedim, tavsiye ederim" */
+  votesUp: number;
+  /** "Denedim, tavsiye etmem" */
+  votesDown: number;
+  /** "İlgimi çekti" — deneyim yok, yalnızca niyet */
+  votesInterest: number;
+  /** Kaç haftadır izleniyor */
+  weeksTracked: number;
+  /** Bu haftaların kaçında kategorisinde üst dilimdeydi */
+  weeksTop: number;
+  /** Editör değerlendirmesi, 0-100 */
+  editor: number;
+}
 
 export interface Offer {
   id: string;
@@ -74,8 +98,16 @@ export interface Item {
   priceMin?: number; // hizmet: başlangıç fiyatı aralığı
   priceMax?: number;
   priceLevel?: 1 | 2 | 3 | 4; // mekân: ₺–₺₺₺₺
-  score: number; // 0-100 tavsiye puanı
-  scoreBreakdown: Record<string, number>; // bileşen anahtarı -> 0-100
+  /** Ham sinyaller — puanın kaynağı */
+  signals: ItemSignals;
+  /** 0-100 tavsiye puanı; kategori içi yüzdeliklerin ağırlıklı toplamı */
+  score: number;
+  /** Sinyal anahtarı -> kategori içi yüzdelik (0-100) */
+  scoreBreakdown: Record<string, number>;
+  /** Kategorideki sırası (1 = lider) — rozet koşulları bunu kullanır */
+  categoryRank: number;
+  /** Kategorideki toplam kayıt; örneklem küçükse puan güveni düşer */
+  categorySize: number;
   whyRecommended: string; // "Neden tavsiye ediyoruz?" açıklaması
   attrs: Record<string, string>; // tipe özel alanlar (görüntüleme için anahtar-değer)
   pros: string[];

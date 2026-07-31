@@ -13,6 +13,35 @@ export interface ItemFilters {
   minPrice?: number;
   badge?: string;
   maxPriceLevel?: number;
+  /**
+   * Gelişmiş filtre: her boyut için seçilen değerler.
+   * Aynı boyut içinde VEYA, boyutlar arasında VE mantığı uygulanır —
+   * "8 GB veya 12 GB RAM" ile "ve Samsung" gibi.
+   */
+  facets?: Record<string, string[]>;
+}
+
+/** Kaydın bir filtre boyutundaki değerlerini döndürür. */
+function facetValues(item: Item, param: string): string[] {
+  if (param === "rozet") return item.badges;
+  if (param === "marka") return item.brand ? [item.brand] : [];
+  if (param === "sehir") return item.city ? [item.city] : [];
+  if (param === "ilce") return item.district ? [item.district] : [];
+  if (param === "uygun") return item.suitableFor;
+  if (param.startsWith("oz.")) {
+    const v = item.attrs[param.slice(3)];
+    return v ? [v] : [];
+  }
+  return [];
+}
+
+function matchesFacets(item: Item, facets: Record<string, string[]>): boolean {
+  for (const [param, secilenler] of Object.entries(facets)) {
+    if (secilenler.length === 0) continue;
+    const mevcut = facetValues(item, param);
+    if (!secilenler.some((s) => mevcut.includes(s))) return false;
+  }
+  return true;
 }
 
 export type SortKey = "puan" | "fiyat-artan" | "fiyat-azalan" | "yorum" | "yeni";
@@ -120,6 +149,7 @@ export function filterItems(bundle: DataBundle, f: ItemFilters): Item[] {
     const price = effectivePrice(it);
     if (f.maxPrice && price !== undefined && price > f.maxPrice) return false;
     if (f.minPrice && price !== undefined && price < f.minPrice) return false;
+    if (f.facets && !matchesFacets(it, f.facets)) return false;
     if (f.q && !matchesQuery(it, f.q, catName.get(it.categorySlug) ?? "")) return false;
     return true;
   });

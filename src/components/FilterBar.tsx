@@ -3,7 +3,9 @@
 import { SlidersHorizontal, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BADGES } from "@/lib/badges";
+import type { Facet } from "@/lib/facets";
 import type { BadgeKey } from "@/lib/types";
+import { AdvancedFilters } from "./AdvancedFilters";
 import { Input, Select } from "./ui/Field";
 
 export interface FilterOptions {
@@ -13,6 +15,8 @@ export interface FilterOptions {
   brandLabel?: string;
   /** Sonuç sayısı çubuğun sağında gösterilir — ayrı satır harcanmaz. */
   resultCount?: number;
+  /** Kategorinin kendi verisinden çıkarılan gelişmiş filtre boyutları */
+  facets?: Facet[];
 }
 
 /** Kompakt alan: sabit genişlik + üstte küçük etiket. */
@@ -33,6 +37,7 @@ export function FilterBar({
   showPrice = true,
   brandLabel = "Marka",
   resultCount,
+  facets = [],
 }: FilterOptions) {
   const router = useRouter();
   const pathname = usePathname();
@@ -126,6 +131,10 @@ export function FilterBar({
           ))}
         </Select>
       </Field>
+
+      <div className="pb-1">
+        <AdvancedFilters facets={facets} />
+      </div>
 
       <div className="ml-auto flex items-center gap-3 pb-1">
         {activeKeys.length > 0 && (

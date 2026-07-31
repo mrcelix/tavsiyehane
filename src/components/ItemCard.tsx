@@ -11,6 +11,7 @@ import { BadgeChip } from "./BadgeChip";
 import { StarRating } from "./StarRating";
 import { CompareButton } from "./CompareButton";
 import { FavoriteButton } from "./FavoriteButton";
+import { VoteButtons } from "./VoteButtons";
 
 export function ItemCard({ item }: { item: Item }) {
   const loc = locationText(item);
@@ -77,7 +78,14 @@ export function ItemCard({ item }: { item: Item }) {
         </div>
       </Link>
 
-      <div className="flex items-center justify-between border-t border-[var(--line)] px-4 py-2">
+      <div className="border-t border-[var(--line)] px-4 py-2">
+        <VoteButtons
+          itemId={item.id}
+          counts={{ up: item.signals.votesUp, down: item.signals.votesDown, interest: item.signals.votesInterest }}
+          compact
+        />
+      </div>
+      <div className="flex items-center justify-between border-t border-[var(--line)] px-4 py-1.5">
         <CompareButton item={{ slug: item.slug, type: item.type, title: item.title }} />
         <FavoriteButton item={{ slug: item.slug, type: item.type, title: item.title }} />
       </div>

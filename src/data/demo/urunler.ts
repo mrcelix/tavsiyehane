@@ -38,7 +38,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Şarj adaptörü kutudan çıkmıyor", "Oyun performansı rakiplerinin gerisinde"],
     suitableFor: ["Uzun yıllar kullanacaklar", "İlk akıllı telefonunu alanlar", "Güvenli marka arayanlar"],
     notSuitableFor: ["Yüksek grafikli oyun oynayanlar"],
-    badges: ["editor-secimi", "kullanici-tercihi"],
     reviews: [
       { user: "Murat K.", rating: 5, comment: "İki aydır kullanıyorum, batarya rahat bir gün çıkarıyor. Ekranı bu fiyata rakipsiz.", verified: true, daysAgo: 12 },
       { user: "Elif S.", rating: 4, comment: "Kamera gündüz çok iyi, gece çekimleri idare eder. Kutu içeriği biraz fakir.", verified: true, daysAgo: 34 },
@@ -84,7 +83,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["MIUI/HyperOS reklam bildirimleri rahatsız edebiliyor", "Video stabilizasyonu orta seviye", "Güncelleme süresi Samsung'dan kısa"],
     suitableFor: ["Bütçesini en verimli kullanmak isteyenler", "Fotoğraf meraklıları"],
     notSuitableFor: ["Sade yazılım deneyimi isteyenler"],
-    badges: ["fiyat-performans"],
     reviews: [
       { user: "Seda A.", rating: 5, comment: "Fiyatına göre inanılmaz. Kamerası tatilde çok iş gördü.", verified: true, daysAgo: 20 },
       { user: "Oğuz D.", rating: 4, comment: "Telefon güzel ama ön yüklü uygulamaları silmekle uğraştım.", daysAgo: 45 },
@@ -130,7 +128,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Fiyat/donanım oranı Android rakiplerinden zayıf", "120 Hz ekran yok", "Şarj hızı yavaş"],
     suitableFor: ["Apple ekosistemi kullananlar", "Video çekenler", "Uzun vadeli yatırım yapanlar"],
     notSuitableFor: ["Bütçe öncelikliler", "Yüksek yenileme hızı arayanlar"],
-    badges: ["premium"],
     reviews: [
       { user: "Zeynep Y.", rating: 5, comment: "Android'den geçtim, video kalitesi bambaşka. Pili de beklediğimden iyi.", verified: true, daysAgo: 15 },
       { user: "Kaan B.", rating: 4, comment: "Harika telefon ama bu fiyata 60 Hz ekran üzücü.", daysAgo: 40 },
@@ -174,7 +171,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Şarj hızı segmentine göre yavaş", "Gövde biraz ağır"],
     suitableFor: ["Amiral gemisi isteyip bütçesini zorlamak istemeyenler", "iPhone alternatifi arayanlar"],
     notSuitableFor: ["Kompakt telefon sevenler"],
-    badges: ["en-iyi-alternatif"],
     reviews: [
       { user: "Deniz Ö.", rating: 5, comment: "S24 Ultra'dan tek eksiği S Pen. Kamerası gece bile çok iyi.", verified: true, daysAgo: 25 },
       { user: "Tolga E.", rating: 4, comment: "Isınma sorunu ilk güncellemeyle düzeldi, şu an gayet stabil.", daysAgo: 66 },
@@ -217,7 +213,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Servis ağı sınırlı", "Kamera düşük ışıkta zayıf", "Güncelleme takvimi belirsiz"],
     suitableFor: ["Dar bütçeliler", "Yedek telefon arayanlar", "Öğrenciler"],
     notSuitableFor: ["Uzun yıllar tek telefon kullanacaklar", "Kamera odaklılar"],
-    badges: ["en-ekonomik", "yeni-yukselen"],
     isSponsored: true,
     reviews: [
       { user: "Hakan V.", rating: 4, comment: "Bu paraya bu ekran gerçekten şaşırtıcı. Kamera vasat ama beklentim de yoktu.", daysAgo: 18 },
@@ -263,7 +258,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Paspas modülü sadece siler, ovalamaz", "İstasyon hacimli"],
     suitableFor: ["Evcil hayvanlılar", "Büyük evler", "Yoğun çalışanlar"],
     notSuitableFor: ["Derin halı temizliği bekleyenler"],
-    badges: ["editor-secimi", "en-cok-tercih"],
     reviews: [
       { user: "Pınar G.", rating: 5, comment: "İki kedili evde tüy derdimiz bitti. Haritalaması ilk turda oturdu.", verified: true, daysAgo: 9 },
       { user: "Cem U.", rating: 5, comment: "İstasyon torbası 6 haftada doldu, gerçekten unutuyorsunuz.", verified: true, daysAgo: 41 },
@@ -308,7 +302,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Halı algılama bazen geç tepki veriyor", "Uygulama arayüzü karışık"],
     suitableFor: ["İlk robot süpürgesini alanlar", "Orta bütçeliler", "Apartman daireleri"],
     notSuitableFor: ["Çok tüylü uzun halısı olanlar"],
-    badges: ["fiyat-performans", "kullanici-tercihi"],
     reviews: [
       { user: "Gökhan M.", rating: 5, comment: "Fiyat/istasyon dengesi rakipsiz. Ev her gün temiz.", verified: true, daysAgo: 14 },
       { user: "İrem T.", rating: 4, comment: "Uygulamayı çözmek biraz sürdü ama cihaz işini yapıyor.", daysAgo: 37 },
@@ -351,7 +344,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["İstasyon büyük ve gürültülü", "Sarf malzemeleri (torba, ped) maliyetli"],
     suitableFor: ["Sık paspas isteyenler", "Parke/seramik ağırlıklı evler"],
     notSuitableFor: ["Küçük evler (istasyon yer kaplar)", "Sarf maliyeti istemeyenler"],
-    badges: ["premium"],
     reviews: [
       { user: "Selin K.", rating: 5, comment: "Paspası kendisi yıkıyor, kokusuz kuruyor. Ev silinmiş kokuyor gerçekten.", verified: true, daysAgo: 22 },
       { user: "Emre F.", rating: 4, comment: "Harika cihaz ama torba fiyatları tuzlu. Yine de değer.", daysAgo: 49 },
@@ -394,7 +386,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Haritalama hafızası sınırlı", "Büyük evlerde rota verimsizleşiyor", "Toz haznesi küçük"],
     suitableFor: ["1+1 / 2+1 evler", "İlk deneme yapanlar", "Sessizlik önceliyenler"],
     notSuitableFor: ["Büyük veya çok odalı evler", "Evcil hayvan tüyü yoğun evler"],
-    badges: ["en-ekonomik"],
     reviews: [
       { user: "Fatma D.", rating: 4, comment: "Küçük evim için fazlasıyla yeterli. Sesi gerçekten az.", verified: true, daysAgo: 30 },
       { user: "Onur Ş.", rating: 4, comment: "Rota bazen karışıyor ama sonunda her yeri temizliyor.", daysAgo: 75 },
@@ -437,7 +428,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Çok pahalı", "İstasyon büyük", "Özelliklerin çoğu küçük evde atıl kalır"],
     suitableFor: ["Geniş ve karmaşık planlı evler", "Teknoloji meraklıları", "Premium arayanlar"],
     notSuitableFor: ["Bütçe öncelikliler", "Küçük daireler"],
-    badges: ["premium"],
     isSponsored: true,
     reviews: [
       { user: "Levent A.", rating: 5, comment: "Fiyatı can yakıyor ama ortada gerçekten başka bir lig var.", verified: true, daysAgo: 11 },
@@ -482,7 +472,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Pahalı", "Sadece veteriner önerisiyle kullanılmalı"],
     suitableFor: ["Gıda alerjisi teşhisi konmuş kediler", "Deri/kaşıntı sorunu yaşayanlar"],
     notSuitableFor: ["Sağlıklı kediler (gereksiz)", "Yavru kediler"],
-    badges: ["editor-secimi", "dogrulanmis"],
     reviews: [
       { user: "Ece L.", rating: 5, comment: "Kedimin kaşıntısı 3 haftada geçti, veterinerimiz de şaşırdı.", verified: true, daysAgo: 16 },
       { user: "Berk N.", rating: 4, comment: "Etkili ama fiyatı sürekli artıyor. Alternatifi de yok maalesef.", verified: true, daysAgo: 44 },
@@ -524,7 +513,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Filtre değişimi aylık maliyet", "Şeffaf hazne kireç izi gösteriyor"],
     suitableFor: ["Az su içen kediler", "Böbrek hassasiyeti olan kediler"],
     notSuitableFor: ["Elektrik kablosundan rahatsız olan evler"],
-    badges: ["kullanici-tercihi"],
     reviews: [
       { user: "Melis P.", rating: 5, comment: "Kedim musluktan su içiyordu, artık pınarından ayrılmıyor.", verified: true, daysAgo: 19 },
       { user: "Arda C.", rating: 4, comment: "Güzel ürün, filtre stoklamak lazım sadece.", daysAgo: 55 },
@@ -565,7 +553,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Torbası taşınırken ağır", "Beyaz zeminde ince iz bırakabiliyor"],
     suitableFor: ["Çok kedili evler", "Parfümden rahatsız olan kediler"],
     notSuitableFor: ["Silika kum alışkanlığı olan kediler"],
-    badges: ["en-ekonomik", "en-cok-tercih"],
     reviews: [
       { user: "Yasemin B.", rating: 5, comment: "3 kedili evde ayda 2 torba yetiyor. Koku tutmuyor.", verified: true, daysAgo: 8 },
       { user: "Umut G.", rating: 4, comment: "Toz gerçekten az. Tek eksisi torbanın sapsız olması.", daysAgo: 29 },
@@ -608,7 +595,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Kutusu büyük, kargo hasarı riski", "Montaj tek kişiyle zahmetli"],
     suitableFor: ["İri ırk kediler (British, Maine Coon)", "Çok kedili evler"],
     notSuitableFor: ["Küçük stüdyo daireler"],
-    badges: ["kullanici-tercihi"],
     reviews: [
       { user: "Sinem E.", rating: 5, comment: "6 kiloluk British'im üstünde zıplıyor, kılı kıpırdamıyor.", verified: true, daysAgo: 26 },
       { user: "Volkan T.", rating: 4, comment: "Kalitesi güzel, montajı biraz uğraştırdı.", daysAgo: 70 },
@@ -649,7 +635,6 @@ export const URUN_ITEMS: RawItem[] = [
     cons: ["Sadece kuru mama", "Uygulama ara ara bağlantı koparıyor"],
     suitableFor: ["Kilolu/diyetteki kediler", "Mesaisi uzun sahipler"],
     notSuitableFor: ["Yaş mama ile beslenen kediler"],
-    badges: ["yeni-yukselen"],
     reviews: [
       { user: "Kerem Z.", rating: 4, comment: "Kedim artık sabah 6'da beni değil makineyi rahatsız ediyor.", verified: true, daysAgo: 13 },
       { user: "Buse H.", rating: 4, comment: "Porsiyon ayarı diyet sürecimizi kurtardı. Uygulama bazen gecikmeli.", daysAgo: 39 },

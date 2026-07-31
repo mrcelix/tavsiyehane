@@ -39,7 +39,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Akşam yer bulmak zor", "Kart dışında yemek çeki geçmiyor"],
     suitableFor: ["Öğle yemeği arayan çalışanlar", "Ev yemeği özleyenler", "Vejetaryenler"],
     notSuitableFor: ["Uzun oturmalık özel gün yemeği arayanlar"],
-    badges: ["kullanici-tercihi", "en-cok-tercih"],
     reviews: [
       { user: "Görkem D.", rating: 5, comment: "Kereviz yemeğine bayıldım, anne yemeği tadında. Öğlenleri kuyruk oluyor, erken gidin.", verified: true, daysAgo: 5 },
       { user: "Selin R.", rating: 5, comment: "Fiyatlar Kadıköy ortalamasının altında, lezzet üstünde.", daysAgo: 27 },
@@ -81,7 +80,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Fiyatlar yükseldi", "Hafta sonu gürültülü", "Rezervasyonsuz girmek zor"],
     suitableFor: ["Et severler", "Kalabalık arkadaş grupları", "Özel gün kutlamaları"],
     notSuitableFor: ["Sessiz/romantik akşam arayanlar", "Bütçe öncelikliler"],
-    badges: ["editor-secimi"],
     reviews: [
       { user: "Kemal Y.", rating: 5, comment: "Ocakbaşında oturun, usta ne verirse yiyin. İstanbul'un en iyilerinden.", verified: true, daysAgo: 9 },
       { user: "Aslıhan P.", rating: 4, comment: "Etler mükemmel, hesap da mükemmel(!) — özel günler için uygun.", daysAgo: 35 },
@@ -122,7 +120,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Pazartesi kapalı", "Sezon balığı dışında seçenek azalıyor"],
     suitableFor: ["Balık severler", "Manzaralı akşam yemeği arayanlar", "Aile yemekleri"],
     notSuitableFor: ["Et/tavuk arayanlar (menüde yok denecek kadar az)"],
-    badges: ["kullanici-tercihi"],
     reviews: [
       { user: "Nesrin O.", rating: 5, comment: "Çipura taş gibiydi, ot tabağı şahane. Gün batımına denk getirin.", verified: true, daysAgo: 14 },
       { user: "Uğur B.", rating: 4, comment: "Balıklar taze, servis biraz yavaştı ama manzara affettiriyor.", daysAgo: 42 },
@@ -163,7 +160,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Park sorunu", "Küçük mekân, hafta sonu bekleme olabiliyor"],
     suitableFor: ["Veganlar ve vejetaryenler", "Gluten hassasiyeti olanlar", "Sağlıklı kahvaltı arayanlar"],
     notSuitableFor: ["Et yemeden doymam diyenler"],
-    badges: ["yeni-yukselen"],
     isSponsored: true,
     reviews: [
       { user: "Duygu Ş.", rating: 5, comment: "Vegan değilim ama buranın 'köftesi' için yol yapıyorum.", verified: true, daysAgo: 11 },
@@ -207,7 +203,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Öğlen saatlerinde masa bulmak zor", "Yemek menüsü sınırlı (atıştırmalık)"],
     suitableFor: ["Uzaktan çalışanlar", "Öğrenciler", "Toplantı yapacak serbest çalışanlar"],
     notSuitableFor: ["Kalabalık sohbet grupları (üst katta)", "Yemekli buluşmalar"],
-    badges: ["editor-secimi", "en-cok-tercih"],
     reviews: [
       { user: "Yağmur T.", rating: 5, comment: "Haftanın 3 günü ofisim burası. Sessiz katta kimse yüksek sesle konuşmuyor, inanılmaz.", verified: true, daysAgo: 4 },
       { user: "Berkay U.", rating: 5, comment: "İnternet hız testi 480 Mbps gösterdi. Kahve de iyi üstelik.", daysAgo: 22 },
@@ -248,7 +243,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Oturma alanı küçük", "Kart bazen sorun, nakit bulundurun"],
     suitableFor: ["Kahvaltıcılar", "Bütçe dostu arayanlar", "Paket alıp sahile inenler"],
     notSuitableFor: ["Uzun oturmalık çalışma", "Sessizlik arayanlar"],
-    badges: ["en-ekonomik", "kullanici-tercihi"],
     reviews: [
       { user: "Hasan G.", rating: 5, comment: "30 yıldır aynı lezzet. Poğaçanın sıcağına denk gelirseniz şanslısınız.", verified: true, daysAgo: 8 },
       { user: "Meltem D.", rating: 4, comment: "Fiyatlar inanılmaz makul. Oturacak yer bulmak şans işi.", daysAgo: 30 },
@@ -288,7 +282,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["İnternet video toplantıya yetmeyebilir", "Tatlı çeşidi az"],
     suitableFor: ["Kitap okuyanlar", "Sakin çalışma arayanlar", "Baş başa sohbet"],
     notSuitableFor: ["Kalabalık gruplar", "Video konferans yapacaklar"],
-    badges: ["kullanici-tercihi"],
     reviews: [
       { user: "Şeyma A.", rating: 5, comment: "Tezimi burada bitirdim desem yeridir. Huzur dolu bir yer.", verified: true, daysAgo: 18 },
       { user: "Alper E.", rating: 4, comment: "Kahveler güzel, wifi idare eder. Kitap kokusuna gelin zaten.", daysAgo: 44 },
@@ -328,7 +321,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Fiyatlar tatlıcı ortalamasının üstünde", "Pazartesi kapalı"],
     suitableFor: ["Çikolata tutkunları", "Çocuklu aileler (atölye)", "Hediye arayanlar"],
     notSuitableFor: ["Şeker diyetindekiler", "Hızlı kahve içip çıkacaklar"],
-    badges: ["yeni-yukselen"],
     reviews: [
       { user: "Pelin C.", rating: 5, comment: "Kızımla atölyeye katıldık, kendi çikolatasını yapıp eve götürdü. Harika deneyim.", verified: true, daysAgo: 13 },
       { user: "Onat K.", rating: 4, comment: "%70 tablet çok başarılı. Fiyatlar biraz cesur.", daysAgo: 39 },
@@ -371,7 +363,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Havuz/spa yok", "Cadde tarafı odalar trafiğe bakıyor"],
     suitableFor: ["İş seyahati", "Kongre/fuar ziyaretçileri", "Tek gecelik konaklama"],
     notSuitableFor: ["Tatil/resort deneyimi arayanlar"],
-    badges: ["kullanici-tercihi", "dogrulanmis"],
     reviews: [
       { user: "Serdar İ.", rating: 5, comment: "Sabah 6 uçağına yetişecektim, 5.30'da kahvaltı hazırdı. İş için ideali.", verified: true, daysAgo: 7 },
       { user: "Nil T.", rating: 4, comment: "Oda temiz, yatak rahat. Arka cephe isteyin, cadde gürültülü.", verified: true, daysAgo: 29 },
@@ -412,7 +403,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Asansör yok (tarihi bina)", "12 yaş altı kabul edilmiyor", "Oda sayısı az, erken dolar"],
     suitableFor: ["Çiftler", "Romantik hafta sonu", "Butik otel sevenler"],
     notSuitableFor: ["Küçük çocuklu aileler", "Valizle merdiven çıkamayacaklar"],
-    badges: ["editor-secimi"],
     reviews: [
       { user: "Bircan & Ali", rating: 5, comment: "Yıldönümümüzde kaldık, odaya küçük bir kutlama hazırlamışlar. Detaylara önem veriyorlar.", verified: true, daysAgo: 16 },
       { user: "Tuna S.", rating: 5, comment: "Avlu kahvaltısı başlı başına gelme sebebi.", daysAgo: 47 },
@@ -453,7 +443,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Akşam animasyon sesi geç saate kadar", "Yetişkin havuzu küçük", "Merkeze uzak, araç şart"],
     suitableFor: ["Çocuklu aileler", "Bebekli tatilciler", "Geniş aile grupları"],
     notSuitableFor: ["Sessiz/romantik tatil arayan çiftler"],
-    badges: ["en-cok-tercih"],
     isSponsored: true,
     reviews: [
       { user: "Özge F.", rating: 5, comment: "3 yaşındaki oğlum mini clubdan çıkmak istemedi. İlk kez tatilde kitap okuyabildim.", verified: true, daysAgo: 21 },
@@ -495,7 +484,6 @@ export const MEKAN_ITEMS: RawItem[] = [
     cons: ["Fiyatı yüksek (özellikle balon sezonu)", "Mağara odalar loş, aydınlık isteyene göre değil"],
     suitableFor: ["Balayı çiftleri", "Fotoğraf tutkunları", "Yurt dışından gelen misafirler"],
     notSuitableFor: ["Bütçe öncelikliler", "Klostrofobisi olanlar"],
-    badges: ["premium", "kullanici-tercihi"],
     reviews: [
       { user: "Gizem & Can", rating: 5, comment: "Balayımızda kaldık. Sabah terasta balonlar başımızın üstünden geçti, ömürlük anı.", verified: true, daysAgo: 12 },
       { user: "Emily R.", rating: 5, comment: "Sahipleri tüm turlarımızı ayarladı. Oda masal gibiydi.", daysAgo: 37 },

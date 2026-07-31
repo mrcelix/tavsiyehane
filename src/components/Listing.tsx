@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getBundle } from "@/lib/data";
 import { filterItems, sortItems, uniqueBrands, uniqueCities, type SortKey } from "@/lib/query";
+import { buildFacets } from "@/lib/facets";
 import type { ItemType } from "@/lib/types";
 import { FilterBar } from "./FilterBar";
 import { ItemGrid } from "./ItemGrid";
@@ -37,6 +38,17 @@ export async function Listing({
 }) {
   const bundle = await getBundle();
   const base = filterItems(bundle, { type, categorySlug, city, district });
+
+  // Gelişmiş filtre boyutları kategorinin kendi verisinden çıkarılır;
+  // sayımlar daima filtrelenmemiş kohortu gösterir.
+  const facets = buildFacets(base);
+  const secilenFacets: Record<string, string[]> = {};
+  for (const f of facets) {
+    const v = searchParams[f.param];
+    const dizi = Array.isArray(v) ? v : v ? [v] : [];
+    if (dizi.length) secilenFacets[f.param] = dizi;
+  }
+
   const filtered = filterItems(bundle, {
     type,
     categorySlug,
@@ -46,6 +58,7 @@ export async function Listing({
     maxPrice: n(searchParams.maksfiyat),
     minScore: n(searchParams.minpuan),
     badge: s(searchParams.rozet),
+    facets: secilenFacets,
   });
   const sorted = sortItems(filtered, (s(searchParams.sirala) as SortKey) ?? "puan");
 
@@ -68,6 +81,7 @@ export async function Listing({
             showPrice={type !== "mekan"}
             brandLabel={brandLabel ?? (type === "urun" ? "Marka" : "İşletme")}
             resultCount={sorted.length}
+            facets={facets}
           />
         </Suspense>
       </div>

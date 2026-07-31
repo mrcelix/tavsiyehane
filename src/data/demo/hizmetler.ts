@@ -40,7 +40,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Hafta sonları yoğun, erken randevu gerek", "Fiyatı ortalamalın biraz üstünde"],
     suitableFor: ["Düzenli (haftalık/aylık) temizlik isteyenler", "Kurumsal fatura isteyenler"],
     notSuitableFor: ["Aynı gün acil temizlik arayanlar"],
-    badges: ["editor-secimi", "dogrulanmis"],
     reviews: [
       { user: "Aslı V.", rating: 5, comment: "8 aydır iki haftada bir geliyorlar, hep aynı ekip. Güven sorunum hiç olmadı.", verified: true, daysAgo: 7 },
       { user: "Mehmet R.", rating: 5, comment: "Fiyat listesi sitede yazıyor, kapıda sürpriz yok. Bu sektörde büyük artı.", verified: true, daysAgo: 32 },
@@ -82,7 +81,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Fiyat keşif sonrası netleşiyor", "Anadolu Yakası'na gitmiyor", "Randevu süresi uzun"],
     suitableFor: ["Taşınanlar", "Alerjisi olanlar", "Yılda 1-2 kapsamlı temizlik yaptıranlar"],
     notSuitableFor: ["Rutin haftalık temizlik arayanlar (pahalı kalır)"],
-    badges: ["kullanici-tercihi"],
     reviews: [
       { user: "Nihan K.", rating: 5, comment: "İnşaat sonrası evi teslim aldılar, anahtar teslim pırıl pırıl ettiler.", verified: true, daysAgo: 21 },
       { user: "Serkan Y.", rating: 4, comment: "İşçilik kusursuz ama fiyatı keşiften önce öğrenememek eksi.", daysAgo: 50 },
@@ -123,7 +121,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Ekip her seferinde değişebiliyor", "Malzemeyi müşteri sağlıyor", "Sigorta belgesi sorulmalı"],
     suitableFor: ["Öğrenciler", "Küçük daireler", "Acil temizlik ihtiyacı"],
     notSuitableFor: ["Aynı ekip sürekliliği isteyenler"],
-    badges: ["en-ekonomik"],
     reviews: [
       { user: "Tuğçe M.", rating: 4, comment: "Aynı gün geldiler, fiyat da öğrenci dostu. Ekip değişkenliği tek eksi.", verified: true, daysAgo: 17 },
       { user: "Kadir P.", rating: 4, comment: "İki kere aldım, ikisinde de sorunsuzdu.", daysAgo: 43 },
@@ -164,7 +161,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Yaz sezonunda yoğunluk", "Merkez dışına yol ücreti ekleniyor"],
     suitableFor: ["Yazlık sahipleri", "İzmir çevre ilçelerde oturanlar"],
     notSuitableFor: ["Sezonda acil randevu arayanlar"],
-    badges: ["yeni-yukselen"],
     isSponsored: true,
     reviews: [
       { user: "Hülya S.", rating: 5, comment: "Urla'daki yazlığı bir günde oturulur hale getirdiler.", verified: true, daysAgo: 24 },
@@ -208,7 +204,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Ay sonu tarihleri erken doluyor", "En ucuz seçenek değil"],
     suitableFor: ["Değerli eşyası olanlar", "Şehirler arası taşınanlar", "Kurumsal taşınmalar"],
     notSuitableFor: ["Tek parça/küçük taşıma arayanlar"],
-    badges: ["editor-secimi", "dogrulanmis", "en-cok-tercih"],
     reviews: [
       { user: "Betül A.", rating: 5, comment: "İstanbul'dan İzmir'e tek çizik olmadan taşındık. Sözleşmedeki fiyattan kuruş sapmadı.", verified: true, daysAgo: 10 },
       { user: "Çağrı N.", rating: 5, comment: "Paketlemeleri müze taşır gibiydi. Fiyatı hak ediyor.", verified: true, daysAgo: 36 },
@@ -250,7 +245,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Büyük ev taşımada kapasite sınırlı", "Sigorta kapsamı dar"],
     suitableFor: ["Tek parça eşya taşıyanlar", "1+0/1+1 taşınmalar", "İkinci el eşya alım-satımı"],
     notSuitableFor: ["3+1 ve üzeri tam ev taşınması"],
-    badges: ["fiyat-performans", "yeni-yukselen"],
     reviews: [
       { user: "Eren S.", rating: 5, comment: "Çamaşır makinesini 3 saat içinde aldırıp yeni eve taşıttım. Süper pratik.", verified: true, daysAgo: 12 },
       { user: "Yaprak U.", rating: 4, comment: "Fiyat uygulamada yazdığı gibi çıktı. Küçük işler için birebir.", daysAgo: 46 },
@@ -291,7 +285,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Parsiyelde teslim tarihi esnek olabiliyor", "İletişim mesai saatleriyle sınırlı"],
     suitableFor: ["Ankara'dan başka şehre taşınanlar", "Eşyasını depolatmak isteyenler"],
     notSuitableFor: ["Kesin saatli teslimat bekleyenler (parsiyelde)"],
-    badges: ["dogrulanmis"],
     reviews: [
       { user: "Halil C.", rating: 4, comment: "Parsiyelle Antalya'ya yarı fiyata taşındım, 2 gün gecikme oldu ama haber verdiler.", verified: true, daysAgo: 28 },
       { user: "Melek J.", rating: 5, comment: "Tayin taşınmasında her şeyi onlar halletti. Kurum anlaşmalı fiyat da aldık.", daysAgo: 57 },
@@ -332,7 +325,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Bireysel tek gönderi için uygun değil", "Doğu illerinde teslim +1 gün"],
     suitableFor: ["Aylık 50+ gönderisi olan satıcılar", "Küçük e-ticaret işletmeleri"],
     notSuitableFor: ["Bireysel/nadir gönderim yapanlar"],
-    badges: ["fiyat-performans"],
     reviews: [
       { user: "Ozan E-Ticaret", rating: 4, comment: "Aylık kargo faturamız %30 düştü. Entegrasyon kurulumu 1 gün sürdü.", verified: true, daysAgo: 19 },
       { user: "Dilan Butik", rating: 4, comment: "Toplama saatleri düzenli. İade süreçleri biraz yavaş.", daysAgo: 48 },
@@ -375,7 +367,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Avrupa Yakası'na sınırlı gün gidiyor", "Klima servisi yok"],
     suitableFor: ["Garanti süresi dolmuş beyaz eşyalar", "Güvenilir usta arayanlar"],
     notSuitableFor: ["Garantisi süren cihazlar (yetkili servise gidin)"],
-    badges: ["editor-secimi", "kullanici-tercihi", "dogrulanmis"],
     reviews: [
       { user: "Nurcan B.", rating: 5, comment: "Bulaşık makinesine gelen usta önce fiyat söyledi, onay verince taktı. Eski parçayı da bıraktı.", verified: true, daysAgo: 6 },
       { user: "Tarık L.", rating: 5, comment: "İki yıldır buzdolabı sorunsuz, garantili iş yapıyorlar.", verified: true, daysAgo: 40 },
@@ -417,7 +408,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Yoğunlukta teslim süresi uzayabiliyor", "Orijinal parça bazı modellerde beklemeli"],
     suitableFor: ["Sıvı temaslı/açılmayan cihazlar", "Veri kurtarma ihtiyacı olanlar"],
     notSuitableFor: ["Garanti kapsamındaki cihazlar (garanti bozulur)"],
-    badges: ["kullanici-tercihi"],
     reviews: [
       { user: "Barış Ç.", rating: 5, comment: "MacBook'uma yetkili servis 45 bin dedi, burada 9 bine anakart tamiri yapıldı.", verified: true, daysAgo: 15 },
       { user: "İpek H.", rating: 5, comment: "Denize düşen telefondan tüm fotoğrafları kurtardılar. Minnettarım.", verified: true, daysAgo: 38 },
@@ -459,7 +449,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Yaz aylarında randevu 1 haftayı bulabiliyor", "Mesai dışı acil servis ücretli"],
     suitableFor: ["Yeni klima taktıracaklar", "Yıllık bakım yaptıranlar"],
     notSuitableFor: ["Anında acil müdahale bekleyenler (sezonda)"],
-    badges: ["dogrulanmis"],
     reviews: [
       { user: "Rasim T.", rating: 5, comment: "Montajda duvar delme dahil her şey özenliydi, su damlatma sorunu hiç yaşamadık.", verified: true, daysAgo: 23 },
       { user: "Leyla F.", rating: 4, comment: "Bakım güzeldi; temmuzda randevu bulmak zor, baharda yaptırın.", daysAgo: 54 },
@@ -500,7 +489,6 @@ export const HIZMET_ITEMS: RawItem[] = [
     cons: ["Parça fiyatları yerinde netleşiyor", "Yoğun günlerde usta kalitesi değişken"],
     suitableFor: ["Acil arıza durumları", "Kış öncesi bakım"],
     notSuitableFor: ["Marka garantisi devam eden kombiler"],
-    badges: ["en-cok-tercih"],
     isSponsored: true,
     reviews: [
       { user: "Veli K.", rating: 5, comment: "Gece 23'te aradım, 1 saatte geldiler. Kar kış demediler.", verified: true, daysAgo: 33 },

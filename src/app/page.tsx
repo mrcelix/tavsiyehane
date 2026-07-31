@@ -69,8 +69,9 @@ export const metadata: Metadata = pageMetadata({
 
 export default async function HomePage() {
   const bundle = await getBundle();
+  // Kategori liderleri: her kategoride birinci sıradakiler, puana göre.
   const editorPicks = sortItems(
-    bundle.items.filter((i) => i.badges.includes("editor-secimi")),
+    bundle.items.filter((i) => i.categoryRank === 1),
     "puan"
   ).slice(0, 4);
 
@@ -236,8 +237,10 @@ export default async function HomePage() {
       {/* Editör seçimleri */}
       <section className="mx-auto max-w-[1220px] px-6 py-6">
         <div className="mb-6">
-          <h2 className="text-2xl font-extrabold tracking-tight">Editör Seçimleri</h2>
-          <p className="mt-1 text-sm text-[var(--muted)]">Her kategoride bağımsız incelemeyle öne çıkanlar</p>
+          <h2 className="text-2xl font-extrabold tracking-tight">Kategori Liderleri</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Kendi kategorisinde birinci sırada olanlar — sıralama her gün yeniden hesaplanır
+          </p>
         </div>
         <ItemGrid items={editorPicks} />
       </section>

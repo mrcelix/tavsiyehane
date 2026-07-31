@@ -17,6 +17,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/ara?sihirbaz=1", label: "İhtiyaç sihirbazı" },
       { href: "/karsilastir", label: "Karşılaştırma" },
       { href: "/favoriler", label: "Favoriler" },
+      { href: "/metodoloji", label: "Nasıl puanlıyoruz" },
       { href: "/isletme", label: "İşletmeniz için" },
     ],
   },
