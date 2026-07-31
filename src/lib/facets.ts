@@ -87,9 +87,12 @@ export function buildFacets(items: Item[]): Facet[] {
     if (degerler.length < items.length / 2) continue;
     const v = say(degerler);
     if (v.length < MIN_DISTINCT || v.length > MAX_DISTINCT) continue;
-    // Her değeri tek kayda ait olan alan filtre değildir, listedir (ör. "Adres").
-    // En az bir değerin birden çok kaydı gruplaması gerekir.
-    if (v[0].count < 2) continue;
+    // Kayıtları gerçekten gruplamayan alan filtre değildir, listedir (ör. "Adres").
+    // Ölçüt: kayıtların en az yarısı, birden çok kaydın paylaştığı bir değerde olmalı.
+    // "Adres"te iki kayıt tesadüfen aynı semtte olsa bile kalan altısı tekil kalır
+    // ve alan elenir; "Garanti"de kayıtların çoğu birkaç değerde toplandığı için kalır.
+    const gruplanan = v.reduce((t, x) => (x.count > 1 ? t + x.count : t), 0);
+    if (gruplanan < items.length / 2) continue;
     out.push({ param: `oz.${alan}`, label: alan, values: v });
   }
 
