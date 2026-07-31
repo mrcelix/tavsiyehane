@@ -243,7 +243,7 @@ export const HIZMET_ITEMS: RawItem[] = [
     },
     pros: ["Aynı gün hizmet", "Uygulamadan net fiyat", "Küçük işler için ideal ölçek"],
     cons: ["Büyük ev taşımada kapasite sınırlı", "Sigorta kapsamı dar"],
-    suitableFor: ["Tek parça eşya taşıyanlar", "1+0/1+1 taşınmalar", "İkinci el eşya alım-satımı"],
+    suitableFor: ["Tek parça eşya taşıyanlar", "1+0 / 1+1 taşınmalar", "İkinci el eşya alım-satımı"],
     notSuitableFor: ["3+1 ve üzeri tam ev taşınması"],
     reviews: [
       { user: "Eren S.", rating: 5, comment: "Çamaşır makinesini 3 saat içinde aldırıp yeni eve taşıttım. Süper pratik.", verified: true, daysAgo: 12 },

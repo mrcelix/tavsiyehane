@@ -21,13 +21,16 @@ for (const cat of bundle.categories) {
   }
 }
 
-// Örnek bir filtre uygulaması
-const telefonlar = bundle.items.filter((i) => i.categorySlug === "telefon");
-const ram8 = filterItems(bundle, { categorySlug: "telefon", facets: { "oz.RAM": ["8 GB"] } });
-const ikiDeger = filterItems(bundle, {
-  categorySlug: "telefon",
-  facets: { "oz.RAM": ["8 GB"], marka: ["Samsung"] },
-});
-console.log(`\nÖrnek: telefon ${telefonlar.length} kayıt`);
-console.log(`   RAM=8 GB           -> ${ram8.length}`);
-console.log(`   RAM=8 GB + Samsung -> ${ikiDeger.length}  (boyutlar arası VE)`);
+// Örnek filtre uygulamaları. Panelde gösterilen değerler normalize edilmiştir
+// (bkz. lib/attrs.ts); eşleştirmenin de aynı normalizasyondan geçtiğini
+// buradan doğruluyoruz — "120 Hz" hiçbir kayıtta birebir yazmıyor.
+const say = (categorySlug: string, facets: Record<string, string[]>) =>
+  filterItems(bundle, { categorySlug, facets }).length;
+
+console.log(`\nÖrnek filtreler (telefon ${bundle.items.filter((i) => i.categorySlug === "telefon").length} kayıt)`);
+console.log(`   Ekran=120 Hz                    -> ${say("telefon", { "oz.Ekran": ["120 Hz"] })}`);
+console.log(`   Ekran=120 Hz + Depolama=256 GB  -> ${say("telefon", { "oz.Ekran": ["120 Hz"], "oz.Depolama": ["256 GB"] })}  (boyutlar arası VE)`);
+console.log(`   Kamera=50 MP veya 108 MP        -> ${say("telefon", { "oz.Kamera": ["50 MP", "108 MP"] })}  (boyut içinde VEYA)`);
+console.log(`\nÖrnek filtreler (usta-tamirat)`);
+console.log(`   Deneyim=15 yıl ve üzeri         -> ${say("usta-tamirat", { "oz.Deneyim": ["15 yıl ve üzeri"] })}`);
+console.log(`   Keşif=Ücretsiz                  -> ${say("usta-tamirat", { "oz.Keşif": ["Ücretsiz"] })}`);

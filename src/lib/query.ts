@@ -1,4 +1,5 @@
 import type { DataBundle, Item, ItemType } from "./types";
+import { attrFacetValues } from "./attrs";
 import { slugify } from "./format";
 
 export interface ItemFilters {
@@ -29,8 +30,10 @@ function facetValues(item: Item, param: string): string[] {
   if (param === "ilce") return item.district ? [item.district] : [];
   if (param === "uygun") return item.suitableFor;
   if (param.startsWith("oz.")) {
-    const v = item.attrs[param.slice(3)];
-    return v ? [v] : [];
+    // Panelde normalize edilmiş değerler gösterilir; eşleştirme de aynı
+    // fonksiyondan geçmeli, yoksa seçilen filtre hiçbir kaydı getirmez.
+    const alan = param.slice(3);
+    return attrFacetValues(alan, item.attrs[alan]);
   }
   return [];
 }

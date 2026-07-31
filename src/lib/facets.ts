@@ -1,3 +1,4 @@
+import { attrFacetValues } from "./attrs";
 import { BADGES } from "./badges";
 import type { BadgeKey, Item } from "./types";
 
@@ -20,8 +21,8 @@ export interface Facet {
 
 /** Bir alanın filtre olarak anlamlı olması için gereken en az farklı değer sayısı. */
 const MIN_DISTINCT = 2;
-/** Çok fazla farklı değeri olan alanlar (serbest metin) filtreye uygun değildir. */
-const MAX_DISTINCT = 12;
+/** Panelde bir boyut altında gösterilecek en fazla değer; kalanı kuyrukta kalır. */
+const MAX_GOSTERILEN = 16;
 
 function say(values: (string | undefined)[]): FacetValue[] {
   const m = new Map<string, number>();
@@ -73,27 +74,32 @@ export function buildFacets(items: Item[]): Facet[] {
     out.push({ param: "uygun", label: "Kimler için uygun", values: uygun.slice(0, 14) });
   }
 
-  // Kategoriye özel alanlar: kayıtların çoğunda bulunan ve makul sayıda değeri olanlar
-  const alanlar = new Map<string, (string | undefined)[]>();
+  // Kategoriye özel alanlar. Ham metin filtreye uygun olmadığı için değerler önce
+  // normalize edilir (bkz. lib/attrs.ts): "Var (basit ped)" -> Var,
+  // "2 yıl resmi distribütör" -> 2 yıl, "12 yıl" -> 10-14 yıl.
+  const alanlar = new Map<string, string[][]>();
   for (const it of items) {
-    for (const [k, v] of Object.entries(it.attrs)) {
-      const dizi = alanlar.get(k) ?? [];
-      dizi.push(v);
-      alanlar.set(k, dizi);
+    for (const alan of Object.keys(it.attrs)) {
+      const degerler = attrFacetValues(alan, it.attrs[alan]);
+      if (degerler.length === 0) continue;
+      alanlar.set(alan, [...(alanlar.get(alan) ?? []), degerler]);
     }
   }
-  for (const [alan, degerler] of alanlar) {
+
+  for (const [alan, kayitDegerleri] of alanlar) {
     // Alan kayıtların en az yarısında bulunmalı
-    if (degerler.length < items.length / 2) continue;
-    const v = say(degerler);
-    if (v.length < MIN_DISTINCT || v.length > MAX_DISTINCT) continue;
-    // Kayıtları gerçekten gruplamayan alan filtre değildir, listedir (ör. "Adres").
-    // Ölçüt: kayıtların en az yarısı, birden çok kaydın paylaştığı bir değerde olmalı.
-    // "Adres"te iki kayıt tesadüfen aynı semtte olsa bile kalan altısı tekil kalır
-    // ve alan elenir; "Garanti"de kayıtların çoğu birkaç değerde toplandığı için kalır.
-    const gruplanan = v.reduce((t, x) => (x.count > 1 ? t + x.count : t), 0);
-    if (gruplanan < items.length / 2) continue;
-    out.push({ param: `oz.${alan}`, label: alan, values: v });
+    if (kayitDegerleri.length < items.length / 2) continue;
+    const v = say(kayitDegerleri.flat());
+    if (v.length < MIN_DISTINCT) continue;
+
+    // Kayıtları gerçekten gruplamayan alan filtre değildir, listedir (ör. "İşlemci":
+    // her telefonda başka bir yonga). Ölçüt: kayıtların en az yarısı, en az bir
+    // değerini başka bir kayıtla paylaşmalı.
+    const gruplayan = new Set(v.filter((x) => x.count > 1).map((x) => x.value));
+    const kapsanan = kayitDegerleri.filter((d) => d.some((x) => gruplayan.has(x))).length;
+    if (kapsanan < items.length / 2) continue;
+
+    out.push({ param: `oz.${alan}`, label: alan, values: v.slice(0, MAX_GOSTERILEN) });
   }
 
   return out;
