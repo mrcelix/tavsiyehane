@@ -49,16 +49,67 @@ Ardından `/panel` üzerinden yorum moderasyonu, sponsorluk ve içerik yönetimi
 3. Client ID + Secret'ı Supabase → **Authentication → Providers → Google**'a yapıştırıp etkinleştirin.
 4. E-posta/şifre girişi bu kurulum olmadan da çalışır.
 
+## Cloudflare'e dağıtım
+
+Site **Cloudflare Workers** üzerinde çalışacak şekilde yapılandırıldı ([OpenNext adaptörü](https://opennext.js.org/cloudflare) ile).
+
+> **Neden Pages değil Workers?** Cloudflare ve Next.js ekibi Next.js için artık Workers + OpenNext'i
+> öneriyor. Pages tarafındaki `@cloudflare/next-on-pages` yalnızca Edge runtime destekliyor ve bakım
+> modunda. Workers da aynı panelde yönetilir, özel alan adı ve ücretsiz plan aynı şekilde geçerlidir.
+
+### Panelden (GitHub'a bağlı, otomatik dağıtım)
+
+1. Cloudflare panel → **Workers & Pages → Create → Workers → Import a repository**, `tavsiyehane` deposunu seçin.
+2. Derleme ayarları:
+   - **Build command:** `npm run cf:build`
+   - **Deploy command:** `npx wrangler deploy`
+3. **Settings → Variables and Secrets** altına Supabase değerlerini ekleyin (aşağıya bakın), sonra yeniden dağıtın.
+
+### Terminalden (tek seferlik)
+
+```bash
+npx wrangler login
+npm run cf:deploy
+```
+
+Dağıtmadan önce yerelde gerçek Workers runtime'ında denemek için:
+
+```bash
+npm run cf:preview
+```
+
+### Ortam değişkenleri
+
+| Değişken | Nerede gerekir | Not |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | **Derleme anında** | `NEXT_PUBLIC_` ile başlayan değişkenler derlemede koda gömülür; Cloudflare'de *build* değişkeni olarak tanımlanmalı. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Derleme anında** | Aynı şekilde. Bu anahtar zaten tarayıcıya açıktır, gizli değildir. |
+| `NEXT_PUBLIC_SITE_URL` | İsteğe bağlı | Ayarlanmazsa site adresi isteğin kendi alan adından türetilir. Özel alan adında canonical adresi sabitlemek için tanımlayın. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Gerekmez** | Yalnızca yerelde `npm run seed` için. Cloudflare'e **eklemeyin**. |
+
+Supabase anahtarları tanımlanmazsa site üretimde de demo veriyle sorunsuz açılır.
+
+### Bilinen kısıt
+
+Next.js 16 `middleware.ts`'i `proxy.ts` olarak yeniden adlandırdı ve Proxy'yi zorunlu olarak Node.js
+runtime'da çalıştırıyor; OpenNext adaptörü bunu henüz desteklemiyor. Bu nedenle oturum tazeleme katmanı
+bilinçli olarak eski `src/middleware.ts` sözleşmesinde tutuluyor — derlemede bir deprecation uyarısı
+verir ama çalışır. Adaptör desteği geldiğinde dosya `proxy.ts`, fonksiyon `proxy` olarak geri alınmalı.
+Takip: [workers-sdk#13755](https://github.com/cloudflare/workers-sdk/issues/13755).
+
 ## Komutlar
 
-| Komut               | Açıklama                                   |
-| ------------------- | ------------------------------------------ |
-| `npm run dev`       | Geliştirme sunucusu                        |
-| `npm run build`     | Üretim derlemesi                           |
-| `npm run start`     | Üretim sunucusu                            |
-| `npm run lint`      | ESLint                                     |
-| `npm run typecheck` | Yalnızca TypeScript tip kontrolü           |
-| `npm run seed`      | Demo verisini Supabase'e yükler            |
+| Komut               | Açıklama                                        |
+| ------------------- | ----------------------------------------------- |
+| `npm run dev`       | Geliştirme sunucusu                             |
+| `npm run build`     | Üretim derlemesi                                |
+| `npm run start`     | Üretim sunucusu (Node.js)                       |
+| `npm run lint`      | ESLint                                          |
+| `npm run typecheck` | Yalnızca TypeScript tip kontrolü                |
+| `npm run seed`      | Demo verisini Supabase'e yükler                 |
+| `npm run cf:build`  | Cloudflare Worker paketini üretir               |
+| `npm run cf:preview`| Worker'ı yerelde gerçek runtime ile çalıştırır  |
+| `npm run cf:deploy` | Derleyip Cloudflare'e dağıtır                   |
 
 ## Mimari özeti
 

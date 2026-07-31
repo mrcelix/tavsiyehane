@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Cloudflare adaptörünün ürettiği paket — lint edilmemeli
+    ".open-next/**",
+    ".wrangler/**",
   ]),
 ]);
 

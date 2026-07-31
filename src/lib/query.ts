@@ -82,16 +82,16 @@ export function searchItems(bundle: DataBundle, q: string): Item[] {
       continue;
     }
 
-    const tiers: { text: string; weight: number }[] = [
+    const tiers = [
       { text: [item.title, item.brand, catName.get(item.categorySlug) ?? ""].join(" ").toLocaleLowerCase("tr"), weight: 3 },
       { text: [item.description, item.city, item.district, ...item.suitableFor].join(" ").toLocaleLowerCase("tr"), weight: 2 },
       { text: Object.values(item.attrs).join(" ").toLocaleLowerCase("tr"), weight: 1 },
-    ].map((t) => ({ ...t, slug: slugify(t.text) })) as { text: string; weight: number; slug: string }[];
+    ].map((t) => ({ ...t, slug: slugify(t.text) }));
 
     let relevance = 0;
     let allMatched = true;
     for (const word of words) {
-      const tier = tiers.find((t) => wordMatches(t.text, (t as { slug: string }).slug, word));
+      const tier = tiers.find((t) => wordMatches(t.text, t.slug, word));
       if (!tier) {
         allMatched = false;
         break;

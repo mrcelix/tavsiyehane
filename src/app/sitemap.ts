@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 import { getBundle } from "@/lib/data";
 import { itemHref } from "@/lib/routes";
 import { slugify } from "@/lib/format";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+import { getSiteUrl } from "@/lib/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const BASE = await getSiteUrl();
   const bundle = await getBundle();
   const now = new Date();
 

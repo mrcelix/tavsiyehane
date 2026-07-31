@@ -42,3 +42,8 @@ next-env.d.ts
 
 # ornek env dosyasi repoya dahil
 !.env.local.example
+
+# cloudflare (opennext adaptoru)
+.open-next/
+.wrangler/
+worker-configuration.d.ts
