@@ -24,11 +24,11 @@ export function ClaimForm() {
       }}
       className="grid gap-3 sm:grid-cols-2"
     >
-      <Input required placeholder="İşletme adı" aria-label="İşletme adı" />
-      <Input required placeholder="Yetkili adı soyadı" aria-label="Yetkili adı soyadı" />
-      <Input required type="email" placeholder="Kurumsal e-posta" aria-label="Kurumsal e-posta" />
-      <Input required type="tel" placeholder="Telefon" aria-label="Telefon" />
-      <Select required defaultValue="" aria-label="Kategori" className="sm:col-span-2">
+      <Input required placeholder="İşletme adı" aria-label="İşletme adı" className="w-full" />
+      <Input required placeholder="Yetkili adı soyadı" aria-label="Yetkili adı soyadı" className="w-full" />
+      <Input required type="email" placeholder="Kurumsal e-posta" aria-label="Kurumsal e-posta" className="w-full" />
+      <Input required type="tel" placeholder="Telefon" aria-label="Telefon" className="w-full" />
+      <Select required defaultValue="" aria-label="Kategori" className="w-full sm:col-span-2">
         <option value="" disabled>
           Kategori seçin
         </option>
@@ -44,9 +44,9 @@ export function ClaimForm() {
         rows={3}
         placeholder="Kısaca işletmenizi tanıtın (isteğe bağlı)"
         aria-label="İşletme tanıtımı"
-        className="sm:col-span-2"
+        className="w-full sm:col-span-2"
       />
-      <Button type="submit" variant="primary" size="lg" className="sm:col-span-2">
+      <Button type="submit" variant="primary" size="lg" className="w-full sm:col-span-2">
         <Send size={15} />
         Başvuruyu Gönder
       </Button>

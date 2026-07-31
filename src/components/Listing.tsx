@@ -51,22 +51,23 @@ export async function Listing({
 
   return (
     <div className="mx-auto max-w-[1220px] px-6 py-10">
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-[28px]">{title}</h1>
         {subtitle && <p className="mt-1.5 max-w-3xl text-[var(--muted)]">{subtitle}</p>}
-        <p className="mt-1.5 text-sm text-[var(--muted-2)]">
-          <span className="font-num font-semibold text-[var(--ink-2)]">{sorted.length}</span> sonuç · Puanlar{" "}
-          {type === "urun" ? "ürün" : type === "hizmet" ? "hizmet" : "mekân"} kriterlerine göre ağırlıklandırılır
+        <p className="mt-1 text-[13px] text-[var(--muted-2)]">
+          Puanlar {type === "urun" ? "ürün" : type === "hizmet" ? "hizmet" : "mekân"} kriterlerine göre
+          ağırlıklandırılır
         </p>
       </div>
 
-      <div className="mb-6 rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-3 shadow-[var(--shadow-card)]">
+      <div className="mb-6 rounded-[14px] border border-[var(--line)] bg-[var(--card)] px-3 py-2.5 shadow-[var(--shadow-card)]">
         <Suspense>
           <FilterBar
             brands={uniqueBrands(base)}
             cities={city ? [] : uniqueCities(bundle, type)}
             showPrice={type !== "mekan"}
             brandLabel={brandLabel ?? (type === "urun" ? "Marka" : "İşletme")}
+            resultCount={sorted.length}
           />
         </Suspense>
       </div>

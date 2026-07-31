@@ -85,6 +85,7 @@ export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType })
         onChange={(e) => setComment(e.target.value)}
         rows={3}
         placeholder="Deneyiminizi paylaşın…"
+        className="w-full"
       />
 
       <div className="flex flex-wrap items-center gap-3">

@@ -75,8 +75,10 @@ export function HeroPicker({ categories, citiesByType }: Props) {
   return (
     <form
       onSubmit={submit}
-      className="mx-auto w-full max-w-3xl rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-5"
+      className="mx-auto w-full max-w-xl rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-5 lg:max-w-none"
     >
+      <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">Seçerek bul</p>
+
       {/* Tip seçimi */}
       <div
         role="tablist"
@@ -103,12 +105,13 @@ export function HeroPicker({ categories, citiesByType }: Props) {
         ))}
       </div>
 
-      <div className={cn("grid gap-3", showCity ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3")}>
+      {/* Dar sütunda iki kolon; tek sütuna düşmesi için ekstra kırılım yok. */}
+      <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label htmlFor="hp-kategori" className={LABEL}>
             Kategori
           </label>
-          <Select id="hp-kategori" value={category} onChange={(e) => setCategory(e.target.value)}>
+          <Select id="hp-kategori" className="w-full" value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="">Hepsi</option>
             {cats.map((c) => (
               <option key={c.slug} value={c.slug}>
@@ -123,7 +126,7 @@ export function HeroPicker({ categories, citiesByType }: Props) {
             Bütçe
           </label>
           {type === "mekan" ? (
-            <Select id="hp-butce" value={budget} onChange={(e) => setBudget(e.target.value)}>
+            <Select id="hp-butce" className="w-full" value={budget} onChange={(e) => setBudget(e.target.value)}>
               <option value="">Fark etmez</option>
               {PRICE_LEVELS.map((o) => (
                 <option key={o.v} value={o.v}>
@@ -140,7 +143,7 @@ export function HeroPicker({ categories, citiesByType }: Props) {
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
               placeholder="Üst sınır (TL)"
-              className="font-num"
+              className="w-full font-num"
             />
           )}
         </div>
@@ -150,7 +153,7 @@ export function HeroPicker({ categories, citiesByType }: Props) {
             <label htmlFor="hp-sehir" className={LABEL}>
               Şehir
             </label>
-            <Select id="hp-sehir" value={city} onChange={(e) => setCity(e.target.value)}>
+            <Select id="hp-sehir" className="w-full" value={city} onChange={(e) => setCity(e.target.value)}>
               <option value="">Tümü</option>
               {cities.map((c) => (
                 <option key={c} value={c}>
@@ -165,7 +168,7 @@ export function HeroPicker({ categories, citiesByType }: Props) {
           <label htmlFor="hp-oncelik" className={LABEL}>
             Önceliğin
           </label>
-          <Select id="hp-oncelik" value={priority} onChange={(e) => setPriority(e.target.value)}>
+          <Select id="hp-oncelik" className="w-full" value={priority} onChange={(e) => setPriority(e.target.value)}>
             <option value="">Genel tavsiye puanı</option>
             {PRIORITIES[type].map((o) => (
               <option key={o.key} value={o.key}>
@@ -176,16 +179,15 @@ export function HeroPicker({ categories, citiesByType }: Props) {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-[var(--muted)]">
-          Seçimlerin, {type === "urun" ? "ürün" : type === "hizmet" ? "hizmet" : "mekân"} kategorisine özel puanlama
-          modeliyle sıralanır.
-        </p>
-        <Button type="submit" variant="gold" size="lg" shine className="font-bold">
-          <Sparkles size={16} />
-          Tavsiye Getir
-        </Button>
-      </div>
+      {/* Dar sütunda buton tam genişlik; açıklama altında kalır. */}
+      <Button type="submit" variant="gold" size="lg" shine className="mt-4 w-full font-bold">
+        <Sparkles size={16} />
+        Tavsiye Getir
+      </Button>
+      <p className="mt-2.5 text-xs text-[var(--muted)]">
+        Seçimlerin, {type === "urun" ? "ürün" : type === "hizmet" ? "hizmet" : "mekân"} kategorisine özel puanlama
+        modeliyle sıralanır.
+      </p>
     </form>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BADGES } from "@/lib/badges";
 import type { BadgeKey } from "@/lib/types";
@@ -11,9 +11,29 @@ export interface FilterOptions {
   cities?: string[];
   showPrice?: boolean;
   brandLabel?: string;
+  /** Sonuç sayısı çubuğun sağında gösterilir — ayrı satır harcanmaz. */
+  resultCount?: number;
 }
 
-export function FilterBar({ brands = [], cities = [], showPrice = true, brandLabel = "Marka" }: FilterOptions) {
+/** Kompakt alan: sabit genişlik + üstte küçük etiket. */
+function Field({ label, width, children }: { label: string; width: string; children: React.ReactNode }) {
+  return (
+    <label className={`flex shrink-0 flex-col gap-1 ${width}`}>
+      <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-2)]">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+const CTRL = "h-9 w-full text-[13px]";
+
+export function FilterBar({
+  brands = [],
+  cities = [],
+  showPrice = true,
+  brandLabel = "Marka",
+  resultCount,
+}: FilterOptions) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -25,102 +45,105 @@ export function FilterBar({ brands = [], cities = [], showPrice = true, brandLab
     router.replace(`${pathname}?${next.toString()}`, { scroll: false });
   }
 
-  const hasFilters = ["sirala", "sehir", "marka", "maksfiyat", "minpuan", "rozet"].some((k) => params.get(k));
+  const activeKeys = ["sehir", "marka", "maksfiyat", "minpuan", "rozet"].filter((k) => params.get(k));
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Select
-        value={params.get("sirala") ?? "puan"}
-        onChange={(e) => set("sirala", e.target.value)}
-        aria-label="Sıralama"
-        className="w-auto"
-      >
-        <option value="puan">Tavsiye puanı</option>
-        <option value="fiyat-artan">Fiyat (artan)</option>
-        <option value="fiyat-azalan">Fiyat (azalan)</option>
-        <option value="yorum">Yorum sayısı</option>
-        <option value="yeni">Son güncellenen</option>
-      </Select>
+    <div className="flex flex-wrap items-end gap-x-2 gap-y-3">
+      <SlidersHorizontal size={15} className="mb-2.5 hidden shrink-0 text-[var(--muted-2)] sm:block" />
+
+      <Field label="Sırala" width="w-[152px]">
+        <Select
+          value={params.get("sirala") ?? "puan"}
+          onChange={(e) => set("sirala", e.target.value)}
+          aria-label="Sıralama"
+          className={CTRL}
+        >
+          <option value="puan">Tavsiye puanı</option>
+          <option value="fiyat-artan">Fiyat (artan)</option>
+          <option value="fiyat-azalan">Fiyat (azalan)</option>
+          <option value="yorum">Yorum sayısı</option>
+          <option value="yeni">Son güncellenen</option>
+        </Select>
+      </Field>
 
       {cities.length > 0 && (
-        <Select
-          value={params.get("sehir") ?? ""}
-          onChange={(e) => set("sehir", e.target.value)}
-          aria-label="Şehir"
-          className="w-auto"
-        >
-          <option value="">Tüm şehirler</option>
-          {cities.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </Select>
+        <Field label="Şehir" width="w-[130px]">
+          <Select value={params.get("sehir") ?? ""} onChange={(e) => set("sehir", e.target.value)} aria-label="Şehir" className={CTRL}>
+            <option value="">Tümü</option>
+            {cities.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </Select>
+        </Field>
       )}
 
       {brands.length > 0 && (
-        <Select
-          value={params.get("marka") ?? ""}
-          onChange={(e) => set("marka", e.target.value)}
-          aria-label={brandLabel}
-          className="w-auto"
-        >
-          <option value="">Tüm {brandLabel.toLocaleLowerCase("tr")}lar</option>
-          {brands.map((b) => (
-            <option key={b} value={b}>
-              {b}
-            </option>
-          ))}
-        </Select>
+        <Field label={brandLabel} width="w-[150px]">
+          <Select value={params.get("marka") ?? ""} onChange={(e) => set("marka", e.target.value)} aria-label={brandLabel} className={CTRL}>
+            <option value="">Tümü</option>
+            {brands.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </Select>
+        </Field>
       )}
 
       {showPrice && (
-        <Input
-          type="number"
-          placeholder="Maks. fiyat (TL)"
-          defaultValue={params.get("maksfiyat") ?? ""}
-          onBlur={(e) => set("maksfiyat", e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && set("maksfiyat", (e.target as HTMLInputElement).value)}
-          aria-label="Maksimum fiyat"
-          className="w-40 font-num"
-        />
+        <Field label="Maks. fiyat" width="w-[124px]">
+          <Input
+            type="number"
+            inputMode="numeric"
+            placeholder="TL"
+            defaultValue={params.get("maksfiyat") ?? ""}
+            onBlur={(e) => set("maksfiyat", e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && set("maksfiyat", (e.target as HTMLInputElement).value)}
+            aria-label="Maksimum fiyat"
+            className={`${CTRL} font-num`}
+          />
+        </Field>
       )}
 
-      <Select
-        value={params.get("minpuan") ?? ""}
-        onChange={(e) => set("minpuan", e.target.value)}
-        aria-label="Minimum puan"
-        className="w-auto"
-      >
-        <option value="">Tüm puanlar</option>
-        <option value="85">85+ (Çok iyi)</option>
-        <option value="80">80+</option>
-        <option value="70">70+</option>
-      </Select>
+      <Field label="Puan" width="w-[112px]">
+        <Select value={params.get("minpuan") ?? ""} onChange={(e) => set("minpuan", e.target.value)} aria-label="Minimum puan" className={CTRL}>
+          <option value="">Tümü</option>
+          <option value="85">85+</option>
+          <option value="80">80+</option>
+          <option value="70">70+</option>
+        </Select>
+      </Field>
 
-      <Select
-        value={params.get("rozet") ?? ""}
-        onChange={(e) => set("rozet", e.target.value)}
-        aria-label="Rozet"
-        className="w-auto"
-      >
-        <option value="">Tüm rozetler</option>
-        {(Object.keys(BADGES) as BadgeKey[]).map((k) => (
-          <option key={k} value={k}>
-            {BADGES[k].label}
-          </option>
-        ))}
-      </Select>
+      <Field label="Rozet" width="w-[168px]">
+        <Select value={params.get("rozet") ?? ""} onChange={(e) => set("rozet", e.target.value)} aria-label="Rozet" className={CTRL}>
+          <option value="">Tümü</option>
+          {(Object.keys(BADGES) as BadgeKey[]).map((k) => (
+            <option key={k} value={k}>
+              {BADGES[k].label}
+            </option>
+          ))}
+        </Select>
+      </Field>
 
-      {hasFilters && (
-        <button
-          onClick={() => router.replace(pathname, { scroll: false })}
-          className="inline-flex items-center gap-1.5 rounded-[10px] px-3 py-2 text-sm font-semibold text-[var(--down)] transition-colors hover:bg-[var(--down-soft)]"
-        >
-          <X size={14} />
-          Filtreleri temizle
-        </button>
-      )}
+      <div className="ml-auto flex items-center gap-3 pb-1">
+        {activeKeys.length > 0 && (
+          <button
+            onClick={() => router.replace(pathname, { scroll: false })}
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[13px] font-semibold text-[var(--down)] transition-colors hover:bg-[var(--down-soft)]"
+          >
+            <X size={13} />
+            Temizle
+            <span className="font-num text-[11px] opacity-70">({activeKeys.length})</span>
+          </button>
+        )}
+        {resultCount !== undefined && (
+          <span className="whitespace-nowrap text-[13px] text-[var(--muted)]">
+            <span className="font-num font-bold text-[var(--ink)]">{resultCount}</span> sonuç
+          </span>
+        )}
+      </div>
     </div>
   );
 }

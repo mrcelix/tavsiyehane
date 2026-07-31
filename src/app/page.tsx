@@ -8,7 +8,6 @@ import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { jsonLd, pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/seo";
-import { SearchBox } from "@/components/SearchBox";
 import { HeroPicker } from "@/components/HeroPicker";
 import { RotatingWord } from "@/components/RotatingWord";
 import { ItemGrid } from "@/components/ItemGrid";
@@ -148,59 +147,49 @@ export default async function HomePage() {
           style={{ background: "radial-gradient(circle, rgba(239,160,19,.16), transparent 70%)" }}
         />
 
-        <div className="relative mx-auto max-w-[1220px] px-6 text-center">
-          <h1 className="text-[34px] font-black leading-tight tracking-tight text-white md:text-[40px]">
-            <RotatingWord items={HERO_WORDS} />
-            <br />
-            kolay karar ver
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg" style={{ color: "#B6BEDC" }}>
-            Ürün, hizmet ve mekân tavsiyelerinde her alanda en iyiler. Şeffaf puanlama, kategoriye özel kriterler,
-            doğrulanmış yorumlar.
-          </p>
+        {/* İki sütun: solda mesaj, sağda seçim formu. Dar ekranda alt alta düşer. */}
+        <div className="relative mx-auto grid max-w-[1220px] items-center gap-10 px-6 lg:grid-cols-[1fr_minmax(360px,420px)]">
+          <div className="text-center lg:text-left">
+            <h1 className="text-[34px] font-black leading-tight tracking-tight text-white md:text-[40px]">
+              <RotatingWord items={HERO_WORDS} />
+              <br />
+              kolay karar ver
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg lg:mx-0" style={{ color: "#B6BEDC" }}>
+              Ürün, hizmet ve mekân tavsiyelerinde her alanda en iyiler. Şeffaf puanlama, kategoriye özel kriterler,
+              doğrulanmış yorumlar.
+            </p>
 
-          <div className="mt-8">
-            <SearchBox />
+            <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
+              {EXAMPLE_QUERIES.map((q) => (
+                <Link
+                  key={q}
+                  href={`/ara?q=${encodeURIComponent(q)}`}
+                  className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-white/40 hover:bg-white/10"
+                  style={{ color: "#C7CEE8" }}
+                >
+                  {q}
+                </Link>
+              ))}
+            </div>
+
+            <Link
+              href="/ara?sihirbaz=1"
+              className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white"
+            >
+              <Sparkles size={15} className="text-[#EFA013]" />
+              Adım adım ilerlemeyi tercih ederim
+              <ArrowRight size={14} />
+            </Link>
           </div>
 
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {EXAMPLE_QUERIES.map((q) => (
-              <Link
-                key={q}
-                href={`/ara?q=${encodeURIComponent(q)}`}
-                className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-white/40 hover:bg-white/10"
-                style={{ color: "#C7CEE8" }}
-              >
-                {q}
-              </Link>
-            ))}
-          </div>
+          <HeroPicker categories={pickerCategories} citiesByType={citiesByType} />
+        </div>
 
-          {/* Aramayı bilmeyenler için yapılandırılmış seçim */}
-          <div className="mx-auto mt-8 flex max-w-3xl items-center gap-3">
-            <span className="h-px flex-1 bg-white/15" />
-            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#8C96B8" }}>
-              veya seçerek bul
-            </span>
-            <span className="h-px flex-1 bg-white/15" />
-          </div>
-
-          <div className="mt-5">
-            <HeroPicker categories={pickerCategories} citiesByType={citiesByType} />
-          </div>
-
-          <Link
-            href="/ara?sihirbaz=1"
-            className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white"
-          >
-            <Sparkles size={15} className="text-[#EFA013]" />
-            Adım adım ilerlemeyi tercih ederim
-            <ArrowRight size={14} />
-          </Link>
-
-          {/* Hero güven şeridi */}
+        {/* Hero güven şeridi */}
+        <div className="relative mx-auto mt-10 max-w-[1220px] px-6">
           <div
-            className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12.5px] font-semibold"
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-white/10 pt-6 text-[12.5px] font-semibold lg:justify-start"
             style={{ color: "#8C96B8" }}
           >
             {HERO_STATS.map((s) => (

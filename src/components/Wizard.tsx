@@ -160,7 +160,7 @@ export function Wizard({ categories, cities }: Props) {
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
                     placeholder="Üst sınır (TL) — örn. 25000"
-                    className="h-12 flex-1 font-num"
+                    className="h-12 w-full flex-1 font-num"
                   />
                   <Button variant="primary" size="lg" onClick={() => setStep(3)}>
                     İleri
