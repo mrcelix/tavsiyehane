@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { AuthForm } from "@/components/AuthForm";
 
-export const metadata: Metadata = { title: "Giriş Yap" };
+export const metadata: Metadata = pageMetadata({
+  title: "Giriş Yap",
+  description: "TavsiyeHane hesabınıza giriş yapın; deneyimlerinizi paylaşın ve favorilerinizi saklayın.",
+  path: "/giris",
+  noIndex: true,
+});
 
 export default function GirisPage() {
   return (

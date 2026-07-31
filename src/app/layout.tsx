@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Nunito, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { metadataBase, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 import { TopBar } from "@/components/layout/TopBar";
 import { Header } from "@/components/layout/Header";
 import { TrustMarquee } from "@/components/layout/TrustMarquee";
@@ -29,12 +30,27 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase,
   title: {
-    default: "TavsiyeHane — Her konuda doğru tavsiye",
-    template: "%s | TavsiyeHane",
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Ne alacağına, kimi seçeceğine ve nereye gideceğine kolay karar ver. Ürün, hizmet ve mekân tavsiyelerinde her alanda en iyiler; şeffaf puanlama ve doğrulanmış yorumlarla.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  robots: { index: true, follow: true },
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  // Hero her iki temada da koyu; tarayıcı arayüz rengi temaya göre değişir.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1120" },
+  ],
 };
 
 // İlk boyamadan önce çalışır — tema yanıp sönmesi (FOUC) olmaz.

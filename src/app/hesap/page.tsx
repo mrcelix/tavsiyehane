@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Heart, LogOut, Store, Wrench } from "lucide-react";
 import { redirect } from "next/navigation";
+import { ButtonLink } from "@/components/ui/Button";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { pageMetadata } from "@/lib/seo";
 import { signOutAction } from "./actions";
 
-export const metadata: Metadata = { title: "Hesabım" };
+export const metadata: Metadata = pageMetadata({
+  title: "Hesabım",
+  description: "Hesap bilgileriniz, favorileriniz ve yetkilerinize göre yönetim bağlantıları.",
+  path: "/hesap",
+  noIndex: true,
+});
 
 export default async function HesapPage() {
   if (!isSupabaseConfigured()) {
@@ -32,23 +39,27 @@ export default async function HesapPage() {
         <p className="font-semibold capitalize">{profile.role}</p>
 
         <div className="mt-5 flex flex-wrap gap-3">
-          <Link href="/favoriler" className="rounded-lg bg-[var(--mist-2)] px-4 py-2 text-sm font-semibold hover:bg-[var(--line)]">
-            ♥ Favorilerim
-          </Link>
+          <ButtonLink href="/favoriler" variant="secondary">
+            <Heart size={15} />
+            Favorilerim
+          </ButtonLink>
           {profile.role === "admin" && (
-            <Link href="/panel" className="rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--brand-ink)]">
-              🛠️ Yönetim Paneli
-            </Link>
+            <ButtonLink href="/panel" variant="primary">
+              <Wrench size={15} />
+              Yönetim Paneli
+            </ButtonLink>
           )}
           {(profile.role === "business" || profile.role === "admin") && (
-            <Link href="/isletme" className="rounded-lg bg-[var(--mist-2)] px-4 py-2 text-sm font-semibold hover:bg-[var(--line)]">
-              🏪 İşletmem
-            </Link>
+            <ButtonLink href="/isletme" variant="secondary">
+              <Store size={15} />
+              İşletmem
+            </ButtonLink>
           )}
         </div>
 
         <form action={signOutAction} className="mt-6">
-          <button className="rounded-lg px-4 py-2 text-sm font-semibold text-[var(--down)] hover:bg-[var(--down-soft)]">
+          <button className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-[var(--down)] transition-colors hover:bg-[var(--down-soft)]">
+            <LogOut size={15} />
             Çıkış yap
           </button>
         </form>

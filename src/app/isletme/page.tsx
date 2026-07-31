@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Megaphone, PencilLine, ShieldCheck } from "lucide-react";
+import { pageMetadata } from "@/lib/seo";
 import { getBundle } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -6,10 +8,11 @@ import { itemHref } from "@/lib/routes";
 import Link from "next/link";
 import { ClaimForm } from "./ClaimForm";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "İşletmeniz için TavsiyeHane",
   description: "İşletme profilinizi sahiplenin, bilgilerinizi güncel tutun ve doğrulanmış sağlayıcı rozeti kazanın.",
-};
+  path: "/isletme",
+});
 
 export default async function IsletmePage() {
   const profile = await getCurrentProfile();
@@ -26,13 +29,28 @@ export default async function IsletmePage() {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         {[
-          { icon: "📝", title: "Profili sahiplen", desc: "Kaydınızdaki bilgi, saat ve fiyatları siz yönetin." },
-          { icon: "🛡️", title: "Doğrulama rozeti", desc: "Vergi levhası ve belgelerle doğrulanmış rozet alın." },
-          { icon: "📣", title: "Sponsorlu görünürlük", desc: "Görünürlük satın alın — puan ve sıralama satılmaz." },
+          {
+            icon: <PencilLine size={20} />,
+            tone: "bg-[var(--brand-soft)] text-[var(--brand)]",
+            title: "Profili sahiplen",
+            desc: "Kaydınızdaki bilgi, saat ve fiyatları siz yönetin.",
+          },
+          {
+            icon: <ShieldCheck size={20} />,
+            tone: "bg-[var(--up-soft)] text-[var(--up)]",
+            title: "Doğrulama rozeti",
+            desc: "Vergi levhası ve belgelerle doğrulanmış rozet alın.",
+          },
+          {
+            icon: <Megaphone size={20} />,
+            tone: "bg-[var(--gold-soft)] text-[var(--gold-ink)]",
+            title: "Sponsorlu görünürlük",
+            desc: "Görünürlük satın alın — puan ve sıralama satılmaz.",
+          },
         ].map((c) => (
-          <div key={c.title} className="rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5">
-            <div className="text-2xl">{c.icon}</div>
-            <h2 className="mt-2 font-bold">{c.title}</h2>
+          <div key={c.title} className="rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5 shadow-[var(--shadow-card)]">
+            <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${c.tone}`}>{c.icon}</span>
+            <h2 className="mt-3 text-base font-bold">{c.title}</h2>
             <p className="mt-1 text-sm text-[var(--muted)]">{c.desc}</p>
           </div>
         ))}

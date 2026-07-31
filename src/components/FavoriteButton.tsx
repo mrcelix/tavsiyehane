@@ -44,8 +44,8 @@ export function FavoriteButton({ item, large = false }: { item: FavEntry; large?
       onClick={toggle}
       aria-label={fav ? "Favorilerden çıkar" : "Favorilere ekle"}
       title={fav ? "Favorilerden çıkar" : "Favorilere ekle"}
-      className={`inline-flex items-center gap-1.5 rounded-lg font-semibold transition-colors ${
-        large ? "px-3 py-1.5 text-sm" : "px-2 py-1 text-xs"
+      className={`inline-flex min-h-8 items-center gap-1.5 rounded-lg font-semibold transition-colors ${
+        large ? "px-3 py-2 text-sm" : "px-2.5 py-2 text-xs"
       } ${fav ? "text-[var(--down)]" : "text-[var(--muted)] hover:bg-[var(--down-soft)] hover:text-[var(--down)]"}`}
     >
       <Heart size={large ? 15 : 13} className={fav ? "fill-[var(--down)]" : undefined} />

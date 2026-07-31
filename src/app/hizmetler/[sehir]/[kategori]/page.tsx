@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getBundle } from "@/lib/data";
 import { uniqueCities } from "@/lib/query";
@@ -22,7 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cat, city } = await resolve(sehir, kategori);
   if (!cat) return {};
   const title = city ? `${city} ${cat.name} Hizmetleri` : `${cat.name} Hizmetleri`;
-  return { title, description: cat.description };
+  return pageMetadata({
+    title,
+    description: city ? `${city} için ${cat.description.toLocaleLowerCase("tr")}` : cat.description,
+    path: `/hizmetler/${sehir}/${cat.slug}`,
+  });
 }
 
 export default async function HizmetKategoriPage({ params, searchParams }: Props) {

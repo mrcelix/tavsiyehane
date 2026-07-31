@@ -1,10 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, Handshake, Heart, MapPinned, Package } from "lucide-react";
 import { useEffect, useState } from "react";
 import { readFavs, writeFavs, type FavEntry } from "@/components/FavoriteButton";
 
-const TYPE_ICON: Record<string, string> = { urun: "🛒", hizmet: "🤝", mekan: "📍" };
+const TYPE_ICON: Record<string, React.ReactNode> = {
+  urun: <Package size={18} className="text-[var(--brand)]" />,
+  hizmet: <Handshake size={18} className="text-[var(--up)]" />,
+  mekan: <MapPinned size={18} className="text-[var(--gold-ink)]" />,
+};
 const TYPE_PREFIX: Record<string, string> = { urun: "/urun", hizmet: "/hizmet", mekan: "/mekan" };
 
 export default function FavorilerPage() {
@@ -26,11 +31,14 @@ export default function FavorilerPage() {
 
       {favs && favs.length === 0 && (
         <div className="mt-10 rounded-[14px] border border-dashed border-[var(--line)] p-12 text-center text-[var(--muted)]">
-          <div className="mb-2 text-3xl">♡</div>
-          Henüz favori eklemediniz. Kartlardaki <strong>&quot;♡ Favori&quot;</strong> düğmesiyle ekleyin.
+          <Heart size={32} className="mx-auto mb-3 text-[var(--muted-2)]" />
+          Henüz favori eklemediniz. Kartlardaki <strong>Favori</strong> düğmesiyle ekleyin.
           <div className="mt-4">
-            <Link href="/urunler" className="font-semibold text-[var(--brand)] hover:underline">
-              Keşfetmeye başla →
+            <Link
+              href="/urunler"
+              className="inline-flex items-center gap-1.5 font-bold text-[var(--brand)] hover:underline"
+            >
+              Keşfetmeye başla <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -42,7 +50,9 @@ export default function FavorilerPage() {
             key={f.slug}
             className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--card)] p-4"
           >
-            <span className="text-xl">{TYPE_ICON[f.type] ?? "★"}</span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--mist)]">
+              {TYPE_ICON[f.type]}
+            </span>
             <Link href={`${TYPE_PREFIX[f.type] ?? "/urun"}/${f.slug}`} className="flex-1 font-semibold hover:text-[var(--brand)]">
               {f.title}
             </Link>

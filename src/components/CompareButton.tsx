@@ -50,7 +50,7 @@ export function CompareButton({ item }: { item: CompareEntry }) {
   return (
     <button
       onClick={toggle}
-      className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold transition-colors ${
+      className={`inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors ${
         selected
           ? "bg-[var(--brand)] text-white"
           : "text-[var(--muted)] hover:bg-[var(--brand-soft)] hover:text-[var(--brand-ink)]"

@@ -9,13 +9,14 @@ import { Textarea } from "./ui/Field";
 
 function Stars({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
-    <span className="inline-flex gap-0.5">
+    // Negatif dış boşluk + iç boşluk: görsel aralık dar kalır, dokunma alanı ~34px olur.
+    <span className="-m-1 inline-flex">
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
           type="button"
           onClick={() => onChange(n)}
-          className="transition-transform hover:scale-110"
+          className="p-2 transition-transform hover:scale-110"
           aria-label={`${n} yıldız`}
         >
           <Star

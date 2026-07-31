@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { getBundle } from "@/lib/data";
 import { formatDate } from "@/lib/format";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "En İyi Listeleri",
   description: "İhtiyaca göre derlenmiş 'en iyi' rehberleri: telefonlardan otellere, temizlikten robot süpürgelere.",
-};
+  path: "/listeler",
+});
 
 export default async function ListelerPage() {
   const bundle = await getBundle();

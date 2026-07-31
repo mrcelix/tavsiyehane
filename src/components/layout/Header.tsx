@@ -67,22 +67,28 @@ export async function Header() {
             <Heart size={18} />
           </Link>
 
-          <ButtonLink href="/ara?sihirbaz=1" variant="gold" size="default" shine className="hidden font-bold md:inline-flex">
-            Ücretsiz Tavsiye Al
-          </ButtonLink>
+          {/* Görünürlük sarmalayıcıda tutulur: Button'ın kendi `inline-flex` sınıfı
+              dışarıdan gelen `hidden`ı ezdiği için doğrudan buton üzerine konamaz. */}
+          <span className="hidden md:inline-flex">
+            <ButtonLink href="/ara?sihirbaz=1" variant="gold-cta" size="default" shine className="font-bold">
+              Ücretsiz Tavsiye Al
+            </ButtonLink>
+          </span>
 
           {profile ? (
             <Link
               href="/hesap"
               title={profile.displayName}
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--brand)] text-[11px] font-bold text-white"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand)] text-[11px] font-bold text-white"
             >
               {profile.displayName.slice(0, 2).toLocaleUpperCase("tr")}
             </Link>
           ) : (
-            <ButtonLink href={authReady ? "/giris" : "/giris?demo=1"} variant="ghost" size="sm" className="hidden sm:inline-flex">
-              Giriş
-            </ButtonLink>
+            <span className="hidden sm:inline-flex">
+              <ButtonLink href={authReady ? "/giris" : "/giris?demo=1"} variant="ghost" size="sm">
+                Giriş
+              </ButtonLink>
+            </span>
           )}
 
           <MobileMenu groups={groups} />

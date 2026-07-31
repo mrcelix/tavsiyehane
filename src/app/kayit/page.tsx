@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { AuthForm } from "@/components/AuthForm";
 
-export const metadata: Metadata = { title: "Kayıt Ol" };
+export const metadata: Metadata = pageMetadata({
+  title: "Kayıt Ol",
+  description: "Ücretsiz TavsiyeHane hesabı oluşturun; yorum yazın, favorilerinizi saklayın.",
+  path: "/kayit",
+  noIndex: true,
+});
 
 export default function KayitPage() {
   return (

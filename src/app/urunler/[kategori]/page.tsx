@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getBundle } from "@/lib/data";
 import { Listing, type ListingSearchParams } from "@/components/Listing";
@@ -13,7 +14,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const bundle = await getBundle();
   const cat = bundle.categories.find((c) => c.slug === kategori && c.type === "urun");
   if (!cat) return {};
-  return { title: `En İyi ${cat.name} Tavsiyeleri`, description: cat.description };
+  return pageMetadata({
+    title: `En İyi ${cat.name} Tavsiyeleri`,
+    description: cat.description,
+    path: `/urunler/${cat.slug}`,
+  });
 }
 
 export default async function UrunKategoriPage({ params, searchParams }: Props) {

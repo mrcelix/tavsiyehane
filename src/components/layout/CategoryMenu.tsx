@@ -34,15 +34,16 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
 
   return (
     <div ref={wrapRef} className="relative" onMouseLeave={() => setOpen(false)}>
+      {/* §5: dolu buton, h36/px12/radius10/14px-700/gap6; sayaç rozeti bg-white/20, 10px mono */}
       <button
         onClick={() => setOpen((v) => !v)}
         onMouseEnter={() => setOpen(true)}
         aria-expanded={open}
-        className="flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-sm font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
+        className="flex h-9 items-center gap-1.5 rounded-[10px] bg-[var(--brand)] px-3 text-sm font-bold text-white shadow-[var(--shadow-primary)] transition-colors hover:bg-[var(--brand-ink)] dark:text-[#0b1120]"
       >
         <LayoutGrid size={15} />
         Kategoriler
-        <span className="flex h-5 items-center rounded-full bg-[var(--brand-soft)] px-1.5 font-num text-[10px] font-semibold text-[var(--brand-ink)]">
+        <span className="flex h-5 items-center rounded-full bg-white/20 px-1.5 font-num text-[10px] font-semibold">
           {total}
         </span>
         <ChevronDown size={13} className={open ? "rotate-180 transition-transform" : "transition-transform"} />

@@ -1,16 +1,37 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Handshake, MapPinned, Package, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, Handshake, MapPinned, Package, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
 import { getBundle } from "@/lib/data";
 import { sortItems, uniqueCities } from "@/lib/query";
 import { categoryHref } from "@/lib/menu";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { jsonLd, pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/seo";
 import { SearchBox } from "@/components/SearchBox";
 import { HeroPicker } from "@/components/HeroPicker";
 import { RotatingWord } from "@/components/RotatingWord";
 import { ItemGrid } from "@/components/ItemGrid";
 import { Overline } from "@/components/ui/Card";
+
+// Her kelimenin kendi gradyanı ve ışıması var (§6.1).
+const HERO_WORDS = [
+  {
+    word: "Ne alacağına",
+    gradient: "linear-gradient(90deg, #8E97FF 0%, #C7CEE8 100%)",
+    glow: "rgba(58,69,224,.55)",
+  },
+  {
+    word: "Kimi seçeceğine",
+    gradient: "linear-gradient(90deg, #4ADE80 0%, #C7F9DA 100%)",
+    glow: "rgba(21,162,74,.45)",
+  },
+  {
+    word: "Nereye gideceğine",
+    gradient: "linear-gradient(90deg, #EFA013 0%, #FFE1A6 100%)",
+    glow: "rgba(239,160,19,.5)",
+  },
+];
 
 const EXAMPLE_QUERIES = [
   "25.000 TL altı telefon",
@@ -41,6 +62,12 @@ const MODELS: { type: ItemType; icon: React.ReactNode; title: string; text: stri
   },
 ];
 
+export const metadata: Metadata = pageMetadata({
+  title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+  description: SITE_DESCRIPTION,
+  path: "/",
+});
+
 export default async function HomePage() {
   const bundle = await getBundle();
   const editorPicks = sortItems(
@@ -49,6 +76,18 @@ export default async function HomePage() {
   ).slice(0, 4);
 
   const typeCounts = (t: ItemType) => bundle.items.filter((i) => i.type === t).length;
+
+  // Hero güven şeridi — sayılar demo veriden gerçek olarak hesaplanır.
+  const rated = bundle.items.filter((i) => i.ratingCount > 0);
+  const avgRating = rated.length
+    ? Math.round((rated.reduce((s, i) => s + i.ratingAvg, 0) / rated.length) * 10) / 10
+    : 0;
+  const HERO_STATS = [
+    { icon: BadgeCheck, value: String(bundle.items.length), label: "incelenmiş tavsiye" },
+    { icon: Users, value: String(bundle.reviews.length), label: "kullanıcı değerlendirmesi" },
+    { icon: Star, value: avgRating.toFixed(1).replace(".", ","), label: "ortalama kullanıcı puanı" },
+    { icon: ShieldCheck, value: String(bundle.categories.length), label: "kategoride şeffaf puanlama" },
+  ];
 
   // Hero formu için kompakt veri — tüm bundle istemciye taşınmaz.
   const pickerCategories = bundle.categories.map((c) => ({ slug: c.slug, name: c.name, type: c.type }));
@@ -60,28 +99,62 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-[var(--line)] bg-[var(--mist)] py-16">
+      {/* Site geneli yapılandırılmış veri: arama kutusu ve yayıncı kimliği */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd([
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: SITE_NAME,
+              description: SITE_DESCRIPTION,
+              inLanguage: "tr-TR",
+              ...(SITE_URL ? { url: SITE_URL } : {}),
+              ...(SITE_URL
+                ? {
+                    potentialAction: {
+                      "@type": "SearchAction",
+                      target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/ara?q={search_term_string}` },
+                      "query-input": "required name=search_term_string",
+                    },
+                  }
+                : {}),
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: SITE_NAME,
+              description: SITE_TAGLINE,
+              ...(SITE_URL ? { url: SITE_URL, logo: `${SITE_URL}/og.png` } : {}),
+            },
+          ]),
+        }}
+      />
+
+      {/* Hero — §1.3'teki token dışı sabit renkler; her iki temada da koyu kalır */}
+      <section
+        className="relative overflow-hidden py-12 sm:py-16"
+        style={{ background: "linear-gradient(165deg, #16203A 0%, #1E2B4D 100%)" }}
+      >
         <div
-          className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full opacity-60"
-          style={{
-            background: "radial-gradient(circle, color-mix(in oklab, var(--brand) 28%, transparent), transparent 70%)",
-          }}
+          aria-hidden
+          className="pointer-events-none absolute -left-40 -top-40 h-[28rem] w-[28rem] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(58,69,224,.28), transparent 70%)" }}
         />
         <div
-          className="pointer-events-none absolute -right-24 top-10 h-80 w-80 rounded-full opacity-50"
-          style={{
-            background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 30%, transparent), transparent 70%)",
-          }}
+          aria-hidden
+          className="pointer-events-none absolute -right-32 top-4 h-96 w-96 rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(239,160,19,.16), transparent 70%)" }}
         />
 
-        <div className="relative mx-auto max-w-4xl px-6 text-center">
-          <h1 className="text-[34px] font-extrabold leading-tight tracking-tight md:text-[44px]">
-            <RotatingWord words={["Ne alacağına", "Kimi seçeceğine", "Nereye gideceğine"]} />
+        <div className="relative mx-auto max-w-[1220px] px-6 text-center">
+          <h1 className="text-[34px] font-black leading-tight tracking-tight text-white md:text-[40px]">
+            <RotatingWord items={HERO_WORDS} />
             <br />
             kolay karar ver
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--muted)]">
+          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg" style={{ color: "#B6BEDC" }}>
             Ürün, hizmet ve mekân tavsiyelerinde her alanda en iyiler. Şeffaf puanlama, kategoriye özel kriterler,
             doğrulanmış yorumlar.
           </p>
@@ -95,7 +168,8 @@ export default async function HomePage() {
               <Link
                 key={q}
                 href={`/ara?q=${encodeURIComponent(q)}`}
-                className="rounded-full border border-[var(--line)] bg-[var(--paper)] px-3.5 py-1.5 text-sm font-medium text-[var(--ink-2)] transition-colors hover:border-[var(--brand)] hover:text-[var(--brand)]"
+                className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-white/40 hover:bg-white/10"
+                style={{ color: "#C7CEE8" }}
               >
                 {q}
               </Link>
@@ -103,12 +177,12 @@ export default async function HomePage() {
           </div>
 
           {/* Aramayı bilmeyenler için yapılandırılmış seçim */}
-          <div className="mt-8 flex items-center gap-3">
-            <span className="h-px flex-1 bg-[var(--line)]" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-2)]">
+          <div className="mx-auto mt-8 flex max-w-3xl items-center gap-3">
+            <span className="h-px flex-1 bg-white/15" />
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#8C96B8" }}>
               veya seçerek bul
             </span>
-            <span className="h-px flex-1 bg-[var(--line)]" />
+            <span className="h-px flex-1 bg-white/15" />
           </div>
 
           <div className="mt-5">
@@ -117,12 +191,25 @@ export default async function HomePage() {
 
           <Link
             href="/ara?sihirbaz=1"
-            className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand)] hover:underline"
+            className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white"
           >
-            <Sparkles size={15} className="text-[var(--gold)]" />
+            <Sparkles size={15} className="text-[#EFA013]" />
             Adım adım ilerlemeyi tercih ederim
             <ArrowRight size={14} />
           </Link>
+
+          {/* Hero güven şeridi */}
+          <div
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12.5px] font-semibold"
+            style={{ color: "#8C96B8" }}
+          >
+            {HERO_STATS.map((s) => (
+              <span key={s.label} className="flex items-center gap-1.5">
+                <s.icon size={14} className="text-[#EFA013]" />
+                <span className="font-num text-white">{s.value}</span> {s.label}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 

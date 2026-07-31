@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { RotateCcw, Sparkles } from "lucide-react";
 import { getBundle } from "@/lib/data";
@@ -10,10 +11,12 @@ import { Wizard } from "@/components/Wizard";
 import { ItemGrid } from "@/components/ItemGrid";
 import { formatPrice } from "@/lib/format";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Ara ve Keşfet",
   description: "İhtiyacını yaz ya da sihirbazla adım adım daralt: sana özel tavsiye listesi oluşturalım.",
-};
+  path: "/ara",
+  noIndex: true,
+});
 
 interface Props {
   searchParams: Promise<Record<string, string | undefined>>;

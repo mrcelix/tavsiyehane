@@ -5,11 +5,19 @@ import { createSupabaseServer, getCurrentProfile } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { formatDate } from "@/lib/format";
 import { itemHref } from "@/lib/routes";
+import { Check, X } from "lucide-react";
 import { BadgeChip } from "@/components/BadgeChip";
+import { StarRating } from "@/components/StarRating";
+import { pageMetadata } from "@/lib/seo";
 import { moderateReviewAction, toggleSponsorAction, touchItemAction } from "./actions";
 import type { Review } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Yönetim Paneli" };
+export const metadata: Metadata = pageMetadata({
+  title: "Yönetim Paneli",
+  description: "Yorum moderasyonu, sponsorluk görünürlüğü ve içerik yönetimi.",
+  path: "/panel",
+  noIndex: true,
+});
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -87,7 +95,7 @@ export default async function PanelPage() {
         <p className="mt-1 text-xs text-[var(--muted-2)]">Yeni yorumlar onaylanana kadar yayınlanmaz.</p>
         {pending.length === 0 ? (
           <p className="mt-4 rounded-xl bg-[var(--mist)] p-4 text-sm text-[var(--muted)]">
-            {demo ? "Demo modunda moderasyon kuyruğu boş görünür." : "Bekleyen yorum yok. 🎉"}
+            {demo ? "Demo modunda moderasyon kuyruğu boş görünür." : "Bekleyen yorum yok."}
           </p>
         ) : (
           <ul className="mt-4 space-y-3">
@@ -95,7 +103,7 @@ export default async function PanelPage() {
               <li key={r.id} className="rounded-xl border border-[var(--line)] p-4">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="font-semibold">{r.userName}</span>
-                  <span className="text-[var(--gold)]">{"★".repeat(r.rating)}</span>
+                  <StarRating value={r.rating} small />
                   <span className="text-[var(--muted-2)]">→ {itemTitle.get(r.itemId) ?? r.itemId}</span>
                   <span className="ml-auto text-xs text-[var(--muted-2)]">{formatDate(r.createdAt)}</span>
                 </div>
@@ -104,12 +112,16 @@ export default async function PanelPage() {
                   <form action={moderateReviewAction}>
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="status" value="approved" />
-                    <button className="rounded-lg bg-[var(--up)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">✓ Onayla</button>
+                    <button className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--up)] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90">
+                      <Check size={13} /> Onayla
+                    </button>
                   </form>
                   <form action={moderateReviewAction}>
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="status" value="rejected" />
-                    <button className="rounded-lg bg-[var(--down)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">✗ Reddet</button>
+                    <button className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--down)] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90">
+                      <X size={13} /> Reddet
+                    </button>
                   </form>
                 </div>
               </li>

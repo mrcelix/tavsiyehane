@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { getBundle } from "@/lib/data";
 import { formatPrice, locationText, priceSummary, formatDate } from "@/lib/format";
@@ -8,10 +9,12 @@ import { ScoreRing } from "@/components/ScoreRing";
 import { BadgeChip } from "@/components/BadgeChip";
 import { StarRating } from "@/components/StarRating";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Karşılaştır",
   description: "Ürün, hizmet ve mekânları yan yana karşılaştırın: fiyat, özellikler, artılar ve eksiler tek tabloda.",
-};
+  path: "/karsilastir",
+  noIndex: true,
+});
 
 interface Props {
   searchParams: Promise<{ ids?: string }>;

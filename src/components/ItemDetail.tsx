@@ -19,6 +19,8 @@ import { SCORE_TONE_LABEL, scoreTone } from "@/lib/scoring";
 import { TYPE_LABELS, type Item } from "@/lib/types";
 import { formatDate, formatPrice, locationText, priceSummary, slugify } from "@/lib/format";
 import { categoryHref } from "@/lib/menu";
+import { itemHref } from "@/lib/routes";
+import { breadcrumbLd, jsonLd } from "@/lib/seo";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { cn } from "@/lib/cn";
 import { ScoreRing } from "./ScoreRing";
@@ -382,6 +384,21 @@ export async function ItemDetail({ item }: { item: Item }) {
           <ItemGrid items={alternatives} />
         </section>
       )}
+
+      {/* Kırıntı yolu — arama sonuçlarında hiyerarşiyi gösterir */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbLd([
+              { name: "Ana sayfa", path: "/" },
+              { name: TYPE_LABELS[item.type].plural, path: TYPE_LABELS[item.type].hub },
+              { name: category?.name ?? "", path: categoryHref(item.type, item.categorySlug) },
+              { name: item.title, path: itemHref(item) },
+            ])
+          ),
+        }}
+      />
 
       {/* JSON-LD */}
       <script

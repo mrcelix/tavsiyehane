@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getBundle } from "@/lib/data";
 import { slugify } from "@/lib/format";
@@ -25,7 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cat, city, district } = await resolve(sehir, ilce, kategori);
   if (!cat) return {};
   const place = [district, city].filter(Boolean).join(", ");
-  return { title: place ? `${place} — En İyi ${cat.name}ler` : `En İyi ${cat.name}lar`, description: cat.description };
+  return pageMetadata({
+    title: place ? `${place} — En İyi ${cat.name}ler` : `En İyi ${cat.name}lar`,
+    description: place ? `${place} bölgesinde ${cat.description.toLocaleLowerCase("tr")}` : cat.description,
+    path: `/mekanlar/${sehir}/${ilce}/${cat.slug}`,
+  });
 }
 
 export default async function MekanKategoriPage({ params, searchParams }: Props) {

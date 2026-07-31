@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 export type ButtonVariant =
   | "primary"
   | "gold"
+  | "gold-cta"
   | "soft"
   | "gold-soft"
   | "outline"
@@ -24,6 +25,10 @@ const VARIANTS: Record<ButtonVariant, string> = {
   primary:
     "bg-[var(--brand)] text-white shadow-[var(--shadow-primary)] hover:bg-[var(--brand-ink)] dark:text-[#0b1120]",
   gold: "bg-[var(--gold)] text-white shadow-[var(--shadow-gold)] hover:bg-[var(--gold-ink)]",
+  // §4.1 Header CTA: altın zemin + ink metin; hover'da koyu altın, beyaz metin, 1px yükselme
+  "gold-cta":
+    "bg-[var(--gold)] text-[#16203A] shadow-[0_2px_8px_-2px_rgb(0_0_0/0.25)] " +
+    "hover:bg-[var(--gold-ink)] hover:text-white hover:-translate-y-px hover:shadow-[0_4px_14px_-4px_rgb(0_0_0/0.35)]",
   soft: "bg-[var(--brand-soft)] text-[var(--brand-ink)] hover:opacity-70",
   "gold-soft": "bg-[var(--gold-soft)] text-[var(--gold-ink)] hover:opacity-70",
   outline:

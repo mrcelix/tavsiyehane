@@ -1,17 +1,18 @@
 "use client";
 
+import { Check, Send } from "lucide-react";
 import { useState } from "react";
-
-const inputCls =
-  "w-full rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2 text-sm outline-none focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand-soft)]";
+import { Button } from "@/components/ui/Button";
+import { Input, Select, Textarea } from "@/components/ui/Field";
 
 export function ClaimForm() {
   const [sent, setSent] = useState(false);
 
   if (sent)
     return (
-      <div className="rounded-xl bg-[var(--up-soft)] p-4 text-sm text-[var(--up)] ring-1 ring-[color-mix(in_oklab,var(--up)_30%,transparent)]">
-        ✓ Başvurunuz alındı. Editör ekibi belge doğrulaması için sizinle iletişime geçecek.
+      <div className="flex items-center gap-2 rounded-xl bg-[var(--up-soft)] p-4 text-sm font-semibold text-[var(--up)]">
+        <Check size={16} />
+        Başvurunuz alındı. Editör ekibi belge doğrulaması için sizinle iletişime geçecek.
       </div>
     );
 
@@ -23,12 +24,14 @@ export function ClaimForm() {
       }}
       className="grid gap-3 sm:grid-cols-2"
     >
-      <input required placeholder="İşletme adı" className={inputCls} />
-      <input required placeholder="Yetkili adı soyadı" className={inputCls} />
-      <input required type="email" placeholder="Kurumsal e-posta" className={inputCls} />
-      <input required placeholder="Telefon" className={inputCls} />
-      <select required className={`${inputCls} sm:col-span-2`} defaultValue="">
-        <option value="" disabled>Kategori seçin</option>
+      <Input required placeholder="İşletme adı" aria-label="İşletme adı" />
+      <Input required placeholder="Yetkili adı soyadı" aria-label="Yetkili adı soyadı" />
+      <Input required type="email" placeholder="Kurumsal e-posta" aria-label="Kurumsal e-posta" />
+      <Input required type="tel" placeholder="Telefon" aria-label="Telefon" />
+      <Select required defaultValue="" aria-label="Kategori" className="sm:col-span-2">
+        <option value="" disabled>
+          Kategori seçin
+        </option>
         <option>Ev Temizliği</option>
         <option>Nakliye</option>
         <option>Teknik Servis</option>
@@ -36,11 +39,17 @@ export function ClaimForm() {
         <option>Kafe</option>
         <option>Otel</option>
         <option>Diğer</option>
-      </select>
-      <textarea rows={3} placeholder="Kısaca işletmenizi tanıtın (isteğe bağlı)" className={`${inputCls} sm:col-span-2`} />
-      <button type="submit" className="rounded-lg bg-[var(--brand)] py-2.5 text-sm font-semibold text-white hover:bg-[var(--brand-ink)] sm:col-span-2">
+      </Select>
+      <Textarea
+        rows={3}
+        placeholder="Kısaca işletmenizi tanıtın (isteğe bağlı)"
+        aria-label="İşletme tanıtımı"
+        className="sm:col-span-2"
+      />
+      <Button type="submit" variant="primary" size="lg" className="sm:col-span-2">
+        <Send size={15} />
         Başvuruyu Gönder
-      </button>
+      </Button>
     </form>
   );
 }

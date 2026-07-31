@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { TypeHub } from "@/components/TypeHub";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Ürün Tavsiyeleri",
   description: "Telefon, robot süpürge ve kedi ürünlerinde fiyat-performans, kullanıcı puanı ve dayanıklılığa göre en iyi ürünler.",
-};
+  path: "/urunler",
+});
 
 export default function UrunlerPage() {
   return (

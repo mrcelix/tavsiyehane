@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { jsonLd, pageMetadata, SITE_URL } from "@/lib/seo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBundle } from "@/lib/data";
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const bundle = await getBundle();
   const list = bundle.lists.find((l) => l.slug === slug);
   if (!list) return {};
-  return { title: list.title, description: list.description };
+  return pageMetadata({ title: list.title, description: list.description, path: `/liste/${list.slug}`, type: "article" });
 }
 
 export default async function ListePage({ params }: Props) {
@@ -75,6 +76,27 @@ export default async function ListePage({ params }: Props) {
           </li>
         ))}
       </ol>
+
+      {/* Sıralı liste — arama sonuçlarında "en iyi X" listeleri olarak tanınır */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: list.title,
+            description: list.description,
+            numberOfItems: items.length,
+            itemListOrder: "https://schema.org/ItemListOrderDescending",
+            itemListElement: items.map((item, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: item.title,
+              ...(SITE_URL ? { url: `${SITE_URL}${itemHref(item)}` } : {}),
+            })),
+          }),
+        }}
+      />
     </div>
   );
 }
