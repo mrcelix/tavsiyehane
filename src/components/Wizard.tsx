@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, MapPin, Package, MapPinned, Handshake } from "lu
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CategoryIcon } from "@/lib/category-icons";
+import { PRIORITIES } from "@/lib/priorities";
 import type { Category, ItemType } from "@/lib/types";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Field";
@@ -12,27 +13,6 @@ interface Props {
   categories: Category[];
   cities: string[];
 }
-
-const PRIORITIES: Record<ItemType, { key: string; label: string }[]> = {
-  urun: [
-    { key: "fiyatPerformans", label: "Fiyat-performans" },
-    { key: "teknikOzellikler", label: "En iyi özellikler" },
-    { key: "kullaniciMemnuniyeti", label: "Kullanıcı memnuniyeti" },
-    { key: "garantiServis", label: "Garanti ve servis" },
-  ],
-  hizmet: [
-    { key: "dogrulanmisDegerlendirme", label: "Güvenilirlik" },
-    { key: "fiyatSeffafligi", label: "Net fiyat" },
-    { key: "ulasilabilirlik", label: "Hızlı randevu" },
-    { key: "uzmanlikDeneyim", label: "Uzmanlık" },
-  ],
-  mekan: [
-    { key: "amacaUygunluk", label: "Amaca uygunluk" },
-    { key: "fiyatSeviyesi", label: "Uygun fiyat" },
-    { key: "konum", label: "Konum" },
-    { key: "degerlendirmeKalitesi", label: "Yorum kalitesi" },
-  ],
-};
 
 const TYPE_OPTS: { value: ItemType; label: string; desc: string; icon: React.ReactNode }[] = [
   {

@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, Handshake, MapPinned, Package, ShieldCheck, Sparkles } from "lucide-react";
 import { getBundle } from "@/lib/data";
-import { sortItems } from "@/lib/query";
+import { sortItems, uniqueCities } from "@/lib/query";
 import { categoryHref } from "@/lib/menu";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { SearchBox } from "@/components/SearchBox";
+import { HeroPicker } from "@/components/HeroPicker";
 import { RotatingWord } from "@/components/RotatingWord";
 import { ItemGrid } from "@/components/ItemGrid";
 import { Overline } from "@/components/ui/Card";
@@ -48,6 +49,14 @@ export default async function HomePage() {
   ).slice(0, 4);
 
   const typeCounts = (t: ItemType) => bundle.items.filter((i) => i.type === t).length;
+
+  // Hero formu için kompakt veri — tüm bundle istemciye taşınmaz.
+  const pickerCategories = bundle.categories.map((c) => ({ slug: c.slug, name: c.name, type: c.type }));
+  const citiesByType = {
+    urun: [],
+    hizmet: uniqueCities(bundle, "hizmet"),
+    mekan: uniqueCities(bundle, "mekan"),
+  };
 
   return (
     <div>
@@ -93,12 +102,25 @@ export default async function HomePage() {
             ))}
           </div>
 
+          {/* Aramayı bilmeyenler için yapılandırılmış seçim */}
+          <div className="mt-8 flex items-center gap-3">
+            <span className="h-px flex-1 bg-[var(--line)]" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-2)]">
+              veya seçerek bul
+            </span>
+            <span className="h-px flex-1 bg-[var(--line)]" />
+          </div>
+
+          <div className="mt-5">
+            <HeroPicker categories={pickerCategories} citiesByType={citiesByType} />
+          </div>
+
           <Link
             href="/ara?sihirbaz=1"
-            className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand)] hover:underline"
+            className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand)] hover:underline"
           >
             <Sparkles size={15} className="text-[var(--gold)]" />
-            Kararsız mısın? İhtiyaç sihirbazını dene
+            Adım adım ilerlemeyi tercih ederim
             <ArrowRight size={14} />
           </Link>
         </div>
