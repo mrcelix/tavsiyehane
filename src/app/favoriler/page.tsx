@@ -20,16 +20,16 @@ export default function FavorilerPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Favorilerim</h1>
-      <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-1.5 text-sm text-[var(--muted)]">
         Favoriler bu tarayıcıda saklanır{favs && favs.length > 0 ? ` · ${favs.length} kayıt` : ""}.
       </p>
 
       {favs && favs.length === 0 && (
-        <div className="mt-10 rounded-2xl border border-dashed border-zinc-300 p-12 text-center text-zinc-500 dark:border-zinc-700">
+        <div className="mt-10 rounded-[14px] border border-dashed border-[var(--line)] p-12 text-center text-[var(--muted)]">
           <div className="mb-2 text-3xl">♡</div>
           Henüz favori eklemediniz. Kartlardaki <strong>&quot;♡ Favori&quot;</strong> düğmesiyle ekleyin.
           <div className="mt-4">
-            <Link href="/urunler" className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+            <Link href="/urunler" className="font-semibold text-[var(--brand)] hover:underline">
               Keşfetmeye başla →
             </Link>
           </div>
@@ -40,15 +40,15 @@ export default function FavorilerPage() {
         {(favs ?? []).map((f) => (
           <li
             key={f.slug}
-            className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+            className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--card)] p-4"
           >
             <span className="text-xl">{TYPE_ICON[f.type] ?? "★"}</span>
-            <Link href={`${TYPE_PREFIX[f.type] ?? "/urun"}/${f.slug}`} className="flex-1 font-semibold hover:text-indigo-600">
+            <Link href={`${TYPE_PREFIX[f.type] ?? "/urun"}/${f.slug}`} className="flex-1 font-semibold hover:text-[var(--brand)]">
               {f.title}
             </Link>
             <button
               onClick={() => writeFavs(readFavs().filter((x) => x.slug !== f.slug))}
-              className="rounded-lg px-3 py-1.5 text-sm text-zinc-400 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10"
+              className="rounded-lg px-3 py-1.5 text-sm text-[var(--muted-2)] hover:bg-[var(--down-soft)] hover:text-[var(--down)]"
             >
               Kaldır
             </button>

@@ -1,6 +1,9 @@
 "use client";
 
+import { Check, Send } from "lucide-react";
 import { useState } from "react";
+import { Button } from "./ui/Button";
+import { Input, Textarea } from "./ui/Field";
 
 /** Hizmet detayındaki "Teklif Al" formu (demo: yerel onay gösterir). */
 export function QuoteForm({ businessName }: { businessName: string }) {
@@ -8,9 +11,14 @@ export function QuoteForm({ businessName }: { businessName: string }) {
 
   if (sent)
     return (
-      <div className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30">
-        ✓ Teklif talebiniz {businessName} firmasına iletildi. Genellikle 24 saat içinde dönüş yapılır.
-        <span className="mt-1 block text-xs opacity-75">(Demo sürümde talep gerçek işletmeye gönderilmez.)</span>
+      <div className="rounded-xl bg-[var(--up-soft)] p-4 text-sm text-[var(--up)]">
+        <span className="flex items-center gap-2 font-semibold">
+          <Check size={16} />
+          Teklif talebiniz {businessName} firmasına iletildi.
+        </span>
+        <span className="mt-1 block text-xs opacity-80">
+          Genellikle 24 saat içinde dönüş yapılır. (Demo sürümde talep gerçek işletmeye gönderilmez.)
+        </span>
       </div>
     );
 
@@ -22,26 +30,14 @@ export function QuoteForm({ businessName }: { businessName: string }) {
       }}
       className="space-y-3"
     >
-      <input
-        required
-        placeholder="Adınız"
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900"
-      />
-      <input
-        required
-        placeholder="Telefon veya e-posta"
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900"
-      />
-      <textarea
-        required
-        rows={3}
-        placeholder="İhtiyacınızı kısaca anlatın (tarih, adres, işin kapsamı…)"
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900"
-      />
-      <button type="submit" className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500">
-        📨 Ücretsiz Teklif Al
-      </button>
-      <p className="text-xs text-zinc-400">İletişim bilgileriniz yalnızca bu işletmeyle paylaşılır.</p>
+      <Input required placeholder="Adınız" />
+      <Input required placeholder="Telefon veya e-posta" />
+      <Textarea required rows={3} placeholder="İhtiyacınızı kısaca anlatın (tarih, adres, işin kapsamı…)" />
+      <Button type="submit" variant="gold" size="lg" shine className="w-full">
+        <Send size={15} />
+        Ücretsiz Teklif Al
+      </Button>
+      <p className="text-xs text-[var(--muted)]">İletişim bilgileriniz yalnızca bu işletmeyle paylaşılır.</p>
     </form>
   );
 }

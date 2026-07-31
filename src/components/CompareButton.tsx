@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Scale } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export interface CompareEntry {
@@ -49,13 +50,14 @@ export function CompareButton({ item }: { item: CompareEntry }) {
   return (
     <button
       onClick={toggle}
-      className={`rounded-lg px-2 py-1 text-xs font-medium transition ${
+      className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold transition-colors ${
         selected
-          ? "bg-indigo-600 text-white"
-          : "text-zinc-500 hover:bg-indigo-50 hover:text-indigo-600 dark:text-zinc-400 dark:hover:bg-indigo-500/10"
+          ? "bg-[var(--brand)] text-white"
+          : "text-[var(--muted)] hover:bg-[var(--brand-soft)] hover:text-[var(--brand-ink)]"
       }`}
     >
-      {selected ? "✓ Karşılaştırmada" : "+ Karşılaştır"}
+      {selected ? <Check size={13} /> : <Scale size={13} />}
+      {selected ? "Karşılaştırmada" : "Karşılaştır"}
     </button>
   );
 }

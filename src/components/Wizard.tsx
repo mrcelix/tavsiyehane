@@ -1,8 +1,12 @@
 "use client";
 
+import { ArrowLeft, ArrowRight, MapPin, Package, MapPinned, Handshake } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CategoryIcon } from "@/lib/category-icons";
 import type { Category, ItemType } from "@/lib/types";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Field";
 
 interface Props {
   categories: Category[];
@@ -11,34 +15,48 @@ interface Props {
 
 const PRIORITIES: Record<ItemType, { key: string; label: string }[]> = {
   urun: [
-    { key: "fiyatPerformans", label: "💰 Fiyat-performans" },
-    { key: "teknikOzellikler", label: "⚙️ En iyi özellikler" },
-    { key: "kullaniciMemnuniyeti", label: "⭐ Kullanıcı memnuniyeti" },
-    { key: "garantiServis", label: "🛡️ Garanti ve servis" },
+    { key: "fiyatPerformans", label: "Fiyat-performans" },
+    { key: "teknikOzellikler", label: "En iyi özellikler" },
+    { key: "kullaniciMemnuniyeti", label: "Kullanıcı memnuniyeti" },
+    { key: "garantiServis", label: "Garanti ve servis" },
   ],
   hizmet: [
-    { key: "dogrulanmisDegerlendirme", label: "⭐ Güvenilirlik" },
-    { key: "fiyatSeffafligi", label: "💰 Net fiyat" },
-    { key: "ulasilabilirlik", label: "⚡ Hızlı randevu" },
-    { key: "uzmanlikDeneyim", label: "🎓 Uzmanlık" },
+    { key: "dogrulanmisDegerlendirme", label: "Güvenilirlik" },
+    { key: "fiyatSeffafligi", label: "Net fiyat" },
+    { key: "ulasilabilirlik", label: "Hızlı randevu" },
+    { key: "uzmanlikDeneyim", label: "Uzmanlık" },
   ],
   mekan: [
-    { key: "amacaUygunluk", label: "🎯 Amaca uygunluk" },
-    { key: "fiyatSeviyesi", label: "💰 Uygun fiyat" },
-    { key: "konum", label: "📍 Konum" },
-    { key: "degerlendirmeKalitesi", label: "⭐ Yorum kalitesi" },
+    { key: "amacaUygunluk", label: "Amaca uygunluk" },
+    { key: "fiyatSeviyesi", label: "Uygun fiyat" },
+    { key: "konum", label: "Konum" },
+    { key: "degerlendirmeKalitesi", label: "Yorum kalitesi" },
   ],
 };
 
-const TYPE_OPTS: { value: ItemType; label: string; desc: string }[] = [
-  { value: "urun", label: "🛒 Ürün", desc: "Telefon, robot süpürge, kedi ürünleri…" },
-  { value: "hizmet", label: "🤝 Hizmet", desc: "Temizlik, nakliye, teknik servis…" },
-  { value: "mekan", label: "📍 Mekân", desc: "Restoran, kafe, otel…" },
+const TYPE_OPTS: { value: ItemType; label: string; desc: string; icon: React.ReactNode }[] = [
+  {
+    value: "urun",
+    label: "Ürün",
+    desc: "Telefon, robot süpürge, kedi ürünleri…",
+    icon: <Package size={22} className="shrink-0 text-[var(--brand)]" />,
+  },
+  {
+    value: "hizmet",
+    label: "Hizmet",
+    desc: "Temizlik, nakliye, teknik servis…",
+    icon: <Handshake size={22} className="shrink-0 text-[var(--up)]" />,
+  },
+  {
+    value: "mekan",
+    label: "Mekân",
+    desc: "Restoran, kafe, otel…",
+    icon: <MapPinned size={22} className="shrink-0 text-[var(--gold-ink)]" />,
+  },
 ];
 
-const optionCls =
-  "w-full rounded-xl border-2 p-4 text-left transition hover:border-indigo-400 dark:hover:border-indigo-500";
-const idle = "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900";
+const OPTION =
+  "flex w-full items-center gap-3 rounded-xl border-2 border-[var(--line)] bg-[var(--paper)] p-4 text-left transition-all hover:border-[var(--brand)] hover:bg-[var(--brand-soft)]";
 
 export function Wizard({ categories, cities }: Props) {
   const router = useRouter();
@@ -52,21 +70,26 @@ export function Wizard({ categories, cities }: Props) {
   const needsCity = type !== "urun";
   const steps = needsCity ? 5 : 4;
 
-  function finish(city?: string) {
+  function go(extra: Record<string, string> = {}) {
     const p = new URLSearchParams();
     if (type) p.set("tip", type);
     if (category) p.set("kategori", category);
     if (budget) p.set("butce", budget);
     if (priority) p.set("oncelik", priority);
-    if (city) p.set("sehir", city);
+    Object.entries(extra).forEach(([k, v]) => v && p.set(k, v));
     router.push(`/ara?${p.toString()}`);
   }
 
   return (
-    <div className="mx-auto max-w-xl rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="mx-auto max-w-xl rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-6 shadow-[var(--shadow-card)]">
       <div className="mb-5 flex items-center gap-2">
         {Array.from({ length: steps }, (_, i) => (
-          <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-indigo-500" : "bg-zinc-200 dark:bg-zinc-700"}`} />
+          <div
+            key={i}
+            className={`h-1.5 flex-1 rounded-full transition-colors ${
+              i <= step ? "bg-[var(--brand)]" : "bg-[var(--mist-2)]"
+            }`}
+          />
         ))}
       </div>
 
@@ -75,9 +98,20 @@ export function Wizard({ categories, cities }: Props) {
           <h2 className="text-lg font-bold">1. Ne arıyorsun?</h2>
           <div className="mt-4 space-y-2.5">
             {TYPE_OPTS.map((o) => (
-              <button key={o.value} className={`${optionCls} ${idle}`} onClick={() => { setType(o.value); setCategory(""); setStep(1); }}>
-                <span className="font-semibold">{o.label}</span>
-                <span className="mt-0.5 block text-sm text-zinc-500 dark:text-zinc-400">{o.desc}</span>
+              <button
+                key={o.value}
+                className={OPTION}
+                onClick={() => {
+                  setType(o.value);
+                  setCategory("");
+                  setStep(1);
+                }}
+              >
+                {o.icon}
+                <span>
+                  <span className="block font-bold text-[var(--ink)]">{o.label}</span>
+                  <span className="mt-0.5 block text-sm text-[var(--muted)]">{o.desc}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -88,12 +122,28 @@ export function Wizard({ categories, cities }: Props) {
         <div>
           <h2 className="text-lg font-bold">2. Hangi kategori?</h2>
           <div className="mt-4 space-y-2.5">
-            {cats.map((c) => (
-              <button key={c.slug} className={`${optionCls} ${idle}`} onClick={() => { setCategory(c.slug); setStep(2); }}>
-                <span className="font-semibold">{c.icon} {c.name}</span>
-              </button>
-            ))}
-            <button className={`${optionCls} ${idle} text-zinc-500`} onClick={() => { setCategory(""); setStep(2); }}>
+            {cats.map((c) => {
+              return (
+                <button
+                  key={c.slug}
+                  className={OPTION}
+                  onClick={() => {
+                    setCategory(c.slug);
+                    setStep(2);
+                  }}
+                >
+                  <CategoryIcon slug={c.slug} size={20} className="shrink-0 text-[var(--brand)]" />
+                  <span className="font-bold text-[var(--ink)]">{c.name}</span>
+                </button>
+              );
+            })}
+            <button
+              className={`${OPTION} text-[var(--muted)]`}
+              onClick={() => {
+                setCategory("");
+                setStep(2);
+              }}
+            >
               Fark etmez, hepsine bak
             </button>
           </div>
@@ -105,36 +155,44 @@ export function Wizard({ categories, cities }: Props) {
           <h2 className="text-lg font-bold">3. Bütçen nedir?</h2>
           <div className="mt-4 space-y-2.5">
             {type === "mekan" ? (
-              <>
-                {[
-                  { v: "1", l: "₺ — Ekonomik" },
-                  { v: "2", l: "₺₺ — Orta" },
-                  { v: "3", l: "₺₺₺ — Yüksek" },
-                  { v: "4", l: "₺₺₺₺ — Fark etmez / Premium" },
-                ].map((o) => (
-                  <button key={o.v} className={`${optionCls} ${idle}`} onClick={() => { setBudget(o.v); setStep(3); }}>
-                    <span className="font-semibold">{o.l}</span>
-                  </button>
-                ))}
-              </>
+              [
+                { v: "1", l: "₺ — Ekonomik" },
+                { v: "2", l: "₺₺ — Orta" },
+                { v: "3", l: "₺₺₺ — Yüksek" },
+                { v: "4", l: "₺₺₺₺ — Fark etmez / Premium" },
+              ].map((o) => (
+                <button
+                  key={o.v}
+                  className={OPTION}
+                  onClick={() => {
+                    setBudget(o.v);
+                    setStep(3);
+                  }}
+                >
+                  <span className="font-bold text-[var(--ink)]">{o.l}</span>
+                </button>
+              ))
             ) : (
               <>
                 <div className="flex gap-2">
-                  <input
+                  <Input
                     type="number"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
                     placeholder="Üst sınır (TL) — örn. 25000"
-                    className="flex-1 rounded-xl border-2 border-zinc-200 bg-white px-4 py-3 outline-none focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900"
+                    className="h-12 flex-1 font-num"
                   />
-                  <button
-                    onClick={() => setStep(3)}
-                    className="rounded-xl bg-indigo-600 px-5 font-semibold text-white hover:bg-indigo-500"
-                  >
+                  <Button variant="primary" size="lg" onClick={() => setStep(3)}>
                     İleri
-                  </button>
+                  </Button>
                 </div>
-                <button className={`${optionCls} ${idle} text-zinc-500`} onClick={() => { setBudget(""); setStep(3); }}>
+                <button
+                  className={`${OPTION} text-[var(--muted)]`}
+                  onClick={() => {
+                    setBudget("");
+                    setStep(3);
+                  }}
+                >
                   Bütçe sınırım yok
                 </button>
               </>
@@ -150,12 +208,11 @@ export function Wizard({ categories, cities }: Props) {
             {PRIORITIES[type].map((o) => (
               <button
                 key={o.key}
-                className={`${optionCls} ${idle}`}
+                className={OPTION}
                 onClick={() => {
                   setPriority(o.key);
                   if (needsCity) setStep(4);
                   else {
-                    // ürünlerde şehir adımı yok — doğrudan sonuç
                     const p = new URLSearchParams();
                     p.set("tip", type);
                     if (category) p.set("kategori", category);
@@ -165,7 +222,8 @@ export function Wizard({ categories, cities }: Props) {
                   }
                 }}
               >
-                <span className="font-semibold">{o.label}</span>
+                <span className="font-bold text-[var(--ink)]">{o.label}</span>
+                <ArrowRight size={16} className="ml-auto text-[var(--muted-2)]" />
               </button>
             ))}
           </div>
@@ -177,11 +235,12 @@ export function Wizard({ categories, cities }: Props) {
           <h2 className="text-lg font-bold">5. Hangi şehirde?</h2>
           <div className="mt-4 space-y-2.5">
             {cities.map((c) => (
-              <button key={c} className={`${optionCls} ${idle}`} onClick={() => finish(c)}>
-                <span className="font-semibold">📍 {c}</span>
+              <button key={c} className={OPTION} onClick={() => go({ sehir: c })}>
+                <MapPin size={18} className="shrink-0 text-[var(--brand)]" />
+                <span className="font-bold text-[var(--ink)]">{c}</span>
               </button>
             ))}
-            <button className={`${optionCls} ${idle} text-zinc-500`} onClick={() => finish()}>
+            <button className={`${OPTION} text-[var(--muted)]`} onClick={() => go()}>
               Fark etmez
             </button>
           </div>
@@ -189,8 +248,11 @@ export function Wizard({ categories, cities }: Props) {
       )}
 
       {step > 0 && (
-        <button onClick={() => setStep(step - 1)} className="mt-5 text-sm font-medium text-zinc-400 hover:text-indigo-600">
-          ← Geri
+        <button
+          onClick={() => setStep(step - 1)}
+          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--muted)] transition-colors hover:text-[var(--brand)]"
+        >
+          <ArrowLeft size={14} /> Geri
         </button>
       )}
     </div>

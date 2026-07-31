@@ -19,8 +19,8 @@ interface Props {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <tr className="border-t border-zinc-100 dark:border-zinc-800">
-      <th className="w-44 bg-zinc-50 px-4 py-3 text-left align-top text-sm font-semibold text-zinc-500 dark:bg-zinc-800/50 dark:text-zinc-400">
+    <tr className="border-t border-[var(--line)]">
+      <th className="w-44 bg-[var(--mist)] px-4 py-3 text-left align-top text-sm font-semibold text-[var(--muted)]">
         {label}
       </th>
       {children}
@@ -39,14 +39,14 @@ export default async function KarsilastirPage({ searchParams }: Props) {
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
         <div className="text-5xl">⚖️</div>
         <h1 className="mt-4 text-2xl font-extrabold">Karşılaştırma</h1>
-        <p className="mx-auto mt-3 max-w-xl text-zinc-500 dark:text-zinc-400">
+        <p className="mx-auto mt-3 max-w-xl text-[var(--muted)]">
           Karşılaştırmak için listelerdeki kartlarda <strong>&quot;+ Karşılaştır&quot;</strong> düğmesini kullanın (aynı tipten 2-4 seçim).
           Seçimleriniz sayfanın altındaki şeritte birikir.
         </p>
         <div className="mt-6 flex justify-center gap-3">
-          <Link href="/urunler" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Ürünlere git</Link>
-          <Link href="/hizmetler" className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-semibold hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700">Hizmetlere git</Link>
-          <Link href="/mekanlar" className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-semibold hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700">Mekânlara git</Link>
+          <Link href="/urunler" className="rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--brand-ink)]">Ürünlere git</Link>
+          <Link href="/hizmetler" className="rounded-lg bg-[var(--mist-2)] px-4 py-2 text-sm font-semibold hover:bg-[var(--line)]">Hizmetlere git</Link>
+          <Link href="/mekanlar" className="rounded-lg bg-[var(--mist-2)] px-4 py-2 text-sm font-semibold hover:bg-[var(--line)]">Mekânlara git</Link>
         </div>
       </div>
     );
@@ -57,24 +57,24 @@ export default async function KarsilastirPage({ searchParams }: Props) {
   const catMap = new Map(bundle.categories.map((c) => [c.slug, c]));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto max-w-[1220px] px-4 py-8">
       <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Karşılaştırma</h1>
-      <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-1.5 text-sm text-[var(--muted)]">
         {items.length} {type === "urun" ? "ürün" : type === "hizmet" ? "hizmet" : "mekân"} yan yana — kriterler kategori tipine göre düzenlenir.
       </p>
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="mt-6 overflow-x-auto rounded-[14px] border border-[var(--line)] bg-[var(--card)]">
         <table className="w-full min-w-[720px] border-collapse">
           <thead>
             <tr>
-              <th className="w-44 bg-zinc-50 dark:bg-zinc-800/50" />
+              <th className="w-44 bg-[var(--mist)]" />
               {items.map((it) => (
                 <th key={it.id} className="px-4 py-4 text-left align-top">
                   <div className="text-3xl">{catMap.get(it.categorySlug)?.icon}</div>
-                  <Link href={itemHref(it)} className="mt-1 block font-bold leading-snug hover:text-indigo-600">
+                  <Link href={itemHref(it)} className="mt-1 block font-bold leading-snug hover:text-[var(--brand)]">
                     {it.title}
                   </Link>
-                  <p className="mt-0.5 text-xs font-normal text-zinc-400">
+                  <p className="mt-0.5 text-xs font-normal text-[var(--muted-2)]">
                     {it.brand}
                     {locationText(it) ? ` · ${locationText(it)}` : ""}
                   </p>
@@ -96,7 +96,7 @@ export default async function KarsilastirPage({ searchParams }: Props) {
             </Row>
             <Row label={type === "mekan" ? "Fiyat seviyesi" : type === "hizmet" ? "Fiyat aralığı" : "Fiyat"}>
               {items.map((it) => (
-                <td key={it.id} className="px-4 py-3 font-bold text-indigo-600 dark:text-indigo-400">{priceSummary(it) || "—"}</td>
+                <td key={it.id} className="px-4 py-3 font-bold text-[var(--brand)]">{priceSummary(it) || "—"}</td>
               ))}
             </Row>
             {type === "urun" && (
@@ -109,7 +109,7 @@ export default async function KarsilastirPage({ searchParams }: Props) {
                       {best ? (
                         <>
                           <span className="font-medium">{best.sellerName}</span>
-                          <span className="block text-xs text-zinc-400">{formatPrice(best.price)} · ⭐ {best.sellerRating.toFixed(1)}</span>
+                          <span className="block text-xs text-[var(--muted-2)]">{formatPrice(best.price)} · ⭐ {best.sellerRating.toFixed(1)}</span>
                         </>
                       ) : "—"}
                     </td>
@@ -131,7 +131,7 @@ export default async function KarsilastirPage({ searchParams }: Props) {
                 <td key={it.id} className="px-4 py-3">
                   <ul className="space-y-1">
                     {it.pros.slice(0, 4).map((p) => (
-                      <li key={p} className="flex gap-1.5"><span className="text-emerald-500">✓</span>{p}</li>
+                      <li key={p} className="flex gap-1.5"><span className="text-[var(--up)]">✓</span>{p}</li>
                     ))}
                   </ul>
                 </td>
@@ -142,7 +142,7 @@ export default async function KarsilastirPage({ searchParams }: Props) {
                 <td key={it.id} className="px-4 py-3">
                   <ul className="space-y-1">
                     {it.cons.slice(0, 3).map((c) => (
-                      <li key={c} className="flex gap-1.5"><span className="text-rose-500">✗</span>{c}</li>
+                      <li key={c} className="flex gap-1.5"><span className="text-[var(--down)]">✗</span>{c}</li>
                     ))}
                   </ul>
                 </td>
@@ -150,7 +150,7 @@ export default async function KarsilastirPage({ searchParams }: Props) {
             </Row>
             <Row label="Kimler için">
               {items.map((it) => (
-                <td key={it.id} className="px-4 py-3 text-zinc-500 dark:text-zinc-400">{it.suitableFor.join(", ")}</td>
+                <td key={it.id} className="px-4 py-3 text-[var(--muted)]">{it.suitableFor.join(", ")}</td>
               ))}
             </Row>
             {attrKeys.map((k) => (
@@ -162,7 +162,7 @@ export default async function KarsilastirPage({ searchParams }: Props) {
             ))}
             <Row label="Son güncelleme">
               {items.map((it) => (
-                <td key={it.id} className="px-4 py-3 text-zinc-400">{formatDate(it.updatedAt)}</td>
+                <td key={it.id} className="px-4 py-3 text-[var(--muted-2)]">{formatDate(it.updatedAt)}</td>
               ))}
             </Row>
           </tbody>

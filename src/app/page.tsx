@@ -1,10 +1,15 @@
 import Link from "next/link";
+import { ArrowRight, Handshake, MapPinned, Package, ShieldCheck, Sparkles } from "lucide-react";
 import { getBundle } from "@/lib/data";
 import { sortItems } from "@/lib/query";
+import { categoryHref } from "@/lib/menu";
+import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
-import { SearchBox } from "@/components/SearchBox";
-import { ItemGrid } from "@/components/ItemGrid";
 import { formatDate } from "@/lib/format";
+import { SearchBox } from "@/components/SearchBox";
+import { RotatingWord } from "@/components/RotatingWord";
+import { ItemGrid } from "@/components/ItemGrid";
+import { Overline } from "@/components/ui/Card";
 
 const EXAMPLE_QUERIES = [
   "25.000 TL altı telefon",
@@ -12,6 +17,27 @@ const EXAMPLE_QUERIES = [
   "İstanbul ev temizliği",
   "Uzaktan çalışmaya uygun kafe",
   "Çocuklu aileye otel",
+];
+
+const MODELS: { type: ItemType; icon: React.ReactNode; title: string; text: string }[] = [
+  {
+    type: "urun",
+    icon: <Package size={20} />,
+    title: "Ürünler",
+    text: "%25 fiyat-performans, %20 kullanıcı memnuniyeti, %15 teknik özellikler, %15 satıcı güvenilirliği; kalanı garanti, fiyat güncelliği ve editör.",
+  },
+  {
+    type: "hizmet",
+    icon: <Handshake size={20} />,
+    title: "Hizmetler",
+    text: "%25 doğrulanmış müşteri değerlendirmesi, %20 uzmanlık ve deneyim, %15 şikâyet çözümü, %15 fiyat şeffaflığı; kalanı ulaşılabilirlik, belge ve editör.",
+  },
+  {
+    type: "mekan",
+    icon: <MapPinned size={20} />,
+    title: "Mekânlar",
+    text: "%25 son dönem kullanıcı ilgisi, %20 değerlendirme kalitesi, %15 güncellik, %15 amaca uygunluk; kalanı fiyat, konum ve editör.",
+  },
 ];
 
 export default async function HomePage() {
@@ -26,58 +52,83 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="border-b border-zinc-200 bg-gradient-to-b from-indigo-50 via-white to-white py-14 dark:border-zinc-800 dark:from-indigo-950/40 dark:via-zinc-950 dark:to-zinc-950">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
-            Her konuda <span className="text-indigo-600 dark:text-indigo-400">doğru tavsiye</span>
+      <section className="relative overflow-hidden border-b border-[var(--line)] bg-[var(--mist)] py-16">
+        <div
+          className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full opacity-60"
+          style={{
+            background: "radial-gradient(circle, color-mix(in oklab, var(--brand) 28%, transparent), transparent 70%)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute -right-24 top-10 h-80 w-80 rounded-full opacity-50"
+          style={{
+            background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 30%, transparent), transparent 70%)",
+          }}
+        />
+
+        <div className="relative mx-auto max-w-4xl px-6 text-center">
+          <h1 className="text-[34px] font-extrabold leading-tight tracking-tight md:text-[44px]">
+            <RotatingWord words={["Ne alacağına", "Kimi seçeceğine", "Nereye gideceğine"]} />
+            <br />
+            kolay karar ver
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-zinc-500 dark:text-zinc-400">
-            Ne alacağına, kimi seçeceğine ve nereye gideceğine kolay karar ver. Şeffaf puanlama, kategoriye özel kriterler, doğrulanmış yorumlar.
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--muted)]">
+            Ürün, hizmet ve mekân tavsiyelerinde her alanda en iyiler. Şeffaf puanlama, kategoriye özel kriterler,
+            doğrulanmış yorumlar.
           </p>
+
           <div className="mt-8">
             <SearchBox />
           </div>
+
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {EXAMPLE_QUERIES.map((q) => (
               <Link
                 key={q}
                 href={`/ara?q=${encodeURIComponent(q)}`}
-                className="rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-sm text-zinc-600 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-indigo-500"
+                className="rounded-full border border-[var(--line)] bg-[var(--paper)] px-3.5 py-1.5 text-sm font-medium text-[var(--ink-2)] transition-colors hover:border-[var(--brand)] hover:text-[var(--brand)]"
               >
                 {q}
               </Link>
             ))}
           </div>
-          <div className="mt-6">
-            <Link href="/ara?sihirbaz=1" className="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-              🧭 Kararsız mısın? İhtiyaç sihirbazını dene →
-            </Link>
-          </div>
+
+          <Link
+            href="/ara?sihirbaz=1"
+            className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand)] hover:underline"
+          >
+            <Sparkles size={15} className="text-[var(--gold)]" />
+            Kararsız mısın? İhtiyaç sihirbazını dene
+            <ArrowRight size={14} />
+          </Link>
         </div>
       </section>
 
       {/* Kategoriler */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="text-2xl font-bold">Kategoriler</h2>
-          <div className="flex gap-3 text-sm text-zinc-400">
-            <span>{typeCounts("urun")} ürün</span>·<span>{typeCounts("hizmet")} hizmet</span>·<span>{typeCounts("mekan")} mekân</span>
+      <section className="mx-auto max-w-[1220px] px-6 py-12">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
+          <h2 className="text-2xl font-extrabold tracking-tight">Kategoriler</h2>
+          <div className="flex gap-3 font-num text-sm text-[var(--muted)]">
+            <span>{typeCounts("urun")} ürün</span>·<span>{typeCounts("hizmet")} hizmet</span>·
+            <span>{typeCounts("mekan")} mekân</span>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-9">
           {bundle.categories.map((c) => {
-            const hub = TYPE_LABELS[c.type].hub;
-            const href =
-              c.type === "urun" ? `${hub}/${c.slug}` : c.type === "hizmet" ? `${hub}/tumu/${c.slug}` : `${hub}/tumu/tumu/${c.slug}`;
+            const accent = TYPE_ACCENT[c.type];
             return (
               <Link
                 key={c.id}
-                href={href}
-                className="card-hover flex flex-col items-center gap-2 rounded-2xl border border-zinc-200 bg-white p-4 text-center dark:border-zinc-800 dark:bg-zinc-900"
+                href={categoryHref(c.type, c.slug)}
+                className="card-hover flex flex-col items-center gap-2 rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-4 text-center shadow-[var(--shadow-card)]"
               >
-                <span className="text-3xl">{c.icon}</span>
-                <span className="text-sm font-semibold leading-tight">{c.name}</span>
-                <span className="text-[11px] uppercase tracking-wide text-zinc-400">{TYPE_LABELS[c.type].singular}</span>
+                <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${accent.bg} ${accent.text}`}>
+                  <CategoryIcon slug={c.slug} size={22} strokeWidth={1.75} />
+                </span>
+                <span className="text-sm font-bold leading-tight">{c.name}</span>
+                <span className="text-[10px] uppercase tracking-wider text-[var(--muted-2)]">
+                  {TYPE_LABELS[c.type].singular}
+                </span>
               </Link>
             );
           })}
@@ -85,23 +136,26 @@ export default async function HomePage() {
       </section>
 
       {/* Editör seçimleri */}
-      <section className="mx-auto max-w-7xl px-4 py-6">
+      <section className="mx-auto max-w-[1220px] px-6 py-6">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold">Editör Seçimleri</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Her kategoride bağımsız incelemeyle öne çıkanlar</p>
+          <h2 className="text-2xl font-extrabold tracking-tight">Editör Seçimleri</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">Her kategoride bağımsız incelemeyle öne çıkanlar</p>
         </div>
-        <ItemGrid items={editorPicks} categories={bundle.categories} />
+        <ItemGrid items={editorPicks} />
       </section>
 
       {/* Popüler listeler */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
-        <div className="mb-6 flex items-end justify-between">
+      <section className="mx-auto max-w-[1220px] px-6 py-12">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 className="text-2xl font-bold">Popüler Listeler</h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">İhtiyaca göre derlenmiş &quot;en iyi&quot; rehberleri</p>
+            <h2 className="text-2xl font-extrabold tracking-tight">Popüler Listeler</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">İhtiyaca göre derlenmiş &quot;en iyi&quot; rehberleri</p>
           </div>
-          <Link href="/listeler" className="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-            Tümü →
+          <Link
+            href="/listeler"
+            className="inline-flex items-center gap-1 text-sm font-bold text-[var(--brand)] hover:underline"
+          >
+            Tümü <ArrowRight size={14} />
           </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -109,12 +163,12 @@ export default async function HomePage() {
             <Link
               key={l.id}
               href={`/liste/${l.slug}`}
-              className="card-hover flex flex-col rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900"
+              className="card-hover flex flex-col rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5 shadow-[var(--shadow-card)]"
             >
-              <h3 className="font-bold leading-snug">{l.title}</h3>
-              <p className="mt-2 line-clamp-3 flex-1 text-sm text-zinc-500 dark:text-zinc-400">{l.description}</p>
-              <p className="mt-3 text-xs text-zinc-400">
-                {l.itemSlugs.length} öneri · Güncelleme: {formatDate(l.updatedAt)}
+              <h3 className="text-base font-bold leading-snug">{l.title}</h3>
+              <p className="mt-2 line-clamp-3 flex-1 text-sm text-[var(--muted)]">{l.description}</p>
+              <p className="mt-3 text-xs text-[var(--muted-2)]">
+                <span className="font-num">{l.itemSlugs.length}</span> öneri · Güncelleme: {formatDate(l.updatedAt)}
               </p>
             </Link>
           ))}
@@ -122,38 +176,36 @@ export default async function HomePage() {
       </section>
 
       {/* Nasıl puanlıyoruz */}
-      <section className="border-t border-zinc-200 bg-white py-12 dark:border-zinc-800 dark:bg-zinc-900/50">
-        <div className="mx-auto max-w-7xl px-4">
-          <h2 className="text-2xl font-bold">Nasıl puanlıyoruz?</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+      <section className="border-t border-[var(--line)] bg-[var(--mist)] py-12">
+        <div className="mx-auto max-w-[1220px] px-6">
+          <Overline>Metodoloji</Overline>
+          <h2 className="mt-1 text-2xl font-extrabold tracking-tight">Nasıl puanlıyoruz?</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             Bir telefonla bir diş kliniği aynı modelle sıralanmaz — her kategori tipinin kendi algoritması vardır.
           </p>
+
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800">
-              <div className="text-2xl">📦</div>
-              <h3 className="mt-2 font-semibold">Ürünler</h3>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                %25 fiyat-performans, %20 kullanıcı memnuniyeti, %15 teknik özellikler, %15 satıcı güvenilirliği; kalanı garanti, fiyat güncelliği ve editör.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800">
-              <div className="text-2xl">🤝</div>
-              <h3 className="mt-2 font-semibold">Hizmetler</h3>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                %25 doğrulanmış müşteri değerlendirmesi, %20 uzmanlık ve deneyim, %15 şikâyet çözümü, %15 fiyat şeffaflığı; kalanı ulaşılabilirlik, belge ve editör.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800">
-              <div className="text-2xl">📍</div>
-              <h3 className="mt-2 font-semibold">Mekânlar</h3>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                %25 son dönem kullanıcı ilgisi, %20 değerlendirme kalitesi, %15 güncellik, %15 amaca uygunluk; kalanı fiyat, konum ve editör.
-              </p>
-            </div>
+            {MODELS.map((m) => {
+              const accent = TYPE_ACCENT[m.type];
+              return (
+                <div key={m.type} className="rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5">
+                  <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.bg} ${accent.text}`}>
+                    {m.icon}
+                  </span>
+                  <h3 className="mt-3 text-base font-bold">{m.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">{m.text}</p>
+                </div>
+              );
+            })}
           </div>
-          <p className="mt-6 rounded-xl bg-orange-50 p-4 text-sm text-orange-800 ring-1 ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/30">
-            <strong>Şeffaflık ilkemiz:</strong> Sponsorlu içerikler turuncu çerçeve ve &quot;Sponsorlu&quot; etiketiyle açıkça ayrılır.
-            İşletmeler görünürlük satın alabilir; <strong>tavsiye puanı ve sıralama asla satılmaz.</strong>
+
+          <p className="mt-6 flex gap-2.5 rounded-xl bg-[var(--gold-soft)] p-4 text-sm leading-relaxed text-[var(--gold-ink)]">
+            <ShieldCheck size={18} className="mt-0.5 shrink-0" />
+            <span>
+              <strong>Şeffaflık ilkemiz:</strong> Sponsorlu içerikler altın çerçeve ve &quot;Sponsorlu&quot; etiketiyle
+              açıkça ayrılır. İşletmeler görünürlük satın alabilir;{" "}
+              <strong>tavsiye puanı ve sıralama asla satılmaz.</strong>
+            </span>
           </p>
         </div>
       </section>

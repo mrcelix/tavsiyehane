@@ -1,21 +1,27 @@
 "use client";
 
+import { Check, Star } from "lucide-react";
 import { useState } from "react";
 import { REVIEW_CRITERIA } from "@/lib/criteria";
 import type { ItemType } from "@/lib/types";
+import { Button } from "./ui/Button";
+import { Textarea } from "./ui/Field";
 
 function Stars({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
-    <span className="inline-flex">
+    <span className="inline-flex gap-0.5">
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
           type="button"
           onClick={() => onChange(n)}
-          className={`px-0.5 text-xl leading-none transition ${n <= value ? "text-amber-400" : "text-zinc-300 hover:text-amber-300 dark:text-zinc-600"}`}
+          className="transition-transform hover:scale-110"
           aria-label={`${n} yıldız`}
         >
-          ★
+          <Star
+            size={18}
+            className={n <= value ? "fill-[var(--gold)] text-[var(--gold)]" : "text-[var(--line)] hover:text-[var(--gold)]"}
+          />
         </button>
       ))}
     </span>
@@ -51,52 +57,54 @@ export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType })
 
   if (state === "done")
     return (
-      <div className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30">
-        ✓ Yorumunuz alındı. Moderasyon onayından sonra yayınlanacak.
+      <div className="flex items-center gap-2 rounded-xl bg-[var(--up-soft)] p-4 text-sm font-semibold text-[var(--up)]">
+        <Check size={16} />
+        Yorumunuz alındı. Moderasyon onayından sonra yayınlanacak.
       </div>
     );
 
   return (
     <form onSubmit={submit} className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-semibold">Genel puanınız</label>
+        <label className="mb-1.5 block text-sm font-bold text-[var(--ink)]">Genel puanınız</label>
         <Stars value={rating} onChange={setRating} />
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">
         {criteria.map((c) => (
-          <div key={c.key} className="flex items-center justify-between rounded-lg bg-zinc-50 px-3 py-1.5 dark:bg-zinc-800/60">
-            <span className="text-sm">{c.label}</span>
+          <div key={c.key} className="flex items-center justify-between rounded-[10px] bg-[var(--mist)] px-3 py-2">
+            <span className="text-sm text-[var(--ink-2)]">{c.label}</span>
             <Stars value={crit[c.key] ?? 0} onChange={(v) => setCrit((p) => ({ ...p, [c.key]: v }))} />
           </div>
         ))}
       </div>
 
-      <textarea
+      <Textarea
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         rows={3}
         placeholder="Deneyiminizi paylaşın…"
-        className="w-full rounded-xl border border-zinc-300 bg-white p-3 text-sm outline-none focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900"
       />
 
-      <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={state === "sending" || !rating || !comment.trim()}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-        >
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="submit" variant="primary" disabled={state === "sending" || !rating || !comment.trim()}>
           {state === "sending" ? "Gönderiliyor…" : "Yorumu Gönder"}
-        </button>
+        </Button>
         {state === "demo" && (
-          <span className="text-sm text-amber-600 dark:text-amber-400">Demo modunda yorumlar kaydedilmez (Supabase bağlanınca aktifleşir).</span>
-        )}
-        {state === "auth" && (
-          <span className="text-sm text-amber-600 dark:text-amber-400">
-            Yorum yazmak için <a href="/giris" className="font-semibold underline">giriş yapın</a>.
+          <span className="text-sm text-[var(--gold-ink)]">
+            Demo modunda yorumlar kaydedilmez (Supabase bağlanınca aktifleşir).
           </span>
         )}
-        {state === "error" && <span className="text-sm text-rose-500">Bir hata oluştu, tekrar deneyin.</span>}
+        {state === "auth" && (
+          <span className="text-sm text-[var(--gold-ink)]">
+            Yorum yazmak için{" "}
+            <a href="/giris" className="font-bold underline">
+              giriş yapın
+            </a>
+            .
+          </span>
+        )}
+        {state === "error" && <span className="text-sm text-[var(--down)]">Bir hata oluştu, tekrar deneyin.</span>}
       </div>
     </form>
   );

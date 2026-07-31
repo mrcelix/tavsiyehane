@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { RotateCcw, Sparkles } from "lucide-react";
 import { getBundle } from "@/lib/data";
 import { searchItems, uniqueCities, wizardResults } from "@/lib/query";
 import { SCORE_MODELS } from "@/lib/scoring";
@@ -39,23 +40,32 @@ export default async function AraPage({ searchParams }: Props) {
     const catName = bundle.categories.find((c) => c.slug === sp.kategori)?.name;
 
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">Sana özel tavsiye</p>
-        <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+      <div className="mx-auto max-w-[1220px] px-6 py-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--brand)]">Sana özel tavsiye</p>
+        <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-[28px]">
           {catName ?? (type === "urun" ? "Ürünler" : type === "hizmet" ? "Hizmetler" : "Mekânlar")}
           {sp.sehir ? ` · ${sp.sehir}` : ""}
         </h1>
-        <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
-          {budget ? (type === "mekan" ? `Bütçe: ${"₺".repeat(Math.min(4, budget))}` : `Bütçe: ${formatPrice(budget)} altı`) : "Bütçe sınırsız"}
-          {priorityLabel ? ` · Öncelik: ${priorityLabel}` : ""} · {results.length} sonuç, önceliğine göre sıralandı
+        <p className="mt-1.5 text-sm text-[var(--muted)]">
+          {budget
+            ? type === "mekan"
+              ? `Bütçe: ${"₺".repeat(Math.min(4, budget))}`
+              : `Bütçe: ${formatPrice(budget)} altı`
+            : "Bütçe sınırsız"}
+          {priorityLabel ? ` · Öncelik: ${priorityLabel}` : ""} ·{" "}
+          <span className="font-num font-semibold text-[var(--ink-2)]">{results.length}</span> sonuç, önceliğine göre
+          sıralandı
         </p>
         <div className="mt-4">
-          <Link href="/ara?sihirbaz=1" className="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-            ↻ Sihirbazı yeniden başlat
+          <Link
+            href="/ara?sihirbaz=1"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand)] hover:underline"
+          >
+            <RotateCcw size={14} /> Sihirbazı yeniden başlat
           </Link>
         </div>
         <div className="mt-6">
-          <ItemGrid items={results} categories={bundle.categories} />
+          <ItemGrid items={results} />
         </div>
       </div>
     );
@@ -65,19 +75,24 @@ export default async function AraPage({ searchParams }: Props) {
   if (q) {
     const results = searchItems(bundle, q);
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Arama: &quot;{q}&quot;</h1>
-        <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{results.length} sonuç bulundu</p>
+      <div className="mx-auto max-w-[1220px] px-6 py-10">
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-[28px]">Arama: &quot;{q}&quot;</h1>
+        <p className="mt-1.5 text-sm text-[var(--muted)]">
+          <span className="font-num font-semibold text-[var(--ink-2)]">{results.length}</span> sonuç bulundu
+        </p>
         <div className="mt-4 max-w-2xl">
           <SearchBox initial={q} />
         </div>
         <div className="mt-6">
-          <ItemGrid items={results} categories={bundle.categories} />
+          <ItemGrid items={results} />
         </div>
         {results.length === 0 && (
           <p className="mt-6 text-center">
-            <Link href="/ara?sihirbaz=1" className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-              🧭 Sihirbazla adım adım aramayı deneyin →
+            <Link
+              href="/ara?sihirbaz=1"
+              className="inline-flex items-center gap-1.5 font-bold text-[var(--brand)] hover:underline"
+            >
+              <Sparkles size={15} className="text-[var(--gold)]" /> Sihirbazla adım adım aramayı deneyin
             </Link>
           </p>
         )}
@@ -87,16 +102,19 @@ export default async function AraPage({ searchParams }: Props) {
 
   // Varsayılan: sihirbaz
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
+    <div className="mx-auto max-w-[1220px] px-6 py-12">
       <div className="mx-auto mb-8 max-w-xl text-center">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">İhtiyaç Sihirbazı</h1>
-        <p className="mt-2 text-zinc-500 dark:text-zinc-400">
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-[28px]">İhtiyaç Sihirbazı</h1>
+        <p className="mt-2 text-[var(--muted)]">
           Birkaç soruyla ihtiyacını daralt; sana kişiselleştirilmiş bir tavsiye listesi oluşturalım.
         </p>
       </div>
       <Wizard categories={bundle.categories} cities={uniqueCities(bundle)} />
-      <div className="mx-auto mt-8 max-w-xl text-center text-sm text-zinc-400">
-        veya doğrudan ara: <div className="mt-3"><SearchBox /></div>
+      <div className="mx-auto mt-8 max-w-xl text-center text-sm text-[var(--muted-2)]">
+        veya doğrudan ara:
+        <div className="mt-3">
+          <SearchBox />
+        </div>
       </div>
     </div>
   );

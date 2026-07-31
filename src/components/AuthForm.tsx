@@ -6,7 +6,7 @@ import { useState } from "react";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
 
 const inputCls =
-  "w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-zinc-700 dark:bg-zinc-900";
+  "w-full rounded-xl border border-[var(--line)] bg-[var(--card)] px-4 py-2.5 text-sm outline-none focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand-soft)]";
 
 export function AuthForm({ mode }: { mode: "giris" | "kayit" }) {
   const router = useRouter();
@@ -18,7 +18,7 @@ export function AuthForm({ mode }: { mode: "giris" | "kayit" }) {
 
   if (!supabase) {
     return (
-      <div className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30">
+      <div className="rounded-xl bg-[var(--gold-soft)] p-4 text-sm text-[var(--gold-ink)] ring-1 ring-[color-mix(in_oklab,var(--gold)_30%,transparent)]">
         <strong>Demo modu:</strong> Üyelik için Supabase bağlantısı gerekir. Kurulum adımları proje README dosyasında —
         anahtarları <code>.env.local</code> dosyasına ekleyince bu sayfa otomatik aktifleşir. Favoriler üyeliksiz de çalışır.
       </div>
@@ -69,28 +69,28 @@ export function AuthForm({ mode }: { mode: "giris" | "kayit" }) {
         className={inputCls}
       />
       {msg && (
-        <p className={`rounded-lg p-3 text-sm ${msg.kind === "error" ? "bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"}`}>
+        <p className={`rounded-lg p-3 text-sm ${msg.kind === "error" ? "bg-[var(--down-soft)] text-[var(--down)]" : "bg-[var(--up-soft)] text-[var(--up)]"}`}>
           {msg.text}
         </p>
       )}
       <button
         type="submit"
         disabled={busy}
-        className="w-full rounded-xl bg-indigo-600 py-2.5 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+        className="w-full rounded-xl bg-[var(--brand)] py-2.5 font-semibold text-white hover:bg-[var(--brand-ink)] disabled:opacity-50"
       >
         {busy ? "İşleniyor…" : mode === "kayit" ? "Kayıt Ol" : "Giriş Yap"}
       </button>
 
-      <div className="flex items-center gap-3 text-xs text-zinc-400">
-        <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+      <div className="flex items-center gap-3 text-xs text-[var(--muted-2)]">
+        <span className="h-px flex-1 bg-[var(--line)]" />
         veya
-        <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+        <span className="h-px flex-1 bg-[var(--line)]" />
       </div>
 
       <button
         type="button"
         onClick={google}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white py-2.5 font-semibold hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--card)] py-2.5 font-semibold hover:bg-[var(--mist)]"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />
@@ -101,11 +101,11 @@ export function AuthForm({ mode }: { mode: "giris" | "kayit" }) {
         Google ile devam et
       </button>
 
-      <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="text-center text-sm text-[var(--muted)]">
         {mode === "giris" ? (
-          <>Hesabın yok mu? <Link href="/kayit" className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Kayıt ol</Link></>
+          <>Hesabın yok mu? <Link href="/kayit" className="font-semibold text-[var(--brand)] hover:underline">Kayıt ol</Link></>
         ) : (
-          <>Zaten üye misin? <Link href="/giris" className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Giriş yap</Link></>
+          <>Zaten üye misin? <Link href="/giris" className="font-semibold text-[var(--brand)] hover:underline">Giriş yap</Link></>
         )}
       </p>
     </form>

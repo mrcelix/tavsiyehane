@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { ArrowRight, Scale, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button, ButtonLink } from "./ui/Button";
 import { readCompare, writeCompare, type CompareEntry } from "./CompareButton";
 
 export function CompareTray() {
@@ -17,35 +18,37 @@ export function CompareTray() {
   if (list.length === 0) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-indigo-200 bg-white/95 backdrop-blur dark:border-indigo-500/30 dark:bg-zinc-950/95">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-2.5">
-        <span className="text-sm font-semibold">Karşılaştır ({list.length}/4):</span>
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--brand)] bg-[color-mix(in_oklab,var(--paper)_95%,transparent)] backdrop-blur-lg">
+      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-2 px-4 py-2.5">
+        <span className="flex items-center gap-1.5 text-sm font-bold text-[var(--ink)]">
+          <Scale size={15} className="text-[var(--brand)]" />
+          Karşılaştır <span className="font-num text-[var(--muted)]">({list.length}/4)</span>
+        </span>
         {list.map((e) => (
           <button
             key={e.slug}
             onClick={() => writeCompare(readCompare().filter((x) => x.slug !== e.slug))}
-            className="group flex items-center gap-1 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium hover:bg-rose-50 hover:text-rose-600 dark:bg-zinc-800 dark:hover:bg-rose-500/10"
+            className="group flex items-center gap-1 rounded-full bg-[var(--mist)] px-3 py-1 text-xs font-semibold text-[var(--ink-2)] transition-colors hover:bg-[var(--down-soft)] hover:text-[var(--down)]"
             title="Listeden çıkar"
           >
             <span className="max-w-40 truncate">{e.title}</span>
-            <span className="text-zinc-400 group-hover:text-rose-500">✕</span>
+            <X size={12} className="text-[var(--muted-2)] group-hover:text-[var(--down)]" />
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={() => writeCompare([])}
-            className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-          >
+          <Button variant="ghost" size="sm" onClick={() => writeCompare([])} className="text-xs">
             Temizle
-          </button>
-          <Link
-            href={`/karsilastir?ids=${list.map((e) => e.slug).join(",")}`}
-            className={`rounded-lg px-4 py-1.5 text-sm font-semibold text-white ${
-              list.length >= 2 ? "bg-indigo-600 hover:bg-indigo-500" : "pointer-events-none bg-zinc-300 dark:bg-zinc-700"
-            }`}
-          >
-            Karşılaştır →
-          </Link>
+          </Button>
+          {list.length >= 2 ? (
+            <ButtonLink href={`/karsilastir?ids=${list.map((e) => e.slug).join(",")}`} variant="primary" size="sm">
+              Karşılaştır
+              <ArrowRight size={14} />
+            </ButtonLink>
+          ) : (
+            <span className="rounded-lg bg-[var(--mist-2)] px-4 py-1.5 text-xs font-semibold text-[var(--muted-2)]">
+              En az 2 seçim gerekli
+            </span>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export interface FavEntry {
@@ -43,13 +44,12 @@ export function FavoriteButton({ item, large = false }: { item: FavEntry; large?
       onClick={toggle}
       aria-label={fav ? "Favorilerden çıkar" : "Favorilere ekle"}
       title={fav ? "Favorilerden çıkar" : "Favorilere ekle"}
-      className={`rounded-lg transition ${large ? "px-3 py-1.5 text-sm font-medium" : "px-2 py-1 text-xs"} ${
-        fav
-          ? "text-rose-500"
-          : "text-zinc-400 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10"
-      }`}
+      className={`inline-flex items-center gap-1.5 rounded-lg font-semibold transition-colors ${
+        large ? "px-3 py-1.5 text-sm" : "px-2 py-1 text-xs"
+      } ${fav ? "text-[var(--down)]" : "text-[var(--muted)] hover:bg-[var(--down-soft)] hover:text-[var(--down)]"}`}
     >
-      {fav ? "♥ Favoride" : "♡ Favori"}
+      <Heart size={large ? 15 : 13} className={fav ? "fill-[var(--down)]" : undefined} />
+      {fav ? "Favoride" : "Favori"}
     </button>
   );
 }

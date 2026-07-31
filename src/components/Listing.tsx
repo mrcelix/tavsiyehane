@@ -50,16 +50,17 @@ export async function Listing({
   const sorted = sortItems(filtered, (s(searchParams.sirala) as SortKey) ?? "puan");
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto max-w-[1220px] px-6 py-10">
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1.5 max-w-3xl text-zinc-500 dark:text-zinc-400">{subtitle}</p>}
-        <p className="mt-1 text-sm text-zinc-400">
-          {sorted.length} sonuç · Puanlar {type === "urun" ? "ürün" : type === "hizmet" ? "hizmet" : "mekân"} kriterlerine göre ağırlıklandırılır
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-[28px]">{title}</h1>
+        {subtitle && <p className="mt-1.5 max-w-3xl text-[var(--muted)]">{subtitle}</p>}
+        <p className="mt-1.5 text-sm text-[var(--muted-2)]">
+          <span className="font-num font-semibold text-[var(--ink-2)]">{sorted.length}</span> sonuç · Puanlar{" "}
+          {type === "urun" ? "ürün" : type === "hizmet" ? "hizmet" : "mekân"} kriterlerine göre ağırlıklandırılır
         </p>
       </div>
 
-      <div className="mb-6 rounded-2xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="mb-6 rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-3 shadow-[var(--shadow-card)]">
         <Suspense>
           <FilterBar
             brands={uniqueBrands(base)}
@@ -70,7 +71,7 @@ export async function Listing({
         </Suspense>
       </div>
 
-      <ItemGrid items={sorted} categories={bundle.categories} />
+      <ItemGrid items={sorted} />
     </div>
   );
 }

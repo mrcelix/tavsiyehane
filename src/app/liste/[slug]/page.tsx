@@ -31,42 +31,42 @@ export default async function ListePage({ params }: Props) {
     .filter((i): i is NonNullable<typeof i> => Boolean(i));
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">En iyi listesi</p>
-      <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">{list.title}</h1>
-      <p className="mt-2 text-zinc-500 dark:text-zinc-400">{list.description}</p>
-      <p className="mt-2 text-xs text-zinc-400">Son güncelleme: {formatDate(list.updatedAt)}</p>
+    <div className="mx-auto max-w-4xl px-6 py-10">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--brand)]">En iyi listesi</p>
+      <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-[32px]">{list.title}</h1>
+      <p className="mt-2 text-[var(--muted)]">{list.description}</p>
+      <p className="mt-2 text-xs text-[var(--muted-2)]">Son güncelleme: {formatDate(list.updatedAt)}</p>
 
       <ol className="mt-8 space-y-4">
         {items.map((item, idx) => (
           <li key={item.id}>
             <Link
               href={itemHref(item)}
-              className={`card-hover flex gap-4 rounded-2xl border bg-white p-5 dark:bg-zinc-900 ${
+              className={`card-hover flex gap-4 rounded-[14px] border bg-[var(--card)] p-5 shadow-[var(--shadow-card)] ${
                 item.isSponsored
-                  ? "border-orange-300 ring-1 ring-orange-200 dark:border-orange-500/50 dark:ring-orange-500/20"
-                  : "border-zinc-200 dark:border-zinc-800"
+                  ? "border-[var(--gold)] ring-1 ring-[color-mix(in_oklab,var(--gold)_35%,transparent)]"
+                  : "border-[var(--line)]"
               }`}
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 font-bold text-white">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] font-num font-bold text-white">
                 {idx + 1}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="font-bold">{item.title}</h2>
+                  <h2 className="text-base font-bold">{item.title}</h2>
                   {item.badges.slice(0, 3).map((b) => (
                     <BadgeChip key={b} badge={b} small />
                   ))}
                 </div>
-                <p className="mt-0.5 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-[var(--muted-2)]">
                   {item.brand}
                   {locationText(item) ? ` · ${locationText(item)}` : ""}
                 </p>
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{item.whyRecommended}</p>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--ink-2)]">{item.whyRecommended}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-4 text-sm">
                   <StarRating value={item.ratingAvg} count={item.ratingCount} small />
                   {priceSummary(item) && (
-                    <span className="font-bold text-indigo-600 dark:text-indigo-400">{priceSummary(item)}</span>
+                    <span className="font-num font-bold text-[var(--brand)]">{priceSummary(item)}</span>
                   )}
                 </div>
               </div>

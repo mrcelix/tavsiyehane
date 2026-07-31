@@ -19,20 +19,26 @@ export function PriceHistoryChart({ points }: { points: PricePoint[] }) {
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full" role="img" aria-label="Fiyat geçmişi grafiği">
-        <path d={area} className="fill-indigo-500/10" />
-        <path d={path} fill="none" strokeWidth={2.5} className="stroke-indigo-500" strokeLinecap="round" />
+        <path d={area} className="fill-[var(--brand)] opacity-10" />
+        <path d={path} fill="none" strokeWidth={2.5} className="stroke-[var(--brand)]" strokeLinecap="round" />
         {points.map((p, i) => (
-          <circle key={i} cx={x(i)} cy={y(p.price)} r={3} className="fill-indigo-500">
+          <circle
+            key={i}
+            cx={x(i)}
+            cy={y(p.price)}
+            r={i === points.length - 1 ? 4 : 3}
+            className={i === points.length - 1 ? "fill-[var(--gold)]" : "fill-[var(--brand)]"}
+          >
             <title>{`${new Date(p.date).toLocaleDateString("tr-TR", { month: "short", year: "2-digit" })}: ${formatPrice(p.price)}`}</title>
           </circle>
         ))}
       </svg>
-      <div className="mt-1 flex justify-between text-xs text-zinc-400">
+      <div className="mt-1 flex justify-between text-xs text-[var(--muted)]">
         <span>
-          Son 8 ay · En düşük: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{formatPrice(min)}</span>
+          Son 8 ay · En düşük: <span className="font-num font-bold text-[var(--up)]">{formatPrice(min)}</span>
         </span>
         <span>
-          Güncel: <span className="font-semibold">{formatPrice(last.price)}</span>
+          Güncel: <span className="font-num font-bold text-[var(--ink)]">{formatPrice(last.price)}</span>
         </span>
       </div>
     </div>

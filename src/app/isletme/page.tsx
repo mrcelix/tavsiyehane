@@ -19,7 +19,7 @@ export default async function IsletmePage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">İşletmeniz için TavsiyeHane</h1>
-      <p className="mt-2 max-w-2xl text-zinc-500 dark:text-zinc-400">
+      <p className="mt-2 max-w-2xl text-[var(--muted)]">
         Profilinizi sahiplenin: bilgilerinizi güncel tutun, yorumlara yanıt verin ve belge doğrulamasıyla
         <strong> Doğrulanmış Sağlayıcı</strong> rozeti kazanın.
       </p>
@@ -30,21 +30,21 @@ export default async function IsletmePage() {
           { icon: "🛡️", title: "Doğrulama rozeti", desc: "Vergi levhası ve belgelerle doğrulanmış rozet alın." },
           { icon: "📣", title: "Sponsorlu görünürlük", desc: "Görünürlük satın alın — puan ve sıralama satılmaz." },
         ].map((c) => (
-          <div key={c.title} className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <div key={c.title} className="rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5">
             <div className="text-2xl">{c.icon}</div>
             <h2 className="mt-2 font-bold">{c.title}</h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{c.desc}</p>
+            <p className="mt-1 text-sm text-[var(--muted)]">{c.desc}</p>
           </div>
         ))}
       </div>
 
       {owned.length > 0 && (
-        <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mt-8 rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5">
           <h2 className="font-bold">Sahiplendiğiniz kayıtlar</h2>
           <ul className="mt-3 space-y-2">
             {owned.map((i) => (
               <li key={i.id}>
-                <Link href={itemHref(i)} className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                <Link href={itemHref(i)} className="font-medium text-[var(--brand)] hover:underline">
                   {i.title}
                 </Link>
               </li>
@@ -53,9 +53,9 @@ export default async function IsletmePage() {
         </section>
       )}
 
-      <section className="mt-8 rounded-2xl border border-indigo-200 bg-indigo-50/50 p-6 dark:border-indigo-500/30 dark:bg-indigo-500/5">
+      <section className="mt-8 rounded-[14px] border border-[color-mix(in_oklab,var(--brand)_30%,transparent)] bg-[var(--brand-soft)] p-6">
         <h2 className="font-bold">İşletmenizi sahiplenin veya ekletin</h2>
-        <p className="mb-4 mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mb-4 mt-1 text-sm text-[var(--muted)]">
           Başvurunuz editör ekibince incelenir; belge doğrulaması sonrası profil yönetimi hesabınıza tanımlanır.
           {!isSupabaseConfigured() && " (Demo modunda başvuru kaydedilmez.)"}
         </p>
