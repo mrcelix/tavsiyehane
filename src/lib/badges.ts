@@ -64,6 +64,10 @@ export function computeBadges(item: Item): BadgeKey[] {
   const s = item.signals;
   const b = item.scoreBreakdown;
 
+  // Topluluk sinyali yoksa hiçbir trend rozeti verilemez. "Yükselen" demek için
+  // yükseldiğini gösteren veri gerekir; editör notu bunun yerine geçmez.
+  if (!s) return item.isSponsored ? ["sponsorlu"] : [];
+
   const deneyimOyu = s.votesUp + s.votesDown;
   const olumluOran = deneyimOyu > 0 ? s.votesUp / deneyimOyu : null;
 

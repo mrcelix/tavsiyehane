@@ -7,6 +7,7 @@ import {
   MapPin,
   Minus,
   ShieldAlert,
+  ShieldCheck,
   Store,
   Ticket,
   TrendingDown,
@@ -15,7 +16,7 @@ import {
 import { getBundle } from "@/lib/data";
 import { alternativesFor } from "@/lib/query";
 import { REVIEW_CRITERIA } from "@/lib/criteria";
-import { SCORE_TONE_LABEL, scoreTone } from "@/lib/scoring";
+import { scoreBasisLabel, scoreToneLabel } from "@/lib/scoring";
 import { TYPE_LABELS, type Item } from "@/lib/types";
 import { formatDate, formatPrice, locationText, priceSummary, slugify } from "@/lib/format";
 import { categoryHref } from "@/lib/menu";
@@ -125,18 +126,72 @@ export async function ItemDetail({ item }: { item: Item }) {
 
           <div className="flex shrink-0 flex-col items-center gap-1 self-start">
             <ScoreRing score={item.score} size={84} />
-            <span className="text-xs font-bold text-[var(--ink-2)]">{SCORE_TONE_LABEL[scoreTone(item.score)]}</span>
-            <span className="text-[10px] uppercase tracking-wider text-[var(--muted-2)]">Tavsiye Puanı</span>
+            <span className="text-center text-xs font-bold text-[var(--ink-2)]">{scoreToneLabel(item)}</span>
+            <span className="text-[10px] uppercase tracking-wider text-[var(--muted-2)]">
+              {scoreBasisLabel(item).kisa}
+            </span>
           </div>
         </div>
+
+        {/* Puanın dayanağı ve doğrulama — hangi bilgiye güvendiğimiz gizlenmez */}
+        <div className="mt-4 flex flex-col gap-2 rounded-xl border border-[var(--line)] p-3 text-xs text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between">
+          <span className="flex items-start gap-1.5">
+            <ShieldCheck size={14} className="mt-px shrink-0 text-[var(--brand)]" />
+            <span>{scoreBasisLabel(item).aciklama}</span>
+          </span>
+          {item.provenance.kind === "demo" ? (
+            <Badge variant="down" className="shrink-0 self-start">
+              Örnek veri
+            </Badge>
+          ) : (
+            item.provenance.verifiedAt && (
+              <span className="shrink-0 font-medium text-[var(--ink-2)]">
+                Doğrulandı: {formatDate(item.provenance.verifiedAt)}
+              </span>
+            )
+          )}
+        </div>
+
+        {item.provenance.sources && item.provenance.sources.length > 0 && (
+          <div className="mt-2 text-xs text-[var(--muted)]">
+            <span className="font-semibold text-[var(--ink-2)]">Kaynaklar: </span>
+            {item.provenance.sources.map((s, i) => (
+              <span key={s.label + i}>
+                {i > 0 && " · "}
+                {s.url ? (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[var(--brand)]"
+                  >
+                    {s.label}
+                  </a>
+                ) : (
+                  s.label
+                )}
+                {s.checkedAt && ` (${formatDate(s.checkedAt)})`}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Topluluk oyu — puanın en ağır bileşeni */}
         <div className="mt-5 rounded-xl border border-[var(--line)] bg-[var(--mist)] p-4">
           <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">Sen ne dersin?</p>
           <VoteButtons
             itemId={item.id}
-            counts={{ up: item.signals.votesUp, down: item.signals.votesDown, interest: item.signals.votesInterest }}
+            counts={{
+              up: item.signals?.votesUp ?? 0,
+              down: item.signals?.votesDown ?? 0,
+              interest: item.signals?.votesInterest ?? 0,
+            }}
           />
+          {item.scoreBasis === "editor" && (
+            <p className="mt-2 text-xs text-[var(--muted)]">
+              Bu kategoride topluluk verisi henüz toplanıyor. İlk oylar buradan gelecek.
+            </p>
+          )}
         </div>
 
         {/* Neden tavsiye ediyoruz */}

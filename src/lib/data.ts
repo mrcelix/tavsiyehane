@@ -1,7 +1,7 @@
 import { cache } from "react";
 import type { Category, DataBundle, Item, ListDef, Offer, PricePoint, Review } from "./types";
 import { getDemoBundle } from "@/data/demo";
-import { scoreAll } from "./scoring";
+import { buildEditorial, scoreAll } from "./scoring";
 import { computeBadges } from "./badges";
 import { createSupabaseServer } from "./supabase/server";
 
@@ -33,9 +33,17 @@ function mapItem(r: any): Item {
     priceMin: r.price_min ?? undefined,
     priceMax: r.price_max ?? undefined,
     priceLevel: r.price_level ?? undefined,
-    signals: { ...BOS_SINYAL, ...(r.signals ?? {}) },
+    provenance: {
+      kind: r.provenance_kind ?? "editor",
+      verifiedAt: r.verified_at ?? undefined,
+      sources: r.sources ?? undefined,
+    },
+    editorial: buildEditorial(r.type, r.editor_criteria ?? {}),
+    // Sinyal satırı yoksa `null` — sıfır oyla dolu bir nesne "veri var" izlenimi verir.
+    signals: r.signals ? { ...BOS_SINYAL, ...r.signals } : null,
     // Puan ve rozetler okumadan sonra kohort üzerinden yeniden hesaplanır.
     score: 0,
+    scoreBasis: "editor",
     scoreBreakdown: {},
     categoryRank: 0,
     categorySize: 0,

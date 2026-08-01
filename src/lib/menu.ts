@@ -1,5 +1,6 @@
 import type { DataBundle, ItemType } from "./types";
 import { TYPE_LABELS } from "./types";
+import { liveCategories } from "./categories";
 
 export interface MenuEntry {
   slug: string;
@@ -28,8 +29,7 @@ export function buildMenu(bundle: DataBundle): MenuGroup[] {
     type,
     label: TYPE_LABELS[type].plural,
     hub: TYPE_LABELS[type].hub,
-    entries: bundle.categories
-      .filter((c) => c.type === type)
+    entries: liveCategories(bundle.categories, type)
       .map((c) => ({
         slug: c.slug,
         name: c.name,

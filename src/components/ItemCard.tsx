@@ -69,7 +69,14 @@ export function ItemCard({ item }: { item: Item }) {
                 )}
               </p>
             </div>
-            <ScoreRing score={item.score} size={44} />
+            <span className="flex shrink-0 flex-col items-center gap-0.5">
+              <ScoreRing score={item.score} size={44} />
+              {/* Puanın neye dayandığı kartta da görünür: editör notu ile topluluk
+                  puanı aynı görünürse kullanıcı ikisini aynı sanır. */}
+              {item.scoreBasis === "editor" && (
+                <span className="text-[9px] font-bold uppercase tracking-wide text-[var(--muted-2)]">Editör</span>
+              )}
+            </span>
           </div>
 
           <p className="line-clamp-2 text-sm leading-relaxed text-[var(--muted)]">{item.description}</p>
@@ -84,7 +91,11 @@ export function ItemCard({ item }: { item: Item }) {
       <div className="border-t border-[var(--line)] px-4 py-2">
         <VoteButtons
           itemId={item.id}
-          counts={{ up: item.signals.votesUp, down: item.signals.votesDown, interest: item.signals.votesInterest }}
+          counts={{
+            up: item.signals?.votesUp ?? 0,
+            down: item.signals?.votesDown ?? 0,
+            interest: item.signals?.votesInterest ?? 0,
+          }}
           compact
         />
       </div>

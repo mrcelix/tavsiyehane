@@ -4,6 +4,7 @@ import { ArrowRight, BadgeCheck, Handshake, MapPinned, Package, ShieldCheck, Spa
 import { getBundle } from "@/lib/data";
 import { sortItems, uniqueCities } from "@/lib/query";
 import { categoryHref } from "@/lib/menu";
+import { liveCategories } from "@/lib/categories";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
@@ -76,6 +77,7 @@ export default async function HomePage() {
   ).slice(0, 4);
 
   const typeCounts = (t: ItemType) => bundle.items.filter((i) => i.type === t).length;
+  const yayindaki = liveCategories(bundle.categories);
 
   // Hero güven şeridi — sayılar demo veriden gerçek olarak hesaplanır.
   const rated = bundle.items.filter((i) => i.ratingCount > 0);
@@ -86,11 +88,12 @@ export default async function HomePage() {
     { icon: BadgeCheck, value: String(bundle.items.length), label: "incelenmiş tavsiye" },
     { icon: Users, value: String(bundle.reviews.length), label: "kullanıcı değerlendirmesi" },
     { icon: Star, value: avgRating.toFixed(1).replace(".", ","), label: "ortalama kullanıcı puanı" },
-    { icon: ShieldCheck, value: String(bundle.categories.length), label: "kategoride şeffaf puanlama" },
+    { icon: ShieldCheck, value: String(yayindaki.length), label: "kategoride şeffaf puanlama" },
   ];
 
   // Hero formu için kompakt veri — tüm bundle istemciye taşınmaz.
-  const pickerCategories = bundle.categories.map((c) => ({ slug: c.slug, name: c.name, type: c.type }));
+  // Yalnızca yayındaki kategoriler; form kullanıcıyı boş sayfaya götürmemeli.
+  const pickerCategories = yayindaki.map((c) => ({ slug: c.slug, name: c.name, type: c.type }));
   const citiesByType = {
     urun: [],
     hizmet: uniqueCities(bundle, "hizmet"),
@@ -212,8 +215,8 @@ export default async function HomePage() {
             <span>{typeCounts("mekan")} mekân</span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-9">
-          {bundle.categories.map((c) => {
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
+          {yayindaki.map((c) => {
             const accent = TYPE_ACCENT[c.type];
             return (
               <Link

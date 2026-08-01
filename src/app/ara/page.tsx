@@ -4,6 +4,7 @@ import Link from "next/link";
 import { RotateCcw, Sparkles } from "lucide-react";
 import { getBundle } from "@/lib/data";
 import { searchItems, uniqueCities, wizardResults } from "@/lib/query";
+import { liveCategories } from "@/lib/categories";
 import { SCORE_MODELS } from "@/lib/scoring";
 import type { ItemType } from "@/lib/types";
 import { SearchBox } from "@/components/SearchBox";
@@ -112,7 +113,7 @@ export default async function AraPage({ searchParams }: Props) {
           Birkaç soruyla ihtiyacını daralt; sana kişiselleştirilmiş bir tavsiye listesi oluşturalım.
         </p>
       </div>
-      <Wizard categories={bundle.categories} cities={uniqueCities(bundle)} />
+      <Wizard categories={liveCategories(bundle.categories)} cities={uniqueCities(bundle)} />
       <div className="mx-auto mt-8 max-w-xl text-center text-sm text-[var(--muted-2)]">
         veya doğrudan ara:
         <div className="mt-3">

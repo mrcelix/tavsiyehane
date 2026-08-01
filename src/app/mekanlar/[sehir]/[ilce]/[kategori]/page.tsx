@@ -3,6 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getBundle } from "@/lib/data";
 import { slugify } from "@/lib/format";
+import { isCategoryLive } from "@/lib/categories";
 import { Listing, type ListingSearchParams } from "@/components/Listing";
 
 interface Props {
@@ -37,7 +38,7 @@ export default async function MekanKategoriPage({ params, searchParams }: Props)
   const { sehir, ilce, kategori } = await params;
   const sp = await searchParams;
   const { cat, city, district, missing } = await resolve(sehir, ilce, kategori);
-  if (!cat || missing) notFound();
+  if (!cat || !isCategoryLive(cat) || missing) notFound();
 
   const place = [district, city].filter(Boolean).join(" / ");
   return (

@@ -1,4 +1,4 @@
-import { scoreAll } from "@/lib/scoring";
+import { buildEditorial, scoreAll } from "@/lib/scoring";
 import { computeBadges } from "@/lib/badges";
 import { generateLists } from "@/lib/lists";
 import { REVIEW_CRITERIA } from "@/lib/criteria";
@@ -162,10 +162,51 @@ function synthSignals(raw: RawItem, profile: TrendProfile): ItemSignals {
   };
 }
 
+/**
+ * Demo kayıtlarındaki eski editoryal notları yeni editör kriterlerine eşler.
+ * Demo kategorileri sentetik oy taşıdığı için puanları zaten topluluk modelinden
+ * gelir; bu eşleme yalnızca kayıt editör moduna düşerse kullanılır.
+ */
+const KRITER_ESLEME: Record<ItemType, Record<string, string>> = {
+  urun: {
+    ozellikSeviyesi: "teknikOzellikler",
+    fiyatKarsiligi: "fiyatPerformans",
+    garantiDestek: "garantiServis",
+    erisilebilirlik: "saticiGuvenilirligi",
+    bilgiGuvenilirligi: "fiyatGuncelligi",
+  },
+  hizmet: {
+    belgeDogrulama: "belgeDogrulama",
+    fiyatSeffafligi: "fiyatSeffafligi",
+    kapsamNetligi: "uzmanlikDeneyim",
+    ulasilabilirlik: "ulasilabilirlik",
+    isGarantisi: "sikayetCozumu",
+  },
+  mekan: {
+    amacaUygunluk: "amacaUygunluk",
+    fiyatSeviyesi: "fiyatSeviyesi",
+    erisim: "konum",
+    ayirtEdici: "degerlendirmeKalitesi",
+    bilgiTazeligi: "guncellik",
+  },
+};
+
+function editorialFromRaw(raw: RawItem) {
+  const esleme = KRITER_ESLEME[raw.type];
+  const criteria: Record<string, number> = {};
+  for (const [yeni, eski] of Object.entries(esleme)) {
+    const v = raw.scoreBreakdown[eski];
+    if (typeof v === "number") criteria[yeni] = v;
+  }
+  return buildEditorial(raw.type, criteria);
+}
+
 export function buildBundle(
   categories: Category[],
   rawItems: RawItem[],
-  profiles: Record<string, TrendProfile> = {}
+  profiles: Record<string, TrendProfile> = {},
+  /** Gerçek katalog kayıtları — demo derlemesine girmez, puanlamaya birlikte girer. */
+  catalogItems: Item[] = []
 ): DataBundle {
   const items: Item[] = [];
   const reviews: Review[] = [];
@@ -222,8 +263,12 @@ export function buildBundle(
       priceMin: raw.priceMin,
       priceMax: raw.priceMax,
       priceLevel: raw.priceLevel,
+      // Demo kayıtlar açıkça demo olarak işaretlenir; gerçek katalogla karışmasın.
+      provenance: { kind: "demo" },
+      editorial: editorialFromRaw(raw),
       signals: synthSignals(raw, profiles[raw.slug] ?? "normal"),
       score: 0,
+      scoreBasis: "topluluk",
       scoreBreakdown: {},
       categoryRank: 0,
       categorySize: 0,
@@ -242,8 +287,9 @@ export function buildBundle(
     });
   }
 
-  // Puan ve rozetler kategori kohortu üzerinden hesaplanır
-  const scored = scoreAll(items).map((it) => ({ ...it, badges: computeBadges(it) }));
+  // Puan ve rozetler kategori kohortu üzerinden hesaplanır. Gerçek kayıtlar da
+  // aynı kohorta girer; kategorinin puan dayanağını scoreCategory kendisi seçer.
+  const scored = scoreAll([...items, ...catalogItems]).map((it) => ({ ...it, badges: computeBadges(it) }));
 
   // Listeler sinyallerden üretilir; sabit liste tanımı yoktur.
   return { categories, items: scored, reviews, offers, priceHistory, lists: generateLists(scored), source: "demo" };

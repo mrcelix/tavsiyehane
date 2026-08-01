@@ -3,6 +3,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { getBundle } from "@/lib/data";
 import { filterItems, sortItems, uniqueCities } from "@/lib/query";
 import { categoryHref } from "@/lib/menu";
+import { liveCategories, upcomingCategories } from "@/lib/categories";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import type { ItemType } from "@/lib/types";
 import { slugify } from "@/lib/format";
@@ -11,7 +12,8 @@ import { Overline } from "./ui/Card";
 
 export async function TypeHub({ type, title, subtitle }: { type: ItemType; title: string; subtitle: string }) {
   const bundle = await getBundle();
-  const categories = bundle.categories.filter((c) => c.type === type);
+  const categories = liveCategories(bundle.categories, type);
+  const yakinda = upcomingCategories(bundle.categories, type);
   const cities = type === "urun" ? [] : uniqueCities(bundle, type);
   const top = sortItems(filterItems(bundle, { type }), "puan").slice(0, 8);
   const accent = TYPE_ACCENT[type];
@@ -44,6 +46,26 @@ export async function TypeHub({ type, title, subtitle }: { type: ItemType; title
           );
         })}
       </div>
+
+      {yakinda.length > 0 && (
+        <div className="mt-6">
+          <Overline className="mb-3">Yakında</Overline>
+          <div className="flex flex-wrap gap-2">
+            {yakinda.map((c) => (
+              // Bilinçli olarak bağlantı değil: içi boş bir kategori sayfası açmak,
+              // yol haritasını göstermekten daha kötü bir deneyim.
+              <span
+                key={c.id}
+                title={c.description}
+                className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-[var(--line)] px-3.5 py-1.5 text-xs font-semibold text-[var(--muted)]"
+              >
+                <CategoryIcon slug={c.slug} size={12} strokeWidth={2} />
+                {c.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {cities.length > 0 && (
         <div className="mt-10">

@@ -17,6 +17,11 @@ export interface Category {
   type: ItemType;
   icon: string; // emoji
   description: string;
+  /**
+   * `hazirlaniyor`: kategori tanımlı ama içinde yayına hazır kayıt yok.
+   * Kategori listelerinde "yakında" olarak görünür, gezinme hedefi olmaz.
+   */
+  status?: "yayinda" | "hazirlaniyor";
 }
 
 /**
@@ -31,6 +36,39 @@ export type BadgeKey =
   | "zamana-direnen"
   | "hype-tutmadi"
   | "sponsorlu";
+
+/**
+ * Kaydın nereden geldiği ve neyin doğrulandığı.
+ *
+ * Bu alan olmadan gerçek katalog ile demo veri arayüzde ayırt edilemez; ayırt
+ * edilemediği anda site "gerçek tavsiye" iddiasını kaybeder. Bu yüzden zorunlu.
+ */
+export interface Provenance {
+  /** `editor`: gerçek kayıt, editör doğrulaması var. `demo`: örnek veri. */
+  kind: "editor" | "demo";
+  /** Bilgilerin en son doğrulandığı tarih (ISO). Demo kayıtlarda yoktur. */
+  verifiedAt?: string;
+  /** Doğrulamanın dayandığı kaynaklar — arayüzde açıkça gösterilir. */
+  sources?: SourceRef[];
+}
+
+export interface SourceRef {
+  label: string;
+  url?: string;
+  /** Bu kaynaktan alınan bilginin tarihi (ISO) — fiyat gibi alanlar hızla eskir. */
+  checkedAt?: string;
+}
+
+/**
+ * Editörün doğrulanabilir kriterlere verdiği puanlar (0-100).
+ * Topluluk verisi yokken puan yalnızca buradan gelir; uydurma oy üretilmez.
+ */
+export interface EditorialAssessment {
+  /** Kriter anahtarı -> 0-100 (bkz. lib/scoring.ts EDITOR_MODELS) */
+  criteria: Record<string, number>;
+  /** Kriterlerin ağırlıklı ortalaması, 0-100 */
+  score: number;
+}
 
 /**
  * Puanlamayı besleyen ham sinyaller. Puan bunlardan doğrudan değil,
@@ -98,11 +136,20 @@ export interface Item {
   priceMin?: number; // hizmet: başlangıç fiyatı aralığı
   priceMax?: number;
   priceLevel?: 1 | 2 | 3 | 4; // mekân: ₺–₺₺₺₺
-  /** Ham sinyaller — puanın kaynağı */
-  signals: ItemSignals;
-  /** 0-100 tavsiye puanı; kategori içi yüzdeliklerin ağırlıklı toplamı */
+  /** Kaydın kaynağı ve doğrulama bilgisi */
+  provenance: Provenance;
+  /** Editörün doğrulanabilir kriterlere verdiği puanlar — her kayıtta bulunur */
+  editorial: EditorialAssessment;
+  /**
+   * Ham topluluk sinyalleri. `null` ise bu kayıt için henüz topluluk verisi
+   * yoktur; puan editör değerlendirmesinden gelir ve arayüz bunu belirtir.
+   */
+  signals: ItemSignals | null;
+  /** 0-100 tavsiye puanı */
   score: number;
-  /** Sinyal anahtarı -> kategori içi yüzdelik (0-100) */
+  /** Puanın dayanağı: topluluk sinyalleri mi, yoksa yalnızca editör mü */
+  scoreBasis: "topluluk" | "editor";
+  /** Sinyal/kriter anahtarı -> 0-100 */
   scoreBreakdown: Record<string, number>;
   /** Kategorideki sırası (1 = lider) — rozet koşulları bunu kullanır */
   categoryRank: number;

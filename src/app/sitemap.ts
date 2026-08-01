@@ -3,6 +3,7 @@ import { getBundle } from "@/lib/data";
 import { itemHref } from "@/lib/routes";
 import { slugify } from "@/lib/format";
 import { getSiteUrl } from "@/lib/site-url";
+import { liveCategories } from "@/lib/categories";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const BASE = await getSiteUrl();
@@ -16,7 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: p === "" ? 1 : 0.8,
   }));
 
-  const categoryPages: MetadataRoute.Sitemap = bundle.categories.map((c) => ({
+  // Hazırlanan kategoriler sitemap'e girmez: içinde kayıt yokken indekslenirse
+  // arama motoru boş sayfa görür.
+  const yayindaki = liveCategories(bundle.categories);
+
+  const categoryPages: MetadataRoute.Sitemap = yayindaki.map((c) => ({
     url:
       c.type === "urun"
         ? `${BASE}/urunler/${c.slug}`
@@ -30,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Şehir bazlı hizmet/mekân sayfaları
   const cityPages: MetadataRoute.Sitemap = [];
-  for (const c of bundle.categories) {
+  for (const c of yayindaki) {
     if (c.type === "urun") continue;
     const cities = [...new Set(bundle.items.filter((i) => i.categorySlug === c.slug).map((i) => i.city).filter(Boolean))] as string[];
     for (const city of cities) {

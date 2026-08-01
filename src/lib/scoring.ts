@@ -1,12 +1,19 @@
-import type { Item, ItemSignals, ItemType } from "./types";
+import type { EditorialAssessment, Item, ItemSignals, ItemType } from "./types";
 
 /**
  * PUANLAMA MODELİ
  *
- * Puan mutlak değil **göreli**: her sinyal, kaydın kendi kategorisi içindeki
- * yüzdelik dilimine çevrilir, sonra tipe göre ağırlıklandırılır. Yani 87 puan
- * "kendi kategorisinde üst dilimde" demektir — bir robot süpürge telefonla değil,
- * diğer robot süpürgelerle kıyaslanır.
+ * Puanın iki dayanağı vardır ve hangisinin kullanıldığı her zaman gösterilir:
+ *
+ * 1. **Topluluk** — kategoride yeterli oy biriktiğinde. Puan mutlak değil
+ *    **göreli**: her sinyal, kaydın kendi kategorisi içindeki yüzdelik dilimine
+ *    çevrilir, sonra tipe göre ağırlıklandırılır. 87 puan "kendi kategorisinde
+ *    üst dilimde" demektir; robot süpürge telefonla değil robot süpürgeyle kıyaslanır.
+ *
+ * 2. **Editör** — yeni yayına giren kategorilerde topluluk verisi henüz yoktur.
+ *    O zaman puan, editörün doğrulanabilir kriterlere verdiği notlardan gelir ve
+ *    kayıt "Topluluk verisi toplanıyor" olarak işaretlenir. Oy ve yorum sayısı
+ *    ASLA üretilmez — olmayan veri sıfırdır, tahmin edilmez.
  */
 
 export type SignalKey = "topluluk" | "ivme" | "memnuniyet" | "ilgi" | "kalicilik" | "guncellik" | "editor";
@@ -49,8 +56,80 @@ export const SCORE_MODELS: Record<ItemType, SignalDef[]> = {
   ],
 };
 
+/**
+ * EDİTÖR MODELİ — topluluk verisi yokken kullanılan, doğrulanabilir kriterler.
+ *
+ * Buradaki her kriter belgeye, ölçüme veya yayınlanmış bilgiye dayanmalıdır.
+ * "Kullanıcı memnuniyeti" bilinçli olarak yoktur: onu editör bilemez, topluluk söyler.
+ */
+export interface EditorCriterionDef {
+  key: string;
+  label: string;
+  weight: number;
+  hint: string;
+}
+
+export const EDITOR_MODELS: Record<ItemType, EditorCriterionDef[]> = {
+  urun: [
+    { key: "ozellikSeviyesi", label: "Özellik seviyesi", weight: 0.3, hint: "Teknik özelliklerin kategori içindeki yeri — yayınlanmış spesifikasyona dayanır" },
+    { key: "fiyatKarsiligi", label: "Fiyat karşılığı", weight: 0.3, hint: "Aynı özellikleri veren alternatiflere göre güncel fiyat" },
+    { key: "garantiDestek", label: "Garanti ve destek", weight: 0.2, hint: "Resmi garanti süresi, servis ağı, yazılım güncelleme taahhüdü" },
+    { key: "erisilebilirlik", label: "Erişilebilirlik", weight: 0.1, hint: "Yetkili satıcıda bulunabilirlik ve yedek parça durumu" },
+    { key: "bilgiGuvenilirligi", label: "Bilgi güvenilirliği", weight: 0.1, hint: "Kaç bağımsız kaynaktan doğrulandı, ne kadar güncel" },
+  ],
+  hizmet: [
+    { key: "belgeDogrulama", label: "Belge doğrulaması", weight: 0.3, hint: "Yetki belgesi, sigorta poliçesi, vergi levhası görüldü mü" },
+    { key: "fiyatSeffafligi", label: "Fiyat şeffaflığı", weight: 0.25, hint: "Fiyat önceden yazılı veriliyor mu, kalemler açık mı" },
+    { key: "kapsamNetligi", label: "Kapsam netliği", weight: 0.2, hint: "Neyin dahil, neyin hariç olduğu sözleşmede yazıyor mu" },
+    { key: "ulasilabilirlik", label: "Ulaşılabilirlik", weight: 0.15, hint: "Randevu süresi, hizmet bölgesi, iletişim kanalları" },
+    { key: "isGarantisi", label: "İş garantisi", weight: 0.1, hint: "İşçilik garantisi süresi ve sorun çözüm taahhüdü" },
+  ],
+  mekan: [
+    { key: "amacaUygunluk", label: "Amaca uygunluk", weight: 0.3, hint: "Hangi ihtiyacı ne kadar iyi karşılıyor — yerinde gözlem" },
+    { key: "fiyatSeviyesi", label: "Fiyat seviyesi", weight: 0.2, hint: "Sunduğuna göre fiyat konumu" },
+    { key: "erisim", label: "Erişim", weight: 0.2, hint: "Konum, ulaşım, otopark, engelli erişimi" },
+    { key: "ayirtEdici", label: "Ayırt edici özellik", weight: 0.15, hint: "Benzerlerinden ayrıldığı somut nokta" },
+    { key: "bilgiTazeligi", label: "Bilgi tazeliği", weight: 0.15, hint: "Saat, menü, fiyat bilgisi ne zaman doğrulandı" },
+  ],
+};
+
+/** Editör kriterlerinden 0-100 mutlak puan üretir. */
+export function editorialScore(type: ItemType, criteria: Record<string, number>): number {
+  const model = EDITOR_MODELS[type];
+  let toplam = 0;
+  let agirlik = 0;
+  for (const def of model) {
+    const v = criteria[def.key];
+    if (typeof v !== "number") continue;
+    toplam += v * def.weight;
+    agirlik += def.weight;
+  }
+  // Eksik kriter varsa kalan ağırlığa bölerek orantılıyoruz; uydurma varsayılan yok.
+  return agirlik > 0 ? Math.round(toplam / agirlik) : 0;
+}
+
+export function buildEditorial(type: ItemType, criteria: Record<string, number>): EditorialAssessment {
+  return { criteria, score: editorialScore(type, criteria) };
+}
+
 /** Yüzdeliğin tam güvenle uygulanması için kategoride gereken kayıt sayısı. */
 export const MIN_COHORT = 8;
+
+/** Bir kaydın "topluluk verisi var" sayılması için gereken en az oy sayısı. */
+export const MIN_VOTES_PER_ITEM = 5;
+
+/**
+ * Kategorinin topluluk modeliyle puanlanabilmesi için kayıtların bu oranı
+ * MIN_VOTES_PER_ITEM eşiğini geçmiş olmalı. Altındaysa tüm kategori editör
+ * modeliyle puanlanır — yarısı göreli yarısı mutlak bir sıralama anlamsızdır.
+ */
+const TOPLULUK_ESIGI = 0.5;
+
+export function hasCommunityData(item: Item): boolean {
+  const s = item.signals;
+  if (!s) return false;
+  return s.votesUp + s.votesDown + s.votesInterest >= MIN_VOTES_PER_ITEM;
+}
 
 // ---------- Ham sinyal hesapları ----------
 
@@ -74,8 +153,8 @@ function rawIlgi(s: ItemSignals): number {
 }
 
 /** Yorum puanı ile deneyim oylarının olumlu oranı birleştirilir. */
-function rawMemnuniyet(item: Item): number {
-  const { votesUp, votesDown } = item.signals;
+function rawMemnuniyet(item: Item, s: ItemSignals): number {
+  const { votesUp, votesDown } = s;
   const deneyim = votesUp + votesDown;
   const oyOrani = deneyim > 0 ? votesUp / deneyim : null;
   const yorumOrani = item.ratingCount > 0 ? item.ratingAvg / 5 : null;
@@ -98,21 +177,25 @@ function rawGuncellik(updatedAt: string, now: number): number {
 }
 
 function rawSignal(key: SignalKey, item: Item, now: number): number {
+  const s = item.signals;
+  // Sinyali olmayan kayıt topluluk modelinde en alttadır; bu bir ceza değil,
+  // "hakkında topluluk verisi yok" durumunun dürüst karşılığıdır.
+  if (!s) return key === "guncellik" ? rawGuncellik(item.updatedAt, now) : key === "editor" ? item.editorial.score : 0;
   switch (key) {
     case "topluluk":
-      return rawTopluluk(item.signals);
+      return rawTopluluk(s);
     case "ivme":
-      return rawIvme(item.signals);
+      return rawIvme(s);
     case "ilgi":
-      return rawIlgi(item.signals);
+      return rawIlgi(s);
     case "memnuniyet":
-      return rawMemnuniyet(item);
+      return rawMemnuniyet(item, s);
     case "kalicilik":
-      return rawKalicilik(item.signals);
+      return rawKalicilik(s);
     case "guncellik":
       return rawGuncellik(item.updatedAt, now);
     case "editor":
-      return item.signals.editor;
+      return s.editor;
   }
 }
 
@@ -150,6 +233,11 @@ export function scoreCategory(items: Item[], now = Date.now()): ScoredItem[] {
   const n = items.length;
   if (n === 0) return [];
 
+  // Kategorinin dayanağı: yeterli oy birikmediyse tüm kohort editör modeliyle
+  // puanlanır. Karışık dayanak (bir kayıt göreli, diğeri mutlak) sıralamayı bozar.
+  const oyluKayit = items.filter(hasCommunityData).length;
+  if (oyluKayit < Math.ceil(n * TOPLULUK_ESIGI)) return scoreCategoryByEditor(items, n);
+
   const model = SCORE_MODELS[items[0].type];
 
   // Her sinyal için kategorideki ham değer dağılımı
@@ -170,16 +258,42 @@ export function scoreCategory(items: Item[], now = Date.now()): ScoredItem[] {
       breakdown[def.key] = Math.round(yuzdelik);
       toplam += yuzdelik * def.weight;
     }
-    return { ...item, score: Math.round(toplam), scoreBreakdown: breakdown, categoryRank: 0, categorySize: n };
+    return {
+      ...item,
+      score: Math.round(toplam),
+      scoreBasis: "topluluk" as const,
+      scoreBreakdown: breakdown,
+      categoryRank: 0,
+      categorySize: n,
+    };
   });
 
-  // Sıralama rozet koşulları için gerekli
+  return siralamayiYaz(puanli);
+}
+
+/**
+ * Topluluk verisi olmayan kategori: puan doğrudan editör kriterlerinden gelir.
+ * Yüzdelik uygulanmaz — kıyaslanacak topluluk sinyali yok, mutlak not var.
+ */
+function scoreCategoryByEditor(items: Item[], n: number): ScoredItem[] {
+  const puanli: ScoredItem[] = items.map((item) => ({
+    ...item,
+    score: item.editorial.score,
+    scoreBasis: "editor" as const,
+    scoreBreakdown: { ...item.editorial.criteria },
+    categoryRank: 0,
+    categorySize: n,
+  }));
+  return siralamayiYaz(puanli);
+}
+
+/** Rozet koşulları kategorideki sırayı kullanır. */
+function siralamayiYaz(puanli: ScoredItem[]): ScoredItem[] {
   [...puanli]
     .sort((a, b) => b.score - a.score)
     .forEach((it, i) => {
       it.categoryRank = i + 1;
     });
-
   return puanli;
 }
 
@@ -209,6 +323,33 @@ export const SCORE_TONE_LABEL: Record<ReturnType<typeof scoreTone>, string> = {
   mid: "Kategorisinde ortalama",
   low: "Kategorisinde geride",
 };
+
+/** Editör puanı mutlaktır; "kategorisinde üst sırada" demek yanıltıcı olur. */
+const EDITOR_TONE_LABEL: Record<ReturnType<typeof scoreTone>, string> = {
+  great: "Editör notu: çok iyi",
+  good: "Editör notu: iyi",
+  mid: "Editör notu: ortalama",
+  low: "Editör notu: zayıf",
+};
+
+export function scoreToneLabel(item: Item): string {
+  const tone = scoreTone(item.score);
+  return item.scoreBasis === "topluluk" ? SCORE_TONE_LABEL[tone] : EDITOR_TONE_LABEL[tone];
+}
+
+/** Puanın ne anlama geldiğini tek cümlede söyler — dayanak her yerde görünmeli. */
+export function scoreBasisLabel(item: Item): { kisa: string; aciklama: string } {
+  return item.scoreBasis === "topluluk"
+    ? {
+        kisa: "Topluluk puanı",
+        aciklama: "Ziyaretçi oyları ve ilgi sinyalleri, kategori içi yüzdeliklerle hesaplandı.",
+      }
+    : {
+        kisa: "Editör değerlendirmesi",
+        aciklama:
+          "Bu kategoride henüz yeterli ziyaretçi oyu yok. Puan, editörün doğrulanabilir kriterlerine dayanıyor; oy biriktikçe topluluk puanına geçilecek.",
+      };
+}
 
 /** Kategoride yeterli kayıt yoksa puan güveni düşüktür; arayüz bunu belirtmeli. */
 export function isCohortThin(size: number): boolean {

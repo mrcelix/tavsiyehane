@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getBundle } from "@/lib/data";
+import { isCategoryLive } from "@/lib/categories";
 import { Listing, type ListingSearchParams } from "@/components/Listing";
 
 interface Props {
@@ -25,8 +26,10 @@ export default async function UrunKategoriPage({ params, searchParams }: Props) 
   const { kategori } = await params;
   const sp = await searchParams;
   const bundle = await getBundle();
+  // Hazırlanan kategorinin sayfası açılmaz; boş liste hem kullanıcıyı hem
+  // arama motorunu yanıltır (bkz. lib/categories.ts).
   const cat = bundle.categories.find((c) => c.slug === kategori && c.type === "urun");
-  if (!cat) notFound();
+  if (!cat || !isCategoryLive(cat)) notFound();
 
   return (
     <Listing

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Eye, Scale, ShieldCheck, ThumbsDown, ThumbsUp } from "lucide-react";
 import { pageMetadata } from "@/lib/seo";
-import { MIN_COHORT, SCORE_MODELS } from "@/lib/scoring";
+import { EDITOR_MODELS, MIN_COHORT, MIN_VOTES_PER_ITEM, SCORE_MODELS } from "@/lib/scoring";
 import { BADGES } from "@/lib/badges";
 import { TYPE_LABELS, type BadgeKey, type ItemType } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
@@ -36,8 +36,38 @@ export default function MetodolojiPage() {
 
       <section className={`mt-8 ${PANEL}`}>
         <h2 className="flex items-center gap-2 text-base font-bold">
+          <ShieldCheck size={17} className="text-[var(--brand)]" />
+          Puanın iki dayanağı vardır ve hangisi olduğu her zaman yazar
+        </h2>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-[var(--line)] p-3">
+            <p className="text-sm font-bold">Topluluk puanı</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--ink-2)]">
+              Kategoride yeterli oy biriktiğinde devreye girer: kayıtların en az yarısı{" "}
+              <strong>{MIN_VOTES_PER_ITEM}</strong> oya ulaşmış olmalı. Puan, aşağıdaki yedi sinyalin
+              kategori içi yüzdeliklerinden hesaplanır.
+            </p>
+          </div>
+          <div className="rounded-xl border border-[var(--line)] p-3">
+            <p className="text-sm font-bold">Editör değerlendirmesi</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--ink-2)]">
+              Yeni yayına giren kategorilerde topluluk verisi henüz yoktur. Puan, editörün{" "}
+              <strong>doğrulanabilir</strong> kriterlerine dayanır ve kayıt &quot;Editör
+              değerlendirmesi&quot; olarak etiketlenir.
+            </p>
+          </div>
+        </div>
+        <p className="mt-3 rounded-xl bg-[var(--up-soft)] p-3 text-sm leading-relaxed text-[var(--up-ink)]">
+          <strong>Oy ve yorum sayısı asla üretilmez.</strong> Topluluk verisi olmayan kaydın oy sayısı
+          sıfırdır ve sıfır görünür; tahmini bir rakam yazmayız. Aynı sebeple, editörün ölçemediği bir
+          kriter boş bırakılır — puan yalnızca gerçekten değerlendirilen kriterlerin ağırlığına bölünür.
+        </p>
+      </section>
+
+      <section className={`mt-4 ${PANEL}`}>
+        <h2 className="flex items-center gap-2 text-base font-bold">
           <Scale size={17} className="text-[var(--brand)]" />
-          Puan mutlak değil, kategori içinde görelidir
+          Topluluk puanı mutlak değil, kategori içinde görelidir
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[var(--ink-2)]">
           Bir robot süpürge telefonla değil, diğer robot süpürgelerle kıyaslanır. Her sinyal önce kendi
@@ -52,7 +82,32 @@ export default function MetodolojiPage() {
         </p>
       </section>
 
-      <h2 className="mt-10 text-xl font-extrabold tracking-tight">Sinyaller ve ağırlıklar</h2>
+      <h2 className="mt-10 text-xl font-extrabold tracking-tight">Editör kriterleri</h2>
+      <p className="mt-1 text-sm text-[var(--muted)]">
+        Topluluk verisi yokken kullanılan kriterler. Hepsi belgeye, ölçüme veya yayınlanmış bilgiye
+        dayanır — &quot;kullanıcı memnuniyeti&quot; bilinçli olarak yoktur, onu editör bilemez.
+      </p>
+
+      <div className="mt-4 space-y-4">
+        {tipler.map((t) => (
+          <section key={t} className={PANEL}>
+            <h3 className="text-base font-bold">{TYPE_LABELS[t].plural}</h3>
+            <dl className="mt-3 divide-y divide-[var(--line)] text-sm">
+              {EDITOR_MODELS[t].map((s) => (
+                <div key={s.key} className="flex items-baseline justify-between gap-4 py-2.5">
+                  <dt>
+                    <span className="font-semibold text-[var(--ink)]">{s.label}</span>
+                    <span className="mt-0.5 block text-xs text-[var(--muted)]">{s.hint}</span>
+                  </dt>
+                  <dd className="shrink-0 font-num font-bold text-[var(--brand)]">%{Math.round(s.weight * 100)}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+      </div>
+
+      <h2 className="mt-10 text-xl font-extrabold tracking-tight">Topluluk sinyalleri ve ağırlıkları</h2>
       <p className="mt-1 text-sm text-[var(--muted)]">
         Aynı yedi sinyal, üç tipte farklı dengelerle kullanılır: ürün trendle, hizmet güvenle, mekân
         canlılıkla yaşar.

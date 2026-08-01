@@ -3,6 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getBundle } from "@/lib/data";
 import { uniqueCities } from "@/lib/query";
+import { isCategoryLive } from "@/lib/categories";
 import { slugify } from "@/lib/format";
 import { Listing, type ListingSearchParams } from "@/components/Listing";
 
@@ -34,7 +35,7 @@ export default async function HizmetKategoriPage({ params, searchParams }: Props
   const { sehir, kategori } = await params;
   const sp = await searchParams;
   const { cat, city, cityMissing } = await resolve(sehir, kategori);
-  if (!cat || cityMissing) notFound();
+  if (!cat || !isCategoryLive(cat) || cityMissing) notFound();
 
   return (
     <Listing
