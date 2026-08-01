@@ -18,17 +18,24 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
 ## Supabase kurulumu (gerçek veritabanı + üyelik)
 
 1. [supabase.com](https://supabase.com) → **New project** (ücretsiz plan yeterli).
-2. Proje açılınca **SQL Editor** → `supabase/migrations/0001_init.sql` içeriğini yapıştırıp **Run**.
-3. **Project Settings → API**'den değerleri alın; `.env.local.example` dosyasını `.env.local`
-   olarak kopyalayıp doldurun:
+2. Proje açılınca **SQL Editor** → migration'ları **sırayla** yapıştırıp **Run**:
+   - `supabase/migrations/0001_init.sql` (tablolar, RLS, indeksler)
+   - `supabase/migrations/0002_votes.sql` (oylama tablosu, oy ağırlıklandırma, sinyal görünümü)
+3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` (yalnızca seed için; gizli tutun)
-4. Demo veriyi veritabanına yükleyin:
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı
+   - `SUPABASE_SERVICE_ROLE_KEY` (yalnızca seed için; gizli tutun, Cloudflare'e eklemeyin)
+4. **Authentication → URL Configuration**: giriş, Google ve şifre sıfırlama akışları
+   `<origin>/auth/callback` adresine döner. Bu adresleri **Redirect URLs** listesine ekleyin:
+   - `http://localhost:3005/auth/callback` (geliştirme)
+   - `https://ALAN-ADINIZ/auth/callback` (üretim)
+
+   Listede olmayan adrese dönüş Supabase tarafından reddedilir; giriş sessizce başarısız olur.
+5. Demo veriyi veritabanına yükleyin (isteğe bağlı — gerçek katalog kodda tutuluyor):
    ```bash
    npm run seed
    ```
-5. `npm run dev` — site artık Supabase verisiyle çalışır (kaynak otomatik algılanır).
+6. `npm run dev` — site artık Supabase verisiyle çalışır (kaynak otomatik algılanır).
 
 ### Admin hesabı
 
@@ -47,7 +54,9 @@ Ardından `/panel` üzerinden yorum moderasyonu, sponsorluk ve içerik yönetimi
 2. Authorized redirect URI: `https://XXXXX.supabase.co/auth/v1/callback`
    (Supabase → Authentication → Providers → Google sayfası tam URI'yi gösterir).
 3. Client ID + Secret'ı Supabase → **Authentication → Providers → Google**'a yapıştırıp etkinleştirin.
-4. E-posta/şifre girişi bu kurulum olmadan da çalışır.
+4. Yukarıdaki 4. adımdaki **Redirect URLs** listesi Google için de geçerlidir.
+5. E-posta/şifre girişi bu kurulum olmadan da çalışır. Google sağlayıcısı kapalıyken
+   "Google ile devam et" düğmesi anlaşılır bir hata verir, sessizce başarısız olmaz.
 
 ## Cloudflare'e dağıtım
 
