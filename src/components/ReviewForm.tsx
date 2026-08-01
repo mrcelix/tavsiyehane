@@ -36,7 +36,7 @@ export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType })
   const [rating, setRating] = useState(0);
   const [crit, setCrit] = useState<Record<string, number>>({});
   const [comment, setComment] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "done" | "demo" | "auth" | "error">("idle");
+  const [state, setState] = useState<"idle" | "sending" | "done" | "demo" | "auth" | "dogrulama" | "error">("idle");
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,6 +51,7 @@ export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType })
       const data = await res.json();
       if (data.demo) setState("demo");
       else if (data.authRequired) setState("auth");
+      else if (data.verificationRequired) setState("dogrulama");
       else if (data.ok) setState("done");
       else setState("error");
     } catch {
@@ -111,6 +112,12 @@ export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType })
               giriş yapın
             </button>
             .
+          </span>
+        )}
+        {state === "dogrulama" && (
+          <span className="text-sm text-[var(--gold-ink)]">
+            Yorumun yayımlanması için e-posta adresini doğrulaman gerekiyor. Kayıt sırasında
+            gönderdiğimiz bağlantıya tıkla, sonra tekrar dene.
           </span>
         )}
         {state === "error" && <span className="text-sm text-[var(--down)]">Bir hata oluştu, tekrar deneyin.</span>}

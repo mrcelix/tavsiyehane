@@ -1,0 +1,36 @@
+name: CI
+
+# Bu iş akışı olmadan doğrulama tamamen elle yapılıyordu; bir kez atlanan
+# kontrol, kırık kodun ana dala girmesi demek. Dört adım da PR'da zorunlu.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dogrula:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tip kontrolü
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Testler
+        run: npm run test
+
+      # Derleme en yavaş adım, en sona bırakıldı: hızlı kontroller önce patlasın.
+      # Supabase anahtarları verilmez — site anahtarsız da derlenebilmeli
+      # (yerleşik veriyle çalışan demo modu bunun için var).
+      - name: Üretim derlemesi
+        run: npm run build

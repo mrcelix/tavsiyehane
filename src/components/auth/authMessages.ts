@@ -30,6 +30,9 @@ export interface PasswordStrength {
   hint: string;
 }
 
+/** Kayıt için kabul edilen en düşük güç — 8 karakter + iki koşul daha. */
+export const MIN_PASSWORD_SCORE = 3;
+
 /**
  * Şifre gücü. Amaç yasak koymak değil, eksiği söylemek: "zayıf" yazıp
  * nedenini söylememek kullanıcıyı tahmin etmeye zorlar.
@@ -44,16 +47,17 @@ export function passwordStrength(pw: string): PasswordStrength {
     { ok: /[^\p{L}\d]/u.test(pw), eksik: "noktalama işareti" },
   ];
 
-  const score = kosullar.filter((k) => k.ok).length;
+  const ham = kosullar.filter((k) => k.ok).length;
+  // Uzunluk diğer koşullarla eşit ağırlıkta sayılamaz: "Ab1!" üç koşulu birden
+  // sağlar ama dört karakterdir ve kaba kuvvetle saniyeler içinde kırılır.
+  // Uzunluk sağlanmadan puan hiçbir zaman kayıt eşiğine ulaşmaz.
+  const score = kosullar[0].ok ? ham : Math.min(ham, MIN_PASSWORD_SCORE - 1);
   const eksikler = kosullar.filter((k) => !k.ok).map((k) => k.eksik);
   // 0. eleman da doludur: hiçbir koşulu sağlamayan şifre "etiketsiz" değil, çok zayıftır.
   const label = ["Çok zayıf", "Çok zayıf", "Zayıf", "İyi", "Güçlü"][score];
   const hint = eksikler.length > 0 ? `Güçlendirmek için ${eksikler.join(", ")} ekleyin.` : "Bu şifre güçlü.";
   return { score, label, hint };
 }
-
-/** Kayıt için kabul edilen en düşük güç — 8 karakter + iki koşul daha. */
-export const MIN_PASSWORD_SCORE = 3;
 
 export function isValidEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());

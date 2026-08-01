@@ -10,6 +10,8 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ authRequired: true });
+  // Oyla aynı kural: doğrulanmamış hesabın yorumu moderasyon kuyruğuna girmez.
+  if (!user.email_confirmed_at) return NextResponse.json({ verificationRequired: true });
 
   const body = await request.json().catch(() => null);
   if (!body?.itemId || !body?.rating || !body?.comment) {

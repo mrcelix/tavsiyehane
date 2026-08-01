@@ -156,6 +156,10 @@ export default function MetodolojiPage() {
 
         <h3 className="mt-5 text-sm font-bold">Manipülasyona karşı</h3>
         <ul className="mt-2 space-y-1.5 text-sm text-[var(--ink-2)]">
+          <li>
+            • <strong>Doğrulanmamış hesabın oyu ve yorumu hiç kaydedilmez.</strong> Bu kural hem
+            uygulamada hem veritabanı satır güvenliğinde uygulanır; API atlansa bile geçerlidir.
+          </li>
           <li>• Yeni açılmış hesabın oyu düşük ağırlıkla sayılır; ağırlık hesap yaşıyla artar.</li>
           <li>• Yalnızca tek bir kayda oy vermiş hesapların ağırlığı yarıya iner.</li>
           <li>• Oylar eskidikçe ağırlığını yitirir (90 günde yarılanır) — trend sitesinde iki yıl önceki oy bugünü anlatmaz.</li>

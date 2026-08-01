@@ -22,6 +22,11 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ authRequired: true });
 
+  // Kayıt formunda ve metodolojide "doğrulanmamış hesapların oyu sayılmaz"
+  // yazıyor; kural burada da, RLS'te de (0004_verified_only.sql) uygulanır.
+  // Yalnızca RLS'e bırakmak kullanıcıya anlamsız bir veritabanı hatası gösterirdi.
+  if (!user.email_confirmed_at) return NextResponse.json({ verificationRequired: true });
+
   // Aynı kullanıcı bir kayda tek oy verir; tekrar oylarsa oyu güncellenir.
   const { error } = await supabase
     .from("votes")

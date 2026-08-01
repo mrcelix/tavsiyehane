@@ -3,6 +3,7 @@
 import { Eye, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
+import { useAuthModal } from "./auth/AuthModalProvider";
 
 export type VoteKind = "up" | "down" | "interest";
 
@@ -64,8 +65,9 @@ const OPTIONS: { kind: VoteKind; label: string; short: string; icon: typeof Thum
  * ve tek tip beğeni düğmesi bu bilgiyi yok eder.
  */
 export function VoteButtons({ itemId, counts, compact = false }: Props) {
+  const { open } = useAuthModal();
   const [local, setLocal] = useState(counts);
-  const [not, setNot] = useState<string | null>(null);
+  const [not, setNot] = useState<{ text: string; eylem?: "giris" } | null>(null);
 
   const raw = useSyncExternalStore(
     subscribe,
@@ -77,6 +79,16 @@ export function VoteButtons({ itemId, counts, compact = false }: Props) {
   async function vote(kind: VoteKind) {
     const onceki = mine;
     if (onceki === kind) return;
+
+    /** Sunucu oyu almadıysa arayüz de almamış gibi davranmalı. */
+    function geriAl() {
+      setLocal(counts);
+      const s = readVotes(localStorage.getItem(KEY) ?? "{}");
+      if (onceki) s[itemId] = onceki;
+      else delete s[itemId];
+      localStorage.setItem(KEY, JSON.stringify(s));
+      window.dispatchEvent(new Event(EVENT));
+    }
 
     // İyimser güncelleme: önceki oy geri alınır, yenisi eklenir.
     setLocal((c) => {
@@ -98,11 +110,28 @@ export function VoteButtons({ itemId, counts, compact = false }: Props) {
         body: JSON.stringify({ itemId, kind }),
       });
       const data = await res.json();
-      if (data.demo) setNot("Demo modunda oyunuz yalnızca bu tarayıcıda saklanır.");
-      else if (data.authRequired) setNot("Oyunuz sayıldı; kalıcı olması için giriş yapın.");
-      else setNot(null);
+
+      if (data.demo) {
+        setNot({ text: "Demo modunda oyunuz yalnızca bu tarayıcıda saklanır." });
+      } else if (data.authRequired) {
+        // Önceden "oyunuz sayıldı" yazıyordu; oysa sunucuya hiç yazılmamıştı.
+        // Sayılmayan bir oyu sayıldı diye göstermek, oy sayılarına olan güveni bitirir.
+        geriAl();
+        setNot({ text: "Oy vermek için giriş yapmalısın.", eylem: "giris" });
+      } else if (data.verificationRequired) {
+        geriAl();
+        setNot({
+          text: "Oyun sayılması için e-posta adresini doğrulaman gerekiyor. Kayıt sırasında gönderdiğimiz bağlantıya tıkla.",
+        });
+      } else if (data.error) {
+        geriAl();
+        setNot({ text: "Oy kaydedilemedi, birazdan tekrar deneyin." });
+      } else {
+        setNot(null);
+      }
     } catch {
-      setNot("Oy kaydedilemedi, bağlantınızı kontrol edin.");
+      geriAl();
+      setNot({ text: "Oy kaydedilemedi, bağlantınızı kontrol edin." });
     }
   }
 
@@ -148,7 +177,22 @@ export function VoteButtons({ itemId, counts, compact = false }: Props) {
         </p>
       )}
 
-      {not && !compact && <p className="text-xs text-[var(--gold-ink)]">{not}</p>}
+      {/* Uyarı kartlarda da gösterilir: oyu reddedilen kullanıcı sebebini
+          görmeden bir daha denemez, sessiz başarısızlık en kötü geri bildirimdir. */}
+      {not && (
+        <p className={cn("text-[var(--gold-ink)]", compact ? "mt-1.5 text-[11px] leading-snug" : "text-xs")}>
+          {not.text}
+          {not.eylem === "giris" && (
+            <button
+              type="button"
+              onClick={() => open("giris", "Oyunun sayılması için giriş yapman gerekiyor.")}
+              className="ml-1 font-bold underline"
+            >
+              Giriş yap
+            </button>
+          )}
+        </p>
+      )}
     </div>
   );
 }

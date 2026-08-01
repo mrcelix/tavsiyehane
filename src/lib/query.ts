@@ -76,12 +76,20 @@ export function parseSearchQuery(q: string): { words: string[]; maxPrice?: numbe
   return { words, maxPrice };
 }
 
+/** Gövdenin anlamlı kalması için gereken en az harf sayısı. */
+const MIN_GOVDE = 4;
+
 function wordMatches(hay: string, haySlug: string, word: string): boolean {
   if (hay.includes(word) || haySlug.includes(slugify(word))) return true;
-  // Kaba Türkçe ek toleransı: "kediler" -> "kedi", "çalışmaya" -> "çalışma"
-  if (word.length > 4) {
-    const stem = word.slice(0, word.length - 2);
-    return hay.includes(stem) || haySlug.includes(slugify(stem));
+
+  // Kaba Türkçe ek toleransı. Tek bir kesim yetmez: "-ler", "-ları", "-ında"
+  // gibi ekler iki harften uzun olduğu için sabit kesim "kediler"i "kedile"
+  // yapar ve hiçbir şeyle eşleşmez. Bu yüzden gövde kısala kısala denenir;
+  // MIN_GOVDE altına inilmez, yoksa "kek" ile "kediler" eşleşmeye başlar.
+  const enFazlaKesim = Math.min(4, word.length - MIN_GOVDE);
+  for (let kesim = 1; kesim <= enFazlaKesim; kesim++) {
+    const govde = word.slice(0, word.length - kesim);
+    if (hay.includes(govde) || haySlug.includes(slugify(govde))) return true;
   }
   return false;
 }
