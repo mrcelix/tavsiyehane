@@ -177,6 +177,29 @@ alter table public.profiles      enable row level security;
 alter table public.lists         enable row level security;
 alter table public.list_items    enable row level security;
 
+-- NOT: PostgreSQL `create policy ... if not exists` desteklemez. Dosyanın yeniden
+-- çalıştırılabilir olması için her politika önce düşürülür. Kurulum yarıda kalırsa
+-- (ağ hatası, kopyala-yapıştır eksiği) dosyayı baştan çalıştırmak yeterli olmalı.
+drop policy if exists "public read categories"    on public.categories;
+drop policy if exists "public read items"         on public.items;
+drop policy if exists "public read offers"        on public.offers;
+drop policy if exists "public read price_history" on public.price_history;
+drop policy if exists "public read lists"         on public.lists;
+drop policy if exists "public read list_items"    on public.list_items;
+drop policy if exists "admin write items"         on public.items;
+drop policy if exists "owner update items"        on public.items;
+drop policy if exists "admin write categories"    on public.categories;
+drop policy if exists "admin write offers"        on public.offers;
+drop policy if exists "admin write lists"         on public.lists;
+drop policy if exists "admin write list_items"    on public.list_items;
+drop policy if exists "read approved reviews"     on public.reviews;
+drop policy if exists "insert own review"         on public.reviews;
+drop policy if exists "admin moderate reviews"    on public.reviews;
+drop policy if exists "delete own review"         on public.reviews;
+drop policy if exists "own favorites"             on public.favorites;
+drop policy if exists "read profiles"             on public.profiles;
+drop policy if exists "update own profile"        on public.profiles;
+
 -- Herkese açık okuma (katalog verisi)
 create policy "public read categories"    on public.categories    for select using (true);
 create policy "public read items"         on public.items         for select using (true);

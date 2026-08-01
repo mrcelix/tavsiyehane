@@ -21,6 +21,12 @@ create index if not exists votes_created_idx on public.votes(created_at);
 alter table public.votes enable row level security;
 
 -- Sayımlar herkese açık; oy verme yalnızca giriş yapana ve yalnızca kendi adına.
+-- `create policy` idempotent değildir; dosya yeniden çalıştırılabilsin diye önce düşürülür.
+drop policy if exists "public read votes" on public.votes;
+drop policy if exists "insert own vote"   on public.votes;
+drop policy if exists "update own vote"   on public.votes;
+drop policy if exists "delete own vote"   on public.votes;
+
 create policy "public read votes"  on public.votes for select using (true);
 create policy "insert own vote"    on public.votes for insert with check (user_id = auth.uid());
 create policy "update own vote"    on public.votes for update using (user_id = auth.uid()) with check (user_id = auth.uid());
@@ -96,5 +102,7 @@ create table if not exists public.item_stats (
 create index if not exists item_stats_day_idx on public.item_stats(day);
 
 alter table public.item_stats enable row level security;
+drop policy if exists "public read item_stats" on public.item_stats;
+drop policy if exists "admin write item_stats" on public.item_stats;
 create policy "public read item_stats" on public.item_stats for select using (true);
 create policy "admin write item_stats" on public.item_stats for all using (public.is_admin()) with check (public.is_admin());
