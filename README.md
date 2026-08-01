@@ -22,6 +22,8 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
    - `supabase/migrations/0001_init.sql` (tablolar, RLS, indeksler)
    - `supabase/migrations/0002_votes.sql` (oylama tablosu, oy ağırlıklandırma, sinyal görünümü)
    - `supabase/migrations/0003_email_identity.sql` (üye kimliği e-posta; kullanıcı adı kaldırıldı)
+   - `supabase/migrations/0004_verified_only.sql` (oy ve yorum için e-posta doğrulaması zorunlu)
+   - `supabase/migrations/0005_images.sql` (görsel alanları + item-images depolama kovası)
 3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı
@@ -49,6 +51,38 @@ where id = (select id from auth.users where email = 'ADRESINIZ@ornek.com');
 ```
 
 Ardından `/panel` üzerinden yorum moderasyonu, sponsorluk ve içerik yönetimi açılır.
+
+### Kayıt görselleri
+
+Görseli olmayan kayıtlar, slug'undan **deterministik olarak üretilen bir kapak**
+alır (`src/components/CoverArt.tsx`): telif riski yok, ağ isteği yok, aynı kayıt
+her zaman aynı kapağı görür. Gerçek fotoğraf eklendiği anda kapak devreden çıkar.
+
+Fotoğraf eklerken künye **zorunludur** — adres, alt metin, telif sahibi ve
+kullanım hakkı. Eksik künyeli görsel hiç gösterilmez ve veritabanı kısıtı da
+buna izin vermez (`0005_images.sql`). Sebebi basit: "internette vardı" diye
+konulan üretici fotoğrafı, karşılaştırma sitelerinin en sık dava aldığı yerdir.
+
+1. Görseli Supabase → **Storage → item-images** kovasına yükleyin (yazma yetkisi
+   yalnızca adminde, okuma herkese açık).
+2. Kayda künyesiyle birlikte işleyin:
+
+   ```ts
+   image: {
+     url: "https://<proje>.supabase.co/storage/v1/object/public/item-images/<dosya>",
+     alt: "Beyaz zemin üzerinde siyah iPhone 17'nin ön yüzü",
+     credit: "TavsiyeHane",
+     license: "Kendi çekimimiz",
+   }
+   ```
+
+Kabul edilebilir `license` değerleri: kendi çekiminiz, üreticinin basın kiti
+(izin şartlarıyla), açık lisanslı görsel (CC BY gibi — `credit` alanına atıf
+zorunlu). Bunların dışındakini yüklemeyin.
+
+Üretim ortamında Cloudflare görüntü dönüştürmeyi açtıysanız
+`NEXT_PUBLIC_CF_IMAGES=1` verin; boyutlandırma kenar tarafında yapılır.
+Verilmezse görseller optimize edilmeden ama sorunsuz servis edilir.
 
 ### Google ile giriş (isteğe bağlı)
 

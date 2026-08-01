@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   BadgeCheck,
@@ -22,8 +23,8 @@ import { formatDate, formatPrice, locationText, priceSummary, slugify } from "@/
 import { categoryHref } from "@/lib/menu";
 import { itemHref } from "@/lib/routes";
 import { breadcrumbLd, jsonLd } from "@/lib/seo";
-import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { cn } from "@/lib/cn";
+import { CoverArt } from "./CoverArt";
 import { ScoreRing } from "./ScoreRing";
 import { BadgeChip } from "./BadgeChip";
 import { StarRating } from "./StarRating";
@@ -51,7 +52,6 @@ export async function ItemDetail({ item }: { item: Item }) {
   const alternatives = alternativesFor(bundle, item);
   const criteria = REVIEW_CRITERIA[item.type];
   const loc = locationText(item);
-  const accent = TYPE_ACCENT[item.type];
 
   const criteriaAvg = criteria.map((c) => {
     const vals = reviews.map((r) => r.criteria[c.key]).filter((v) => typeof v === "number");
@@ -90,9 +90,40 @@ export async function ItemDetail({ item }: { item: Item }) {
         )}
       >
         <div className="flex flex-col gap-5 sm:flex-row">
-          <div className={cn("flex h-28 w-28 shrink-0 items-center justify-center self-start rounded-[18px]", accent.bg, accent.text)}>
-            <CategoryIcon slug={item.categorySlug} size={52} strokeWidth={1.5} />
-          </div>
+          <figure className="m-0 shrink-0 self-start">
+            {item.image ? (
+              <Image
+                src={item.image.url}
+                alt={item.image.alt}
+                width={224}
+                height={224}
+                sizes="(max-width: 640px) 100vw, 224px"
+                priority
+                className="h-40 w-full rounded-[18px] object-cover sm:h-28 sm:w-28"
+              />
+            ) : (
+              <CoverArt
+                slug={item.slug}
+                type={item.type}
+                categorySlug={item.categorySlug}
+                iconSize={52}
+                className="h-40 w-full rounded-[18px] sm:h-28 sm:w-28"
+              />
+            )}
+            {/* Telif künyesi görselin yanında durur; kaynağı bilinmeyen görsel yayımlanmaz. */}
+            {item.image && (
+              <figcaption className="mt-1.5 max-w-28 text-[10px] leading-tight text-[var(--muted-2)]">
+                {item.image.sourceUrl ? (
+                  <a href={item.image.sourceUrl} target="_blank" rel="noopener noreferrer nofollow" className="underline">
+                    {item.image.credit}
+                  </a>
+                ) : (
+                  item.image.credit
+                )}{" "}
+                · {item.image.license}
+              </figcaption>
+            )}
+          </figure>
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap gap-1.5">

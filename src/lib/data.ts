@@ -38,6 +38,18 @@ function mapItem(r: any): Item {
       verifiedAt: r.verified_at ?? undefined,
       sources: r.sources ?? undefined,
     },
+    // Görsel yalnızca künyesi tamsa gösterilir; kaynağı bilinmeyen görsel
+    // yayımlanmaz (bkz. ItemImage). Eksik künye = görsel yok, üretilmiş kapak devreye girer.
+    image:
+      r.image_url && r.image_alt && r.image_credit && r.image_license
+        ? {
+            url: r.image_url,
+            alt: r.image_alt,
+            credit: r.image_credit,
+            license: r.image_license,
+            sourceUrl: r.image_source_url ?? undefined,
+          }
+        : undefined,
     editorial: buildEditorial(r.type, r.editor_criteria ?? {}),
     // Sinyal satırı yoksa `null` — sıfır oyla dolu bir nesne "veri var" izlenimi verir.
     signals: r.signals ? { ...BOS_SINYAL, ...r.signals } : null,

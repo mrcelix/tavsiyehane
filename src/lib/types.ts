@@ -52,6 +52,25 @@ export interface Provenance {
   sources?: SourceRef[];
 }
 
+/**
+ * Kayıt görseli.
+ *
+ * `credit` ve `license` zorunludur — kaynağı bilinmeyen görsel siteye girmez.
+ * Karşılaştırma siteleri en sık buradan dava alır: üreticinin ürün fotoğrafı
+ * "internette vardı" diye kullanılmaz. Kaynağı yazamıyorsak o görseli
+ * yayımlamıyoruz; üretilmiş kapak (bkz. CoverArt) bu yüzden var.
+ */
+export interface ItemImage {
+  url: string;
+  /** Ekran okuyucu için betimleme; boş bırakılamaz. */
+  alt: string;
+  /** Telif sahibi / kaynak adı — görselin yanında gösterilir. */
+  credit: string;
+  /** Kullanım hakkı: "kendi çekimimiz", "üretici basın kiti", "CC BY 4.0" gibi. */
+  license: string;
+  sourceUrl?: string;
+}
+
 export interface SourceRef {
   label: string;
   url?: string;
@@ -138,6 +157,8 @@ export interface Item {
   priceLevel?: 1 | 2 | 3 | 4; // mekân: ₺–₺₺₺₺
   /** Kaydın kaynağı ve doğrulama bilgisi */
   provenance: Provenance;
+  /** Gerçek fotoğraf; yoksa deterministik kapak üretilir (bkz. CoverArt) */
+  image?: ItemImage;
   /** Editörün doğrulanabilir kriterlere verdiği puanlar — her kayıtta bulunur */
   editorial: EditorialAssessment;
   /**

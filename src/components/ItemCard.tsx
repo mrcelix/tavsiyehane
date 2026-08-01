@@ -1,11 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import type { Item } from "@/lib/types";
 import { itemHref } from "@/lib/routes";
-import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { locationText, priceSummary } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { CARD_BASE } from "./ui/Card";
+import { CoverArt } from "./CoverArt";
 import { ScoreRing } from "./ScoreRing";
 import { BadgeChip } from "./BadgeChip";
 import { StarRating } from "./StarRating";
@@ -17,7 +18,6 @@ export function ItemCard({ item }: { item: Item }) {
   const loc = locationText(item);
   const price = priceSummary(item);
   const visibleBadges = item.badges.filter((b) => b !== "sponsorlu").slice(0, 2);
-  const accent = TYPE_ACCENT[item.type];
 
   return (
     <div
@@ -37,11 +37,26 @@ export function ItemCard({ item }: { item: Item }) {
       )}
 
       <Link href={itemHref(item)} className="flex flex-1 flex-col">
-        {/* İkon başlığı — kategori tipine göre renklenen sade zemin */}
-        <div className={cn("flex h-24 items-center justify-center rounded-t-[13px]", accent.bg)}>
-          <span className={cn("transition-transform duration-200 group-hover:scale-110", accent.text)}>
-            <CategoryIcon slug={item.categorySlug} size={40} strokeWidth={1.5} />
-          </span>
+        {/* Görsel: gerçek fotoğraf varsa o, yoksa kayda özel üretilmiş kapak.
+            Yükseklik her iki durumda da sabit — düzen kayması olmuyor. */}
+        <div className="h-28 overflow-hidden rounded-t-[13px]">
+          {item.image ? (
+            <Image
+              src={item.image.url}
+              alt={item.image.alt}
+              width={480}
+              height={280}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+            />
+          ) : (
+            <CoverArt
+              slug={item.slug}
+              type={item.type}
+              categorySlug={item.categorySlug}
+              className="h-full w-full transition-transform duration-200 group-hover:scale-105"
+            />
+          )}
         </div>
 
         <div className="flex flex-1 flex-col gap-2 p-5">
