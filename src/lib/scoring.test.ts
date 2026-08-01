@@ -154,3 +154,95 @@ describe("scoreCategory — dayanak seçimi", () => {
     expect(scoreCategory([])).toEqual([]);
   });
 });
+
+describe("scoreCategory — dış sinyal dayanağı", () => {
+  const disSinyal = (ilgi: number, onceki: number, fiyat?: number) => ({
+    aramaIlgi30: ilgi,
+    aramaIlgiOnceki30: onceki,
+    ...(fiyat !== undefined ? { fiyatDegisim30: fiyat } : {}),
+    kaynak: { label: "Google Trends", checkedAt: "2026-08-01" },
+  });
+
+  it("oy yokken ama dış ölçüm varken dış sinyal dayanağına geçer", () => {
+    const kohort = [
+      kayit("a", { signals: null, external: disSinyal(80, 40) }),
+      kayit("b", { signals: null, external: disSinyal(30, 35) }),
+    ];
+    const puanli = scoreCategory(kohort);
+    expect(puanli.every((i) => i.scoreBasis === "dis-sinyal")).toBe(true);
+  });
+
+  it("dış ölçüm de yoksa editör dayanağında kalır", () => {
+    const kohort = [kayit("a", { signals: null }), kayit("b", { signals: null })];
+    expect(scoreCategory(kohort).every((i) => i.scoreBasis === "editor")).toBe(true);
+  });
+
+  it("oy varsa dış sinyali değil topluluğu kullanır — öncelik sırası korunur", () => {
+    const kohort = [
+      kayit("a", { external: disSinyal(90, 10) }),
+      kayit("b", { external: disSinyal(10, 90) }),
+    ];
+    expect(scoreCategory(kohort).every((i) => i.scoreBasis === "topluluk")).toBe(true);
+  });
+
+  it("kohortun yarısından azında dış ölçüm varsa editöre düşer", () => {
+    const kohort = [
+      kayit("a", { signals: null, external: disSinyal(80, 40) }),
+      kayit("b", { signals: null }),
+      kayit("c", { signals: null }),
+      kayit("d", { signals: null }),
+    ];
+    expect(scoreCategory(kohort).every((i) => i.scoreBasis === "editor")).toBe(true);
+  });
+
+  it("ivmesi yüksek olan kaydı üste çıkarır", () => {
+    const kohort = [
+      kayit("yukselen", { signals: null, external: disSinyal(90, 30) }),
+      kayit("dusen", { signals: null, external: disSinyal(30, 90) }),
+    ];
+    const puanli = scoreCategory(kohort);
+    const y = puanli.find((i) => i.slug === "yukselen")!;
+    const d = puanli.find((i) => i.slug === "dusen")!;
+    expect(y.score).toBeGreaterThan(d.score);
+  });
+
+  it("ucuzlayan ürünü pahalılaşandan üste koyar", () => {
+    // Arama sinyalleri aynı; tek fark fiyat yönü.
+    const kohort = [
+      kayit("ucuzladi", { signals: null, external: disSinyal(50, 50, -10) }),
+      kayit("zamlandi", { signals: null, external: disSinyal(50, 50, 10) }),
+    ];
+    const puanli = scoreCategory(kohort);
+    const u = puanli.find((i) => i.slug === "ucuzladi")!;
+    const z = puanli.find((i) => i.slug === "zamlandi")!;
+    expect(u.score).toBeGreaterThan(z.score);
+  });
+
+  it("kırılımda dış sinyal kriterlerini gösterir, oy sinyallerini değil", () => {
+    const puanli = scoreCategory([
+      kayit("a", { signals: null, external: disSinyal(60, 50) }),
+      kayit("b", { signals: null, external: disSinyal(40, 50) }),
+    ]);
+    const anahtarlar = Object.keys(puanli[0].scoreBreakdown);
+    expect(anahtarlar).toContain("disIvme");
+    expect(anahtarlar).not.toContain("topluluk");
+    expect(anahtarlar).not.toContain("memnuniyet");
+  });
+});
+
+describe("dış sinyal oy yerine geçmez", () => {
+  it("dış sinyalli kaydın oy sayısı sıfır kalır", () => {
+    const item = kayit("a", {
+      signals: null,
+      external: {
+        aramaIlgi30: 95,
+        aramaIlgiOnceki30: 20,
+        kaynak: { label: "Google Trends", checkedAt: "2026-08-01" },
+      },
+    });
+    // Arayüz oy sayısını buradan okur; dış sinyal ne kadar yüksek olursa olsun
+    // bir oy üretmez.
+    expect(item.signals).toBeNull();
+    expect(hasCommunityData(item)).toBe(false);
+  });
+});

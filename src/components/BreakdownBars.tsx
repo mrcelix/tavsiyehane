@@ -1,4 +1,4 @@
-import { EDITOR_MODELS, SCORE_MODELS } from "@/lib/scoring";
+import { EDITOR_MODELS, EXTERNAL_MODELS, SCORE_MODELS } from "@/lib/scoring";
 import type { Item } from "@/lib/types";
 
 function barColor(v: number): string {
@@ -12,7 +12,12 @@ export function BreakdownBars({ item }: { item: Item }) {
   // Kırılım puanın dayanağını izler: topluluk puanında sinyaller, editör
   // puanında editör kriterleri gösterilir. İkisini karıştırmak, verilmemiş bir
   // notu verilmiş gibi göstermek olur.
-  const model = item.scoreBasis === "topluluk" ? SCORE_MODELS[item.type] : EDITOR_MODELS[item.type];
+  const model =
+    item.scoreBasis === "topluluk"
+      ? SCORE_MODELS[item.type]
+      : item.scoreBasis === "dis-sinyal"
+        ? EXTERNAL_MODELS[item.type]
+        : EDITOR_MODELS[item.type];
   return (
     <div className="space-y-3">
       {model.map((c) => {

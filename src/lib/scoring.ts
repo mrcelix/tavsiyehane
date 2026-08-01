@@ -1,4 +1,4 @@
-import type { EditorialAssessment, Item, ItemSignals, ItemType } from "./types";
+import type { EditorialAssessment, ExternalSignals, Item, ItemSignals, ItemType } from "./types";
 
 /**
  * PUANLAMA MODELİ
@@ -10,10 +10,17 @@ import type { EditorialAssessment, Item, ItemSignals, ItemType } from "./types";
  *    çevrilir, sonra tipe göre ağırlıklandırılır. 87 puan "kendi kategorisinde
  *    üst dilimde" demektir; robot süpürge telefonla değil robot süpürgeyle kıyaslanır.
  *
- * 2. **Editör** — yeni yayına giren kategorilerde topluluk verisi henüz yoktur.
- *    O zaman puan, editörün doğrulanabilir kriterlere verdiği notlardan gelir ve
- *    kayıt "Topluluk verisi toplanıyor" olarak işaretlenir. Oy ve yorum sayısı
- *    ASLA üretilmez — olmayan veri sıfırdır, tahmin edilmez.
+ * 2. **Dış sinyal** — topluluk verisi yokken ama dışarıdan ölçüm varsa
+ *    (arama ilgisi, fiyat hareketi). Trend modelinin soğuk başlangıçta da
+ *    çalışmasını sağlar. Bu ölçümler OY DEĞİLDİR; ayrı dayanak olarak
+ *    etiketlenir ve kaynağı gösterilir.
+ *
+ * 3. **Editör** — ikisi de yoksa. Puan, editörün doğrulanabilir kriterlere
+ *    verdiği notlardan gelir ve kayıt "Topluluk verisi toplanıyor" olarak
+ *    işaretlenir.
+ *
+ * Her üç durumda da oy ve yorum sayısı ASLA üretilmez — olmayan veri sıfırdır,
+ * tahmin edilmez.
  */
 
 export type SignalKey = "topluluk" | "ivme" | "memnuniyet" | "ilgi" | "kalicilik" | "guncellik" | "editor";
@@ -112,6 +119,34 @@ export function buildEditorial(type: ItemType, criteria: Record<string, number>)
   return { criteria, score: editorialScore(type, criteria) };
 }
 
+/**
+ * DIŞ SİNYAL MODELİ — topluluk yokken trendi dışarıdan okur.
+ *
+ * Ağırlıklarda editörün payı kasıtlı olarak yüksek: dış ölçüm neyin
+ * konuşulduğunu söyler, iyi olduğunu söylemez. Arama hacmi yüksek diye kötü bir
+ * ürünü üste çıkarmak, trend sitesini magazin sayfasına çevirir.
+ */
+export const EXTERNAL_MODELS: Record<ItemType, EditorCriterionDef[]> = {
+  urun: [
+    { key: "disIvme", label: "Arama ilgisindeki artış", weight: 0.3, hint: "Son 30 günün önceki 30 güne göre arama ilgisi oranı" },
+    { key: "disIlgi", label: "Arama ilgi hacmi", weight: 0.25, hint: "Kategorideki diğer kayıtlara göre aranma yoğunluğu" },
+    { key: "editorNotu", label: "Editör değerlendirmesi", weight: 0.3, hint: "Doğrulanabilir kriterlere dayalı editör notu" },
+    { key: "fiyatYonu", label: "Fiyat yönü", weight: 0.15, hint: "Son 30 günde ucuzlayan ürün avantajlıdır" },
+  ],
+  hizmet: [
+    // Hizmette dış sinyal zayıftır: yerel bir ustanın arama hacmi ölçülemez.
+    // Bu yüzden editör payı yarıdan fazla.
+    { key: "disIvme", label: "Arama ilgisindeki artış", weight: 0.25, hint: "Son 30 günün önceki 30 güne göre arama ilgisi oranı" },
+    { key: "disIlgi", label: "Arama ilgi hacmi", weight: 0.2, hint: "Kategorideki diğer kayıtlara göre aranma yoğunluğu" },
+    { key: "editorNotu", label: "Editör değerlendirmesi", weight: 0.55, hint: "Belge doğrulaması ve editör kontrolü" },
+  ],
+  mekan: [
+    { key: "disIvme", label: "Arama ilgisindeki artış", weight: 0.3, hint: "Son 30 günün önceki 30 güne göre arama ilgisi oranı" },
+    { key: "disIlgi", label: "Arama ilgi hacmi", weight: 0.3, hint: "Mekânda ilgi, başlı başına sinyaldir" },
+    { key: "editorNotu", label: "Editör değerlendirmesi", weight: 0.4, hint: "Yerinde gözleme dayalı editör notu" },
+  ],
+};
+
 /** Yüzdeliğin tam güvenle uygulanması için kategoride gereken kayıt sayısı. */
 export const MIN_COHORT = 8;
 
@@ -129,6 +164,10 @@ export function hasCommunityData(item: Item): boolean {
   const s = item.signals;
   if (!s) return false;
   return s.votesUp + s.votesDown + s.votesInterest >= MIN_VOTES_PER_ITEM;
+}
+
+export function hasExternalData(item: Item): boolean {
+  return item.external !== undefined;
 }
 
 // ---------- Ham sinyal hesapları ----------
@@ -233,10 +272,15 @@ export function scoreCategory(items: Item[], now = Date.now()): ScoredItem[] {
   const n = items.length;
   if (n === 0) return [];
 
-  // Kategorinin dayanağı: yeterli oy birikmediyse tüm kohort editör modeliyle
-  // puanlanır. Karışık dayanak (bir kayıt göreli, diğeri mutlak) sıralamayı bozar.
+  // Kategorinin dayanağı tek seferde seçilir. Karışık dayanak (bir kayıt
+  // göreli, diğeri mutlak) sıralamayı anlamsızlaştırır.
+  // Öncelik: topluluk > dış sinyal > editör.
   const oyluKayit = items.filter(hasCommunityData).length;
-  if (oyluKayit < Math.ceil(n * TOPLULUK_ESIGI)) return scoreCategoryByEditor(items, n);
+  if (oyluKayit < Math.ceil(n * TOPLULUK_ESIGI)) {
+    const disVerili = items.filter(hasExternalData).length;
+    if (disVerili >= Math.ceil(n * TOPLULUK_ESIGI)) return scoreCategoryByExternal(items);
+    return scoreCategoryByEditor(items, n);
+  }
 
   const model = SCORE_MODELS[items[0].type];
 
@@ -262,6 +306,69 @@ export function scoreCategory(items: Item[], now = Date.now()): ScoredItem[] {
       ...item,
       score: Math.round(toplam),
       scoreBasis: "topluluk" as const,
+      scoreBreakdown: breakdown,
+      categoryRank: 0,
+      categorySize: n,
+    };
+  });
+
+  return siralamayiYaz(puanli);
+}
+
+/** Dış sinyalden ham ivme: mutlak hacim değil değişim hızı. */
+function rawDisIvme(e: ExternalSignals): number {
+  const oran = (e.aramaIlgi30 + 1) / (e.aramaIlgiOnceki30 + 1);
+  return Math.log(Math.min(oran, 5));
+}
+
+/** Ucuzlayan ürün avantajlıdır; işareti çevirip yüksek = iyi hale getiriyoruz. */
+function rawFiyatYonu(e: ExternalSignals): number {
+  return -(e.fiyatDegisim30 ?? 0);
+}
+
+/**
+ * Topluluk verisi yok ama dış ölçüm var: puan arama ilgisi, ivme, fiyat yönü ve
+ * editör notunun kategori içi yüzdeliklerinden hesaplanır.
+ *
+ * Editör notu burada da yüzdeliğe çevrilir; aksi halde mutlak bir not ile göreli
+ * yüzdelikler aynı toplamda karışır ve ölçek tutmaz.
+ */
+function scoreCategoryByExternal(items: Item[]): ScoredItem[] {
+  const n = items.length;
+  const model = EXTERNAL_MODELS[items[0].type];
+
+  function ham(key: string, item: Item): number {
+    const e = item.external;
+    // Dış sinyali olmayan kayıt bu kohortta en altta kalır — ceza değil,
+    // "hakkında ölçüm yok" durumunun karşılığı.
+    if (!e) return key === "editorNotu" ? item.editorial.score : 0;
+    switch (key) {
+      case "disIvme":
+        return rawDisIvme(e);
+      case "disIlgi":
+        return e.aramaIlgi30;
+      case "fiyatYonu":
+        return rawFiyatYonu(e);
+      default:
+        return item.editorial.score;
+    }
+  }
+
+  const dagilim = new Map<string, number[]>();
+  for (const def of model) dagilim.set(def.key, items.map((it) => ham(def.key, it)));
+
+  const puanli: ScoredItem[] = items.map((item) => {
+    const breakdown: Record<string, number> = {};
+    let toplam = 0;
+    for (const def of model) {
+      const yuzdelik = shrink(percentileRank(dagilim.get(def.key)!, ham(def.key, item)), n);
+      breakdown[def.key] = Math.round(yuzdelik);
+      toplam += yuzdelik * def.weight;
+    }
+    return {
+      ...item,
+      score: Math.round(toplam),
+      scoreBasis: "dis-sinyal" as const,
       scoreBreakdown: breakdown,
       categoryRank: 0,
       categorySize: n,
@@ -339,16 +446,26 @@ export function scoreToneLabel(item: Item): string {
 
 /** Puanın ne anlama geldiğini tek cümlede söyler — dayanak her yerde görünmeli. */
 export function scoreBasisLabel(item: Item): { kisa: string; aciklama: string } {
-  return item.scoreBasis === "topluluk"
-    ? {
-        kisa: "Topluluk puanı",
-        aciklama: "Ziyaretçi oyları ve ilgi sinyalleri, kategori içi yüzdeliklerle hesaplandı.",
-      }
-    : {
-        kisa: "Editör değerlendirmesi",
-        aciklama:
-          "Bu kategoride henüz yeterli ziyaretçi oyu yok. Puan, editörün doğrulanabilir kriterlerine dayanıyor; oy biriktikçe topluluk puanına geçilecek.",
-      };
+  if (item.scoreBasis === "topluluk") {
+    return {
+      kisa: "Topluluk puanı",
+      aciklama: "Ziyaretçi oyları ve ilgi sinyalleri, kategori içi yüzdeliklerle hesaplandı.",
+    };
+  }
+  if (item.scoreBasis === "dis-sinyal") {
+    const kaynak = item.external?.kaynak.label;
+    return {
+      kisa: "Dış sinyal",
+      aciklama:
+        `Bu kategoride henüz ziyaretçi oyu yok. Puan, dışarıdan ölçülen arama ilgisi ve editör notuna dayanıyor` +
+        `${kaynak ? ` (kaynak: ${kaynak})` : ""}. Bu ölçümler oy değildir; oy biriktikçe topluluk puanına geçilecek.`,
+    };
+  }
+  return {
+    kisa: "Editör değerlendirmesi",
+    aciklama:
+      "Bu kategoride henüz yeterli ziyaretçi oyu yok. Puan, editörün doğrulanabilir kriterlerine dayanıyor; oy biriktikçe topluluk puanına geçilecek.",
+  };
 }
 
 /** Kategoride yeterli kayıt yoksa puan güveni düşüktür; arayüz bunu belirtmeli. */

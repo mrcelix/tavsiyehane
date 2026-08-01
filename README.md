@@ -52,6 +52,37 @@ where id = (select id from auth.users where email = 'ADRESINIZ@ornek.com');
 
 Ardından `/panel` üzerinden yorum moderasyonu, sponsorluk ve içerik yönetimi açılır.
 
+### Dış sinyaller (soğuk başlangıç)
+
+Puanın üç dayanağı var ve hangisinin kullanıldığı her kayıtta yazar:
+**topluluk > dış sinyal > editör.** Site yeni açıldığında ziyaretçi oyu
+olmadığı için trend modeli çalışamaz; dış sinyaller bu boşluğu doldurur.
+
+Bu ölçümler **oy değildir**. Oy sayısı sıfır kalır ve sıfır görünür; dış sinyal
+ayrı bir dayanak olarak etiketlenir, kaynağı ve ölçüm tarihi kayıtta gösterilir.
+
+Ölçümler elle yazılmaz — kaynağı olmayan sinyal, uydurulmuş sinyalden ayırt
+edilemez. Google Trends'ten (veya kullandığınız kaynaktan) şu biçimde bir JSON
+hazırlayıp içe aktarın:
+
+```json
+{
+  "kaynak": { "label": "Google Trends", "url": "https://trends.google.com/...", "checkedAt": "2026-08-01" },
+  "olcumler": {
+    "apple-iphone-17-256gb": { "aramaIlgi30": 78, "aramaIlgiOnceki30": 64 },
+    "samsung-galaxy-s25-fe-256gb": { "aramaIlgi30": 55, "aramaIlgiOnceki30": 58, "fiyatDegisim30": -4.2 }
+  }
+}
+```
+
+```bash
+node scripts/ingest-signals.mjs olcumler.json
+```
+
+Önce kuru çalıştırır ve ne olacağını yazar; uygulamak için `--yaz` ekleyin.
+Kaynağı veya ölçüm tarihi eksik girdi reddedilir. Bir kategoride kayıtların en
+az yarısında ölçüm varsa o kategori dış sinyal dayanağına geçer.
+
 ### Kayıt görselleri
 
 Görseli olmayan kayıtlar, slug'undan **deterministik olarak üretilen bir kapak**

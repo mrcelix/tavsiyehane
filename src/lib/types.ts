@@ -90,6 +90,28 @@ export interface EditorialAssessment {
 }
 
 /**
+ * DIŞ SİNYALLER — sitenin kendi topluluğundan değil, dışarıdan gelen ölçümler.
+ *
+ * Soğuk başlangıç problemi için var: ziyaretçi oyu birikene kadar hiçbir
+ * kategori trend gösteremez, yani sitenin farkı olan şey tam da en çok
+ * ihtiyaç duyulduğu anda görünmez.
+ *
+ * KRİTİK AYRIM: bunlar OY DEĞİLDİR ve hiçbir yerde oy gibi gösterilmez.
+ * Arayüzde ayrı bir dayanak olarak etiketlenir ("Dış sinyal"), kaynağı ve
+ * ölçüm tarihi yazılır. Bir kaydın oy sayısı hâlâ sıfırdır ve sıfır görünür.
+ */
+export interface ExternalSignals {
+  /** Son 30 günün arama ilgi endeksi (0-100, kaynağın kendi ölçeği) */
+  aramaIlgi30: number;
+  /** Önceki 30 günün aynı endeksi — ivme bu ikisinin oranıdır */
+  aramaIlgiOnceki30: number;
+  /** Son 30 günde fiyatın yüzde değişimi; negatif = ucuzladı. Yalnızca ürün. */
+  fiyatDegisim30?: number;
+  /** Ölçümün nereden geldiği — kaynaksız dış sinyal kabul edilmez. */
+  kaynak: SourceRef;
+}
+
+/**
  * Puanlamayı besleyen ham sinyaller. Puan bunlardan doğrudan değil,
  * her birinin kendi kategorisi içindeki yüzdelik diliminden hesaplanır.
  */
@@ -166,10 +188,19 @@ export interface Item {
    * yoktur; puan editör değerlendirmesinden gelir ve arayüz bunu belirtir.
    */
   signals: ItemSignals | null;
+  /**
+   * Dış ölçümler (arama ilgisi, fiyat hareketi). Topluluk verisi yokken
+   * puanı besler; oy yerine geçmez, ayrı dayanak olarak etiketlenir.
+   */
+  external?: ExternalSignals;
   /** 0-100 tavsiye puanı */
   score: number;
-  /** Puanın dayanağı: topluluk sinyalleri mi, yoksa yalnızca editör mü */
-  scoreBasis: "topluluk" | "editor";
+  /**
+   * Puanın dayanağı. Öncelik sırası: topluluk > dış sinyal > editör.
+   * Hangisi kullanıldıysa kartta ve detayda yazılır — kullanıcı bir puanın
+   * neye dayandığını görmeden ona güvenmek zorunda bırakılmaz.
+   */
+  scoreBasis: "topluluk" | "dis-sinyal" | "editor";
   /** Sinyal/kriter anahtarı -> 0-100 */
   scoreBreakdown: Record<string, number>;
   /** Kategorideki sırası (1 = lider) — rozet koşulları bunu kullanır */

@@ -88,8 +88,10 @@ export function ItemCard({ item }: { item: Item }) {
               <ScoreRing score={item.score} size={44} />
               {/* Puanın neye dayandığı kartta da görünür: editör notu ile topluluk
                   puanı aynı görünürse kullanıcı ikisini aynı sanır. */}
-              {item.scoreBasis === "editor" && (
-                <span className="text-[9px] font-bold uppercase tracking-wide text-[var(--muted-2)]">Editör</span>
+              {item.scoreBasis !== "topluluk" && (
+                <span className="text-[9px] font-bold uppercase tracking-wide text-[var(--muted-2)]">
+                  {item.scoreBasis === "dis-sinyal" ? "Dış sinyal" : "Editör"}
+                </span>
               )}
             </span>
           </div>

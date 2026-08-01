@@ -64,9 +64,22 @@ export function computeBadges(item: Item): BadgeKey[] {
   const s = item.signals;
   const b = item.scoreBreakdown;
 
-  // Topluluk sinyali yoksa hiçbir trend rozeti verilemez. "Yükselen" demek için
-  // yükseldiğini gösteren veri gerekir; editör notu bunun yerine geçmez.
-  if (!s) return item.isSponsored ? ["sponsorlu"] : [];
+  if (!s) {
+    /*
+     * Topluluk sinyali yok. Tek istisna: dış sinyal dayanağındaki "yükselen".
+     * Rozetin yayımlanmış koşulu "ivme kendi kategorisinde ilk %10'da" — kaynağı
+     * oy olmak zorunda değil, arama ilgisindeki artış da bu koşulu karşılar ve
+     * kaynağı arayüzde yazıyor.
+     *
+     * Diğer rozetler dış sinyalden ÜRETİLEMEZ: "Topluluğun seçimi" için deneyim
+     * oyu, "Hype'ı tutmadı" için memnuniyetsizlik verisi gerekir. Arama hacmiyle
+     * bunları söylemek, topluluk adına konuşmak olur.
+     */
+    const disRozetler: BadgeKey[] = [];
+    if (item.scoreBasis === "dis-sinyal" && (b.disIvme ?? 0) >= 90) disRozetler.push("yukselen");
+    if (item.isSponsored) disRozetler.push("sponsorlu");
+    return disRozetler;
+  }
 
   const deneyimOyu = s.votesUp + s.votesDown;
   const olumluOran = deneyimOyu > 0 ? s.votesUp / deneyimOyu : null;

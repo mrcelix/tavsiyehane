@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Eye, Scale, ShieldCheck, ThumbsDown, ThumbsUp } from "lucide-react";
 import { pageMetadata } from "@/lib/seo";
-import { EDITOR_MODELS, MIN_COHORT, MIN_VOTES_PER_ITEM, SCORE_MODELS } from "@/lib/scoring";
+import { EDITOR_MODELS, EXTERNAL_MODELS, MIN_COHORT, MIN_VOTES_PER_ITEM, SCORE_MODELS } from "@/lib/scoring";
 import { BADGES } from "@/lib/badges";
 import { TYPE_LABELS, type BadgeKey, type ItemType } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
@@ -39,28 +39,36 @@ export default function MetodolojiPage() {
           <ShieldCheck size={17} className="text-[var(--brand)]" />
           Puanın iki dayanağı vardır ve hangisi olduğu her zaman yazar
         </h2>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-[var(--line)] p-3">
-            <p className="text-sm font-bold">Topluluk puanı</p>
+        <ol className="mt-3 grid gap-3 sm:grid-cols-3">
+          <li className="rounded-xl border border-[var(--line)] p-3">
+            <p className="text-sm font-bold">1. Topluluk puanı</p>
             <p className="mt-1 text-sm leading-relaxed text-[var(--ink-2)]">
-              Kategoride yeterli oy biriktiğinde devreye girer: kayıtların en az yarısı{" "}
+              Kategoride yeterli oy biriktiğinde: kayıtların en az yarısı{" "}
               <strong>{MIN_VOTES_PER_ITEM}</strong> oya ulaşmış olmalı. Puan, aşağıdaki yedi sinyalin
               kategori içi yüzdeliklerinden hesaplanır.
             </p>
-          </div>
-          <div className="rounded-xl border border-[var(--line)] p-3">
-            <p className="text-sm font-bold">Editör değerlendirmesi</p>
+          </li>
+          <li className="rounded-xl border border-[var(--line)] p-3">
+            <p className="text-sm font-bold">2. Dış sinyal</p>
             <p className="mt-1 text-sm leading-relaxed text-[var(--ink-2)]">
-              Yeni yayına giren kategorilerde topluluk verisi henüz yoktur. Puan, editörün{" "}
-              <strong>doğrulanabilir</strong> kriterlerine dayanır ve kayıt &quot;Editör
-              değerlendirmesi&quot; olarak etiketlenir.
+              Oy yokken ama dışarıdan ölçüm varsa: arama ilgisi ve fiyat hareketi. Ölçümün{" "}
+              <strong>kaynağı ve tarihi</strong> kayıtta yazar. Bunlar oy değildir ve oy sayısına
+              eklenmez.
             </p>
-          </div>
-        </div>
+          </li>
+          <li className="rounded-xl border border-[var(--line)] p-3">
+            <p className="text-sm font-bold">3. Editör değerlendirmesi</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--ink-2)]">
+              İkisi de yoksa. Puan, editörün <strong>doğrulanabilir</strong> kriterlerine dayanır ve
+              kayıt &quot;Editör değerlendirmesi&quot; olarak etiketlenir.
+            </p>
+          </li>
+        </ol>
         <p className="mt-3 rounded-xl bg-[var(--up-soft)] p-3 text-sm leading-relaxed text-[var(--up)]">
           <strong>Oy ve yorum sayısı asla üretilmez.</strong> Topluluk verisi olmayan kaydın oy sayısı
-          sıfırdır ve sıfır görünür; tahmini bir rakam yazmayız. Aynı sebeple, editörün ölçemediği bir
-          kriter boş bırakılır — puan yalnızca gerçekten değerlendirilen kriterlerin ağırlığına bölünür.
+          sıfırdır ve sıfır görünür; tahmini bir rakam yazmayız. Dış sinyal de oy sayısına eklenmez —
+          ayrı bir dayanaktır ve öyle etiketlenir. Aynı sebeple, editörün ölçemediği bir kriter boş
+          bırakılır; puan yalnızca gerçekten değerlendirilen kriterlerin ağırlığına bölünür.
         </p>
       </section>
 
@@ -81,6 +89,32 @@ export default function MetodolojiPage() {
           bir tercihtir, elimizde olmayan kesinliği taklit etmeyiz.
         </p>
       </section>
+
+      <h2 className="mt-10 text-xl font-extrabold tracking-tight">Dış sinyal ağırlıkları</h2>
+      <p className="mt-1 text-sm text-[var(--muted)]">
+        Editörün payı kasıtlı olarak yüksek: dış ölçüm neyin konuşulduğunu söyler, iyi olduğunu
+        söylemez. Arama hacmi yüksek diye kötü bir kaydı üste çıkarmak, trend sitesini magazin
+        sayfasına çevirir.
+      </p>
+
+      <div className="mt-4 space-y-4">
+        {tipler.map((t) => (
+          <section key={t} className={PANEL}>
+            <h3 className="text-base font-bold">{TYPE_LABELS[t].plural}</h3>
+            <dl className="mt-3 divide-y divide-[var(--line)] text-sm">
+              {EXTERNAL_MODELS[t].map((s) => (
+                <div key={s.key} className="flex items-baseline justify-between gap-4 py-2.5">
+                  <dt>
+                    <span className="font-semibold text-[var(--ink)]">{s.label}</span>
+                    <span className="mt-0.5 block text-xs text-[var(--muted)]">{s.hint}</span>
+                  </dt>
+                  <dd className="shrink-0 font-num font-bold text-[var(--brand)]">%{Math.round(s.weight * 100)}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+      </div>
 
       <h2 className="mt-10 text-xl font-extrabold tracking-tight">Editör kriterleri</h2>
       <p className="mt-1 text-sm text-[var(--muted)]">

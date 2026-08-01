@@ -1,5 +1,5 @@
 import { buildEditorial } from "@/lib/scoring";
-import type { Item, ItemType, SourceRef } from "@/lib/types";
+import type { ExternalSignals, Item, ItemImage, ItemType, SourceRef } from "@/lib/types";
 
 /**
  * GERÇEK KATALOG
@@ -44,6 +44,12 @@ export interface CatalogItem {
   verifiedAt: string;
   sources: SourceRef[];
   isSponsored?: boolean;
+  /**
+   * Dış ölçümler (arama ilgisi, fiyat hareketi). Elle yazılmaz —
+   * scripts/ingest-signals.mjs ile dışarıdan alınır. Oy yerine geçmez.
+   */
+  external?: ExternalSignals;
+  image?: ItemImage;
 }
 
 export function buildCatalogItems(raw: CatalogItem[]): Item[] {
@@ -63,7 +69,9 @@ export function buildCatalogItems(raw: CatalogItem[]): Item[] {
     priceLevel: r.priceLevel,
     provenance: { kind: "editor", verifiedAt: r.verifiedAt, sources: r.sources },
     editorial: buildEditorial(r.type, r.editorCriteria),
+    image: r.image,
     signals: null,
+    external: r.external,
     score: 0,
     scoreBasis: "editor",
     scoreBreakdown: {},

@@ -53,6 +53,8 @@ function mapItem(r: any): Item {
     editorial: buildEditorial(r.type, r.editor_criteria ?? {}),
     // Sinyal satırı yoksa `null` — sıfır oyla dolu bir nesne "veri var" izlenimi verir.
     signals: r.signals ? { ...BOS_SINYAL, ...r.signals } : null,
+    // Dış sinyal ancak kaynağıyla birlikte kabul edilir; kaynaksız ölçüm yok sayılır.
+    external: r.external_signals?.kaynak?.label ? r.external_signals : undefined,
     // Puan ve rozetler okumadan sonra kohort üzerinden yeniden hesaplanır.
     score: 0,
     scoreBasis: "editor",
