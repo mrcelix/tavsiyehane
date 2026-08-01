@@ -57,7 +57,7 @@ export default function MetodolojiPage() {
             </p>
           </div>
         </div>
-        <p className="mt-3 rounded-xl bg-[var(--up-soft)] p-3 text-sm leading-relaxed text-[var(--up-ink)]">
+        <p className="mt-3 rounded-xl bg-[var(--up-soft)] p-3 text-sm leading-relaxed text-[var(--up)]">
           <strong>Oy ve yorum sayısı asla üretilmez.</strong> Topluluk verisi olmayan kaydın oy sayısı
           sıfırdır ve sıfır görünür; tahmini bir rakam yazmayız. Aynı sebeple, editörün ölçemediği bir
           kriter boş bırakılır — puan yalnızca gerçekten değerlendirilen kriterlerin ağırlığına bölünür.

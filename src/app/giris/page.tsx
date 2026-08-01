@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import { AuthForm } from "@/components/AuthForm";
+import { AuthPanel } from "@/components/auth/AuthPanel";
 
 export const metadata: Metadata = pageMetadata({
   title: "Giriş Yap",
@@ -11,10 +11,12 @@ export const metadata: Metadata = pageMetadata({
 
 export default function GirisPage() {
   return (
+    // Modal ile aynı bileşen; iki ayrı giriş uygulaması tutmak, birinde
+    // düzeltilen hatanın diğerinde kalması demek.
     <div className="mx-auto max-w-md px-4 py-14">
-      <h1 className="mb-1 text-2xl font-extrabold">Giriş Yap</h1>
-      <p className="mb-6 text-sm text-[var(--muted)]">Yorum yazmak ve favorilerini eşitlemek için giriş yap.</p>
-      <AuthForm mode="giris" />
+      <div className="rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-6 shadow-[var(--shadow-card)]">
+        <AuthPanel initialMode="giris" compact />
+      </div>
     </div>
   );
 }

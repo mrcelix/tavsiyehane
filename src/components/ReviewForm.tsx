@@ -4,6 +4,7 @@ import { Check, Star } from "lucide-react";
 import { useState } from "react";
 import { REVIEW_CRITERIA } from "@/lib/criteria";
 import type { ItemType } from "@/lib/types";
+import { useAuthModal } from "./auth/AuthModalProvider";
 import { Button } from "./ui/Button";
 import { Textarea } from "./ui/Field";
 
@@ -30,6 +31,7 @@ function Stars({ value, onChange }: { value: number; onChange: (v: number) => vo
 }
 
 export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType }) {
+  const { open } = useAuthModal();
   const criteria = REVIEW_CRITERIA[type];
   const [rating, setRating] = useState(0);
   const [crit, setCrit] = useState<Record<string, number>>({});
@@ -100,9 +102,14 @@ export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType })
         {state === "auth" && (
           <span className="text-sm text-[var(--gold-ink)]">
             Yorum yazmak için{" "}
-            <a href="/giris" className="font-bold underline">
+            {/* Sayfadan çıkarmak yazılan yorumu da götürür; modal yerinde açılır. */}
+            <button
+              type="button"
+              onClick={() => open("giris", "Yorumunu yayınlamak için giriş yapman gerekiyor.")}
+              className="font-bold underline"
+            >
               giriş yapın
-            </a>
+            </button>
             .
           </span>
         )}

@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { TrustMarquee } from "@/components/layout/TrustMarquee";
 import { Footer } from "@/components/layout/Footer";
 import { CompareTray } from "@/components/CompareTray";
+import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -71,12 +72,16 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body className="min-h-full flex flex-col">
-        <TopBar />
-        <Header />
-        <TrustMarquee />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CompareTray />
+        {/* Giriş modalı tüm ağacı sarar: header butonu da, yorum/oylama gibi
+            giriş isteyen bileşenler de aynı modalı açar. */}
+        <AuthModalProvider>
+          <TopBar />
+          <Header />
+          <TrustMarquee />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <CompareTray />
+        </AuthModalProvider>
       </body>
     </html>
   );

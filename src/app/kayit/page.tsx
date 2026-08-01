@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import { AuthForm } from "@/components/AuthForm";
+import { AuthPanel } from "@/components/auth/AuthPanel";
 
 export const metadata: Metadata = pageMetadata({
   title: "Kayıt Ol",
@@ -12,9 +12,9 @@ export const metadata: Metadata = pageMetadata({
 export default function KayitPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-14">
-      <h1 className="mb-1 text-2xl font-extrabold">Kayıt Ol</h1>
-      <p className="mb-6 text-sm text-[var(--muted)]">Ücretsiz hesap oluştur; deneyimlerini paylaş, favorilerini sakla.</p>
-      <AuthForm mode="kayit" />
+      <div className="rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-6 shadow-[var(--shadow-card)]">
+        <AuthPanel initialMode="kayit" compact />
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { buildMenu } from "@/lib/menu";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { ButtonLink } from "@/components/ui/Button";
+import { AuthTrigger } from "@/components/auth/AuthTrigger";
 import { CategoryMenu } from "./CategoryMenu";
 import { HeaderSearch } from "./HeaderSearch";
 import { MobileMenu } from "./MobileMenu";
@@ -85,9 +86,11 @@ export async function Header() {
             </Link>
           ) : (
             <span className="hidden sm:inline-flex">
-              <ButtonLink href={authReady ? "/giris" : "/giris?demo=1"} variant="ghost" size="sm">
-                Giriş
-              </ButtonLink>
+              {/* Sayfaya götürmek yerine modal: kullanıcı baktığı listeyi kaybetmiyor.
+                  /giris ve /kayit sayfaları doğrudan bağlantı için duruyor. */}
+              <AuthTrigger
+                reason={authReady ? undefined : "Demo modunda üyelik kapalı; kurulum sonrası aktifleşir."}
+              />
             </span>
           )}
 
