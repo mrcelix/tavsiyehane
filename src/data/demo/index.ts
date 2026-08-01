@@ -7,7 +7,12 @@ import { MEKAN_ITEMS } from "./mekanlar";
 export const DEMO_CATEGORIES: Category[] = [
   { id: "telefon", slug: "telefon", name: "Telefon", type: "urun", icon: "📱", description: "Akıllı telefonlar: fiyat-performans, kamera ve dayanıklılığa göre en iyiler" },
   { id: "robot-supurge", slug: "robot-supurge", name: "Robot Süpürge", type: "urun", icon: "🤖", description: "Haritalama, emiş gücü ve istasyon özelliklerine göre en iyi robot süpürgeler" },
-  { id: "kedi-urunleri", slug: "kedi-urunleri", name: "Kedi Ürünleri", type: "urun", icon: "🐱", description: "Mama, kum, su pınarı ve aksesuarlarda kediniz için en iyi seçimler" },
+  // Kediyi tek kategoride tutmak filtrelemeyi bozuyordu: mamanın "Protein"i ile
+  // taşıma çantasının "Ölçü"sü ortak bir boyut üretmiyor. Üç ayrı kategori
+  // hem karşılaştırmayı hem filtre panelini anlamlı hale getiriyor.
+  { id: "kedi-mamasi", slug: "kedi-mamasi", name: "Kedi Maması", type: "urun", icon: "🐱", description: "Kuru, yaş ve veteriner diyet mamalarında kediniz için en iyi seçimler" },
+  { id: "kedi-kumu", slug: "kedi-kumu", name: "Kedi Kumu", type: "urun", icon: "🪣", description: "Topaklanma, koku kontrolü ve toz oranına göre en iyi kedi kumları" },
+  { id: "kedi-aksesuar", slug: "kedi-aksesuar", name: "Kedi Aksesuarları", type: "urun", icon: "🧶", description: "Tuvalet, tırmalama, taşıma, su pınarı ve yatakta topluluğun tercihleri" },
   { id: "kisisel-bakim", slug: "kisisel-bakim", name: "Kişisel Bakım", type: "urun", icon: "🪒", description: "Tıraş, saç ve ağız bakımı cihazlarında topluluğun en çok önerdikleri" },
   { id: "ev-temizligi", slug: "ev-temizligi", name: "Ev Temizliği", type: "hizmet", icon: "🧹", description: "Sigortalı, belgeli ve doğrulanmış yorumlu ev temizlik hizmetleri" },
   { id: "nakliye", slug: "nakliye", name: "Nakliye", type: "hizmet", icon: "🚚", description: "Evden eve nakliyat, küçük taşıma ve KOBİ kargo çözümleri" },
@@ -89,6 +94,23 @@ const TREND_PROFILES: Record<string, TrendProfile> = {
   "denge-pilates-studyo-ankara": "yukselen",
   "buz-pateni-arena-istanbul": "hype",
   "ring-boks-kulubu-bursa": "yeni",
+
+  // Kedi kategorileri
+  "hills-science-plan-yetiskin-kedi-mamasi": "oturmus",
+  "acana-tahilsiz-kedi-mamasi": "yukselen",
+  "brit-care-somonlu-kedi-mamasi": "yukselen",
+  "reflex-plus-kisirlastirilmis-kedi-mamasi": "oturmus",
+  "sheba-yas-mama-secmeler": "yeni",
+  "felix-yas-mama-cesitli-secmeler": "hype",
+  "ever-clean-extra-strong-kedi-kumu": "oturmus",
+  "catsan-hygiene-plus-kedi-kumu": "oturmus",
+  "tofu-yesil-cay-kedi-kumu": "yukselen",
+  "golden-grey-master-kedi-kumu": "yukselen",
+  "sanicat-kristal-silika-kedi-kumu": "hype",
+  "mia-kokusuz-kedi-kumu": "yeni",
+  "moderna-acik-kedi-tuvaleti": "yeni",
+  "trixie-malaga-kumas-tasima-cantasi": "yukselen",
+  "catit-oluklu-karton-tirmalama": "hype",
 };
 
 let cached: DataBundle | null = null;

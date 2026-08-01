@@ -21,6 +21,9 @@ export function ItemCard({ item }: { item: Item }) {
 
   return (
     <div
+      // Listeleme testleri kartları buradan sayar (scripts/panel-check.mjs);
+      // sınıf adları değiştiğinde kırılmayan tek tutamak bu.
+      data-slug={item.slug}
       className={cn(
         CARD_BASE,
         "card-hover group relative flex flex-col",

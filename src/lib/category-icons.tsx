@@ -2,9 +2,14 @@ import { createElement } from "react";
 import {
   BedDouble,
   Bot,
+  Box,
   Cat,
   Coffee,
+  Dumbbell,
+  Hammer,
   Package,
+  PawPrint,
+  Scissors,
   Smartphone,
   SprayCan,
   Truck,
@@ -19,13 +24,18 @@ import type { ItemType } from "./types";
 const MAP: Record<string, LucideIcon> = {
   telefon: Smartphone,
   "robot-supurge": Bot,
-  "kedi-urunleri": Cat,
+  "kedi-mamasi": Cat,
+  "kedi-kumu": Box,
+  "kedi-aksesuar": PawPrint,
+  "kisisel-bakim": Scissors,
   "ev-temizligi": SprayCan,
   nakliye: Truck,
   "teknik-servis": Wrench,
+  "usta-tamirat": Hammer,
   restoran: UtensilsCrossed,
   kafe: Coffee,
   otel: BedDouble,
+  "spor-tesisi": Dumbbell,
 };
 
 /**
