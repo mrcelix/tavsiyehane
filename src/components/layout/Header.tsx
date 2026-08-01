@@ -6,6 +6,7 @@ import { getCurrentProfile } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { ButtonLink } from "@/components/ui/Button";
 import { AuthTrigger } from "@/components/auth/AuthTrigger";
+import { emailInitials } from "@/lib/identity";
 import { CategoryMenu } from "./CategoryMenu";
 import { HeaderSearch } from "./HeaderSearch";
 import { MobileMenu } from "./MobileMenu";
@@ -79,10 +80,10 @@ export async function Header() {
           {profile ? (
             <Link
               href="/hesap"
-              title={profile.displayName}
+              title={profile.email}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand)] text-[11px] font-bold text-white"
             >
-              {profile.displayName.slice(0, 2).toLocaleUpperCase("tr")}
+              {emailInitials(profile.email)}
             </Link>
           ) : (
             <span className="hidden sm:inline-flex">

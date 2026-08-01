@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ButtonLink } from "@/components/ui/Button";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { maskEmail } from "@/lib/identity";
 import { pageMetadata } from "@/lib/seo";
 import { signOutAction } from "./actions";
 
@@ -33,8 +34,11 @@ export default async function HesapPage() {
     <div className="mx-auto max-w-md px-4 py-14">
       <h1 className="mb-6 text-2xl font-extrabold">Hesabım</h1>
       <div className="rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-6">
-        <p className="text-sm text-[var(--muted)]">Görünen ad</p>
-        <p className="font-semibold">{profile.displayName}</p>
+        <p className="text-sm text-[var(--muted)]">E-posta (hesap kimliğin)</p>
+        <p className="font-semibold">{profile.email}</p>
+        <p className="mt-3 text-sm text-[var(--muted)]">Yorumlarda görünen ad</p>
+        {/* Herkese açık yerlerde tam adres gösterilmez; toplanıp spam için kullanılıyor. */}
+        <p className="font-semibold">{maskEmail(profile.email)}</p>
         <p className="mt-3 text-sm text-[var(--muted)]">Rol</p>
         <p className="font-semibold capitalize">{profile.role}</p>
 

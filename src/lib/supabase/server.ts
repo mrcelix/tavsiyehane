@@ -29,16 +29,17 @@ export async function getCurrentUser() {
   return data.user ?? null;
 }
 
-export async function getCurrentProfile(): Promise<{ id: string; displayName: string; role: string } | null> {
+/**
+ * Oturum sahibinin profili. Kimlik e-postadır; ayrı kullanıcı adı tutulmaz.
+ * `email` yalnızca üyenin kendisine gösterilecek yerlerde kullanılmalı —
+ * herkese açık gösterim için lib/identity.ts'teki `maskEmail` geçerlidir.
+ */
+export async function getCurrentProfile(): Promise<{ id: string; email: string; role: string } | null> {
   const supabase = await createSupabaseServer();
   if (!supabase) return null;
   const { data } = await supabase.auth.getUser();
   if (!data.user) return null;
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, display_name, role")
-    .eq("id", data.user.id)
-    .single();
-  if (!profile) return { id: data.user.id, displayName: data.user.email ?? "Üye", role: "user" };
-  return { id: profile.id, displayName: profile.display_name ?? data.user.email ?? "Üye", role: profile.role ?? "user" };
+  const email = data.user.email ?? "";
+  const { data: profile } = await supabase.from("profiles").select("id, role").eq("id", data.user.id).single();
+  return { id: data.user.id, email, role: profile?.role ?? "user" };
 }

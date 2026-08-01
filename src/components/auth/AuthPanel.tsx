@@ -52,7 +52,6 @@ export function AuthPanel({
   const uid = useId();
 
   const [ekran, setEkran] = useState<Ekran>(initialMode);
-  const [ad, setAd] = useState("");
   const [email, setEmail] = useState("");
   const [sifre, setSifre] = useState("");
   const [sifreGoster, setSifreGoster] = useState(false);
@@ -96,7 +95,7 @@ export function AuthPanel({
 
   async function gonder(e: React.FormEvent) {
     e.preventDefault();
-    setDokunulan({ email: true, sifre: true, ad: true });
+    setDokunulan({ email: true, sifre: true });
     setMsg(null);
 
     if (!emailGecerli) {
@@ -123,13 +122,12 @@ export function AuthPanel({
         if (error) throw error;
         setMsg({ kind: "info", text: "Sıfırlama bağlantısı e-postanıza gönderildi." });
       } else if (ekran === "kayit") {
+        // Kullanıcı adı sorulmuyor: kimlik e-postadır. Görünen ad, veritabanı
+        // tetikleyicisi tarafından e-postadan türetilir (bkz. 0001_init.sql).
         const { error } = await supabase!.auth.signUp({
           email: email.trim(),
           password: sifre,
-          options: {
-            data: { display_name: ad.trim() || undefined },
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
         });
         if (error) throw error;
         setMsg({
@@ -160,6 +158,38 @@ export function AuthPanel({
 
   return (
     <div className={compact ? "" : "space-y-5"}>
+      {/* Giriş ve kayıt aynı pencerede: kullanıcı hangi durumda olduğunu görmeden
+          önce hangi formu doldurduğunu bilmeli. Ayrı sayfalara bölmek, "hesabım
+          var mıydı?" diye düşünen kullanıcıyı gidip gelmeye zorluyor. */}
+      {ekran !== "sifirla" && (
+        <div
+          role="tablist"
+          aria-label="Giriş veya kayıt"
+          className="mb-4 flex gap-1 rounded-[12px] bg-[var(--mist)] p-1"
+        >
+          {(["giris", "kayit"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              role="tab"
+              aria-selected={ekran === m}
+              onClick={() => {
+                setEkran(m);
+                setMsg(null);
+              }}
+              className={cn(
+                "flex-1 rounded-[9px] py-2 text-sm font-bold transition-colors",
+                ekran === m
+                  ? "bg-[var(--card)] text-[var(--ink)] shadow-[var(--shadow-card)]"
+                  : "text-[var(--muted)] hover:text-[var(--ink-2)]"
+              )}
+            >
+              {m === "giris" ? "Giriş yap" : "Kayıt ol"}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className={compact ? "mb-4" : ""}>
         {ekran === "sifirla" && (
           <button
@@ -197,22 +227,6 @@ export function AuthPanel({
       )}
 
       <form onSubmit={gonder} className="space-y-3.5">
-        {ekran === "kayit" && (
-          <div>
-            <label htmlFor={`${uid}-ad`} className="mb-1 block text-xs font-semibold text-[var(--ink-2)]">
-              Görünen ad <span className="font-normal text-[var(--muted-2)]">(isteğe bağlı)</span>
-            </label>
-            <input
-              id={`${uid}-ad`}
-              value={ad}
-              onChange={(e) => setAd(e.target.value)}
-              placeholder="Yorumlarında görünecek ad"
-              autoComplete="nickname"
-              className={alanUyari(false)}
-            />
-          </div>
-        )}
-
         <div>
           <label htmlFor={`${uid}-email`} className="mb-1 block text-xs font-semibold text-[var(--ink-2)]">
             E-posta
@@ -341,44 +355,13 @@ export function AuthPanel({
         </button>
       </form>
 
-      {ekran !== "sifirla" && (
-        <p className="mt-4 text-center text-sm text-[var(--muted)]">
-          {ekran === "giris" ? (
-            <>
-              Hesabın yok mu?{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setEkran("kayit");
-                  setMsg(null);
-                }}
-                className="font-semibold text-[var(--brand)] hover:underline"
-              >
-                Kayıt ol
-              </button>
-            </>
-          ) : (
-            <>
-              Zaten üye misin?{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setEkran("giris");
-                  setMsg(null);
-                }}
-                className="font-semibold text-[var(--brand)] hover:underline"
-              >
-                Giriş yap
-              </button>
-            </>
-          )}
-        </p>
-      )}
-
+      {/* Sekmeler zaten geçiş sağlıyor; altta ikinci bir "kayıt ol" bağlantısı
+          aynı işi iki yerden yaptırıp hangisinin doğru olduğunu belirsizleştirir. */}
       {ekran === "kayit" && (
         <p className="mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-[var(--muted-2)]">
           <Mail size={13} className="mt-0.5 shrink-0" />
           Kayıttan sonra e-posta doğrulaması gerekir. Doğrulanmamış hesapların oyu sayılmaz.
+          Ayrı kullanıcı adı yok; hesabın e-posta adresinle tanımlanır.
         </p>
       )}
     </div>

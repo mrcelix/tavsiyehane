@@ -21,6 +21,7 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
 2. Proje açılınca **SQL Editor** → migration'ları **sırayla** yapıştırıp **Run**:
    - `supabase/migrations/0001_init.sql` (tablolar, RLS, indeksler)
    - `supabase/migrations/0002_votes.sql` (oylama tablosu, oy ağırlıklandırma, sinyal görünümü)
+   - `supabase/migrations/0003_email_identity.sql` (üye kimliği e-posta; kullanıcı adı kaldırıldı)
 3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı
@@ -42,7 +43,9 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
 Siteden normal kayıt olun, sonra SQL Editor'da:
 
 ```sql
-update profiles set role = 'admin' where display_name = 'KULLANICI_ADINIZ';
+-- Kimlik e-postadır; ayrı kullanıcı adı yoktur.
+update public.profiles set role = 'admin'
+where id = (select id from auth.users where email = 'ADRESINIZ@ornek.com');
 ```
 
 Ardından `/panel` üzerinden yorum moderasyonu, sponsorluk ve içerik yönetimi açılır.

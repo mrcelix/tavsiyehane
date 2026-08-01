@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServer } from "@/lib/supabase/server";
+import { maskEmail } from "@/lib/identity";
 
 export async function POST(request: Request) {
   const supabase = await createSupabaseServer();
@@ -18,7 +19,8 @@ export async function POST(request: Request) {
   const { error } = await supabase.from("reviews").insert({
     item_id: body.itemId,
     user_id: user.id,
-    user_name: user.email?.split("@")[0] ?? "Üye",
+    // Kimlik e-postadır ama yorumda tam adres yayımlanmaz — maskeli yazılır.
+    user_name: user.email ? maskEmail(user.email) : "Üye",
     rating: Math.max(1, Math.min(5, Number(body.rating))),
     criteria: body.criteria ?? {},
     comment: String(body.comment).slice(0, 2000),

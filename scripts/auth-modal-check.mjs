@@ -137,18 +137,23 @@ try {
         google: !!([...d.querySelectorAll('button')].find(b => b.textContent.includes('Google'))),
         alanlar: [...d.querySelectorAll('input')].map(i => i.type),
         sifremiUnuttum: !!([...d.querySelectorAll('button')].find(b => b.textContent.includes('Şifremi unuttum'))),
+        sekmeler: [...d.querySelectorAll('[role=tab]')].map(t => t.textContent.trim()),
+        secili: d.querySelector('[role=tab][aria-selected=true]')?.textContent.trim(),
+        kullaniciAdiAlani: !!d.querySelector('input[autocomplete=nickname]'),
       };
     })()`);
   if (!acilis) throw new Error("modal açılmadı");
   console.log(`2. Modal açıldı — "${acilis.baslik}" · Google: ${acilis.google ? "var" : "YOK"} · alanlar: ${acilis.alanlar.join(", ")}`);
+  console.log(`   sekmeler: ${acilis.sekmeler.join(" | ")} (seçili: ${acilis.secili})`);
   if (!acilis.google) throw new Error("Google ile giriş seçeneği yok");
   if (!acilis.sifremiUnuttum) throw new Error("Şifremi unuttum bağlantısı yok");
+  if (acilis.sekmeler.length !== 2) throw new Error("giriş/kayıt sekmeleri aynı pencerede değil");
 
-  // 3) Kayıt sekmesi: ad alanı, şifre gücü ve koşul onayı geliyor mu?
+  // 3) Kayıt sekmesi: kullanıcı adı SORULMAMALI, şifre gücü ve koşul onayı gelmeli.
   const kayit = await calistir(`
     (async () => {
       const d = document.querySelector('dialog');
-      [...d.querySelectorAll('button')].find(b => b.textContent.trim() === 'Kayıt ol').click();
+      [...d.querySelectorAll('[role=tab]')].find(b => b.textContent.trim() === 'Kayıt ol').click();
       await new Promise(r => setTimeout(r, 300));
       const sifre = d.querySelector('input[type=password]');
       const yaz = (el, v) => {
@@ -164,16 +169,17 @@ try {
       const guclu = [...d.querySelectorAll('p')].map(p => p.textContent.trim()).find(t => t.startsWith('Güçlü') || t.startsWith('İyi'));
       return {
         baslik: d.querySelector('h2')?.textContent.trim(),
-        adAlani: !!d.querySelector('input[autocomplete=nickname]'),
+        kullaniciAdiAlani: !!d.querySelector('input[autocomplete=nickname]'),
         kosulOnayi: !!d.querySelector('input[type=checkbox]'),
         zayifUyari: zayif,
         gucluUyari: guclu,
       };
     })()`);
-  console.log(`3. Kayıt ekranı — "${kayit.baslik}" · ad alanı: ${kayit.adAlani ? "var" : "yok"} · koşul onayı: ${kayit.kosulOnayi ? "var" : "yok"}`);
+  console.log(`3. Kayıt sekmesi — "${kayit.baslik}" · kullanıcı adı alanı: ${kayit.kullaniciAdiAlani ? "VAR (olmamalı)" : "yok ✓"} · koşul onayı: ${kayit.kosulOnayi ? "var" : "yok"}`);
   console.log(`   zayıf şifre uyarısı: ${kayit.zayifUyari}`);
   console.log(`   güçlü şifre: ${kayit.gucluUyari}`);
-  if (!kayit.adAlani || !kayit.kosulOnayi) throw new Error("kayıt ekranı eksik");
+  if (kayit.kullaniciAdiAlani) throw new Error("kullanıcı adı alanı kaldırılmalıydı — kimlik e-postadır");
+  if (!kayit.kosulOnayi) throw new Error("kayıt ekranı eksik");
   if (!kayit.zayifUyari || !kayit.gucluUyari) throw new Error("şifre gücü göstergesi çalışmıyor");
 
   // 4) Şifre görünürlüğü
