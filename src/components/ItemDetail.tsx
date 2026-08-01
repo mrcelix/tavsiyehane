@@ -18,6 +18,7 @@ import { getBundle } from "@/lib/data";
 import { alternativesFor } from "@/lib/query";
 import { REVIEW_CRITERIA } from "@/lib/criteria";
 import { scoreBasisLabel, scoreToneLabel } from "@/lib/scoring";
+import { freshnessOf, freshnessWarning } from "@/lib/freshness";
 import { TYPE_LABELS, type Item } from "@/lib/types";
 import { formatDate, formatPrice, locationText, priceSummary, slugify } from "@/lib/format";
 import { categoryHref } from "@/lib/menu";
@@ -46,6 +47,8 @@ const PANEL = "rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5 s
 export async function ItemDetail({ item }: { item: Item }) {
   const bundle = await getBundle();
   const category = bundle.categories.find((c) => c.slug === item.categorySlug);
+  const tazelik = freshnessOf(item);
+  const tazelikUyarisi = item.provenance.kind === "editor" ? freshnessWarning(item) : null;
   const reviews = bundle.reviews.filter((r) => r.itemId === item.id && r.status === "approved");
   const offers = bundle.offers.filter((o) => o.itemId === item.id).sort((a, b) => a.price - b.price);
   const history = bundle.priceHistory[item.id] ?? [];
@@ -176,12 +179,37 @@ export async function ItemDetail({ item }: { item: Item }) {
             </Badge>
           ) : (
             item.provenance.verifiedAt && (
-              <span className="shrink-0 font-medium text-[var(--ink-2)]">
+              <span
+                className={cn(
+                  "shrink-0 font-medium",
+                  tazelik === "bayat"
+                    ? "text-[var(--down)]"
+                    : tazelik === "eskiyor"
+                      ? "text-[var(--gold-ink)]"
+                      : "text-[var(--ink-2)]"
+                )}
+              >
                 Doğrulandı: {formatDate(item.provenance.verifiedAt)}
               </span>
             )
           )}
         </div>
+
+        {/* Tazelik uyarısı. Bayat kayıt gizlenmez, bayat olduğu söylenir —
+            bilgiyi saklamak yanlış bilgi göstermek kadar kötü. */}
+        {tazelikUyarisi && (
+          <p
+            className={cn(
+              "mt-2 flex items-start gap-1.5 rounded-xl p-3 text-xs leading-relaxed",
+              tazelik === "bayat"
+                ? "bg-[var(--down-soft)] text-[var(--down)]"
+                : "bg-[var(--gold-soft)] text-[var(--gold-ink)]"
+            )}
+          >
+            <Clock size={13} className="mt-0.5 shrink-0" />
+            {tazelikUyarisi}
+          </p>
+        )}
 
         {item.provenance.sources && item.provenance.sources.length > 0 && (
           <div className="mt-2 text-xs text-[var(--muted)]">

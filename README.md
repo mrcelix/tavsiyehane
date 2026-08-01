@@ -24,6 +24,7 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
    - `supabase/migrations/0003_email_identity.sql` (üye kimliği e-posta; kullanıcı adı kaldırıldı)
    - `supabase/migrations/0004_verified_only.sql` (oy ve yorum için e-posta doğrulaması zorunlu)
    - `supabase/migrations/0005_images.sql` (görsel alanları + item-images depolama kovası)
+   - `supabase/migrations/0006_vote_rate_limit.sql` (saatlik oy sınırı + indeks)
 3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı
@@ -51,6 +52,52 @@ where id = (select id from auth.users where email = 'ADRESINIZ@ornek.com');
 ```
 
 Ardından `/panel` üzerinden yorum moderasyonu, sponsorluk ve içerik yönetimi açılır.
+
+> **Dikkat:** `npm run verify` içindeki `next build`, çalışan `next dev` ile aynı
+> `.next` dizinini kullanır. İkisi aynı anda çalışırsa geliştirme sunucusu her
+> rotaya 404 dönmeye başlar. Belirtiyi görünce panik yapmayın: sunucuyu durdurun,
+> `.next` klasörünü silin, yeniden başlatın.
+
+### Bot koruması (Turnstile)
+
+Oylama sitesinin baş tehdidi Sybil saldırısı: toplu hesap açıp toplu oy vermek.
+Savunma dört katmanlı — doğrulanmış e-posta (`0004`), kayıtta bot doğrulaması,
+oy ağırlıklandırması (`0002`), saatlik oy sınırı (`0006`).
+
+Bot doğrulaması **kayıt** akışında, oy anında değil: kök neden toplu hesap
+açmaktır ve her oyda bot testi çıkarmak gerçek kullanıcıyı sınava sokup oylamayı
+öldürür.
+
+1. Cloudflare → **Turnstile → Add site** → alan adınızı girin.
+2. Site key'i `.env.local`'e ekleyin:
+   ```
+   NEXT_PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAA...
+   ```
+3. Secret key'i Supabase → **Authentication → Settings → Bot and Abuse Protection**
+   → Enable Captcha protection → provider **Turnstile** → secret'ı yapıştırın.
+
+Site key tanımlı değilse widget hiç çizilmez ve akış aynen çalışır; ikisini
+birlikte açın, yalnızca Supabase tarafını açarsanız kayıt jetonsuz reddedilir.
+
+### Tazelik ve bakım
+
+Fiyat günlerde eskir. Kayıtlar `verifiedAt` tarihine göre üç durumda olur:
+**güncel / eskiyor / doğrulama bekliyor**. Eşikler tipe göre değişir (ürün 7-30
+gün, hizmet 30-90, mekân 60-180 — bkz. `src/lib/freshness.ts`).
+
+Bayat kayıt gizlenmez, bayat olduğu söylenir: detay sayfasında uyarı çıkar,
+kartta fiyatın yanında saat işareti belirir. Bilgiyi saklamak, yanlış bilgi
+göstermek kadar kötüdür — kullanıcı ne kadar eskiye baktığını bilerek karar
+verebilmeli.
+
+Doğrulama bekleyen kayıtları listelemek için:
+
+```bash
+npx tsx scripts/stale-check.ts
+```
+
+Bayat kayıt varsa çıkış kodu 1 döner; zamanlanmış bir işte eşik olarak
+kullanılabilir.
 
 ### Dış sinyaller (soğuk başlangıç)
 

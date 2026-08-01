@@ -123,6 +123,9 @@ export function VoteButtons({ itemId, counts, compact = false }: Props) {
         setNot({
           text: "Oyun sayılması için e-posta adresini doğrulaman gerekiyor. Kayıt sırasında gönderdiğimiz bağlantıya tıkla.",
         });
+      } else if (data.rateLimited) {
+        geriAl();
+        setNot({ text: data.error ?? "Saatlik oy sınırına ulaştınız." });
       } else if (data.error) {
         geriAl();
         setNot({ text: "Oy kaydedilemedi, birazdan tekrar deneyin." });

@@ -11,6 +11,7 @@ import {
   isValidEmail,
   passwordStrength,
 } from "./authMessages";
+import { Turnstile, turnstileEnabled } from "./Turnstile";
 import type { AuthMode } from "./AuthModalProvider";
 
 const INPUT =
@@ -56,6 +57,7 @@ export function AuthPanel({
   const [sifre, setSifre] = useState("");
   const [sifreGoster, setSifreGoster] = useState(false);
   const [kosul, setKosul] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
   const [dokunulan, setDokunulan] = useState<Record<string, boolean>>({});
   const [msg, setMsg] = useState<{ kind: "error" | "info"; text: string } | null>(null);
   const [busy, setBusy] = useState<"form" | "google" | null>(null);
@@ -113,11 +115,19 @@ export function AuthPanel({
       }
     }
 
+    // Turnstile açıksa jeton olmadan istek göndermek anlamsız: Supabase reddeder
+    // ve kullanıcı ham captcha hatası görür.
+    if (turnstileEnabled() && !captcha) {
+      setMsg({ kind: "error", text: "Bot doğrulamasını tamamlayın." });
+      return;
+    }
+
     setBusy("form");
     try {
       if (ekran === "sifirla") {
         const { error } = await supabase!.auth.resetPasswordForEmail(email.trim(), {
           redirectTo: `${window.location.origin}/auth/callback`,
+          captchaToken: captcha ?? undefined,
         });
         if (error) throw error;
         setMsg({ kind: "info", text: "Sıfırlama bağlantısı e-postanıza gönderildi." });
@@ -127,7 +137,10 @@ export function AuthPanel({
         const { error } = await supabase!.auth.signUp({
           email: email.trim(),
           password: sifre,
-          options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            captchaToken: captcha ?? undefined,
+          },
         });
         if (error) throw error;
         setMsg({
@@ -325,6 +338,10 @@ export function AuthPanel({
             </span>
           </label>
         )}
+
+        {/* Bot doğrulaması kayıt ve şifre sıfırlamada; girişte yok, çünkü giriş
+            için zaten geçerli bir hesap gerekiyor ve orada asıl koruma şifre. */}
+        {ekran !== "giris" && <Turnstile onToken={setCaptcha} />}
 
         {msg && (
           <p

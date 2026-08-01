@@ -198,6 +198,11 @@ export default function MetodolojiPage() {
           <li>• Yalnızca tek bir kayda oy vermiş hesapların ağırlığı yarıya iner.</li>
           <li>• Oylar eskidikçe ağırlığını yitirir (90 günde yarılanır) — trend sitesinde iki yıl önceki oy bugünü anlatmaz.</li>
           <li>• Bir kaydı sahiplenen işletme hesabı o kayda oy veremez.</li>
+          <li>• Kayıt sırasında bot doğrulaması istenir; toplu hesap açmanın önü kapalıdır.</li>
+          <li>
+            • Saatlik oy sınırı vardır. Ağırlıklandırma oyun etkisini azaltır ama kaydını engellemez;
+            sınır, betikle yazılan oyları durdurur.
+          </li>
           <li>• Ağırlık istemciden değil veritabanından gelir; tarayıcıdan değiştirilemez.</li>
         </ul>
       </div>

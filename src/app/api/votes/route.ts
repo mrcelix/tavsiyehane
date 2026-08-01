@@ -32,6 +32,14 @@ export async function POST(request: Request) {
     .from("votes")
     .upsert({ item_id: body.itemId, user_id: user.id, kind: body.kind }, { onConflict: "item_id,user_id" });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    // Hız sınırı tetikleyicisi (0006) anlaşılır bir mesajla reddeder; onu
+    // genel "bir hata oluştu"nun altına gömmek kullanıcıyı kör bırakır.
+    const hizSiniri = error.message.includes("oy sınırına");
+    return NextResponse.json(
+      hizSiniri ? { rateLimited: true, error: error.message } : { error: error.message },
+      { status: hizSiniri ? 429 : 500 }
+    );
+  }
   return NextResponse.json({ ok: true });
 }

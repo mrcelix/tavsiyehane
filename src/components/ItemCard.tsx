@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 import type { Item } from "@/lib/types";
 import { itemHref } from "@/lib/routes";
 import { locationText, priceSummary } from "@/lib/format";
+import { freshnessOf, freshnessWarning } from "@/lib/freshness";
 import { cn } from "@/lib/cn";
 import { CARD_BASE } from "./ui/Card";
 import { CoverArt } from "./CoverArt";
@@ -18,6 +19,8 @@ export function ItemCard({ item }: { item: Item }) {
   const loc = locationText(item);
   const price = priceSummary(item);
   const visibleBadges = item.badges.filter((b) => b !== "sponsorlu").slice(0, 2);
+  // Demo kayıtlarda doğrulama kavramı yok; tazelik uyarısı yalnızca gerçek katalogda.
+  const tazelik = item.provenance.kind === "editor" ? freshnessOf(item) : "taze";
 
   return (
     <div
@@ -100,7 +103,25 @@ export function ItemCard({ item }: { item: Item }) {
 
           <div className="mt-auto flex items-center justify-between pt-2">
             <StarRating value={item.ratingAvg} count={item.ratingCount} small />
-            {price && <span className="font-num text-sm font-bold text-[var(--brand)]">{price}</span>}
+            {price && (
+              <span className="flex items-center gap-1">
+                {/* Bayat fiyatı sessizce güncelmiş gibi göstermek, yanlış fiyat
+                    göstermenin en sinsi hâli. Kartta küçük bir işaret, detayda
+                    tam açıklama. */}
+                {tazelik === "bayat" && (
+                  <Clock size={11} className="text-[var(--muted-2)]" aria-label="Fiyat doğrulama bekliyor" />
+                )}
+                <span
+                  className={cn(
+                    "font-num text-sm font-bold",
+                    tazelik === "bayat" ? "text-[var(--muted)]" : "text-[var(--brand)]"
+                  )}
+                  title={tazelik === "bayat" ? (freshnessWarning(item) ?? undefined) : undefined}
+                >
+                  {price}
+                </span>
+              </span>
+            )}
           </div>
         </div>
       </Link>
