@@ -63,6 +63,28 @@ for (const t of TABLOLAR) {
   }
 }
 
+// Auth ayarları: hangi giriş yöntemleri açık? Salt okunur uç nokta, hesap açmaz.
+console.log();
+try {
+  const r = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } });
+  if (r.ok) {
+    const s = await r.json();
+    const acik = Object.entries(s.external ?? {})
+      .filter(([, v]) => v === true)
+      .map(([k]) => k);
+    console.log(`  Auth · e-posta ile kayıt: ${s.disable_signup ? "KAPALI" : "açık"}`);
+    console.log(`  Auth · e-posta doğrulaması: ${s.mailer_autoconfirm ? "kapalı (otomatik onay)" : "açık"}`);
+    console.log(`  Auth · açık sağlayıcılar: ${acik.length ? acik.join(", ") : "yok"}`);
+    if (!acik.includes("google")) {
+      console.log("        → Google girişi için Supabase > Authentication > Providers > Google açılmalı.");
+    }
+  } else {
+    console.log(`  Auth ayarları okunamadı: HTTP ${r.status}`);
+  }
+} catch (e) {
+  console.log(`  Auth ayarları okunamadı: ${e.message}`);
+}
+
 console.log();
 if (eksik > 0) {
   console.log(`${eksik} nesne okunamadı. Migration'ları SQL Editor'da yeniden çalıştırın.`);
