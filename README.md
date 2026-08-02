@@ -28,7 +28,7 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
 3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı
-   - `SUPABASE_SERVICE_ROLE_KEY` (yalnızca seed için; gizli tutun, Cloudflare'e eklemeyin)
+   - `SUPABASE_SERVICE_ROLE_KEY` (yalnızca seed için; gizli tutun, Vercel'e eklemeyin)
 4. **Authentication → URL Configuration**: giriş, Google ve şifre sıfırlama akışları
    `<origin>/auth/callback` adresine döner. Bu adresleri **Redirect URLs** listesine ekleyin:
    - `http://localhost:3005/auth/callback` (geliştirme)
@@ -158,9 +158,10 @@ Kabul edilebilir `license` değerleri: kendi çekiminiz, üreticinin basın kiti
 (izin şartlarıyla), açık lisanslı görsel (CC BY gibi — `credit` alanına atıf
 zorunlu). Bunların dışındakini yüklemeyin.
 
-Üretim ortamında Cloudflare görüntü dönüştürmeyi açtıysanız
-`NEXT_PUBLIC_CF_IMAGES=1` verin; boyutlandırma kenar tarafında yapılır.
-Verilmezse görseller optimize edilmeden ama sorunsuz servis edilir.
+Görsel boyutlandırma Vercel'in yerleşik optimizasyonuna bırakıldı; ayrıca bir
+ayar gerekmiyor. Uzak adresler `next.config.ts` içindeki `remotePatterns`
+listesinde tanımlı olmalı — liste bilinçli olarak dar, çünkü her adresten görsel
+çekmek sitenin görünümünü üçüncü tarafların kontrolüne bırakmak demek.
 
 ### Google ile giriş (isteğe bağlı)
 
@@ -173,53 +174,41 @@ Verilmezse görseller optimize edilmeden ama sorunsuz servis edilir.
 5. E-posta/şifre girişi bu kurulum olmadan da çalışır. Google sağlayıcısı kapalıyken
    "Google ile devam et" düğmesi anlaşılır bir hata verir, sessizce başarısız olmaz.
 
-## Cloudflare'e dağıtım
+## Vercel'e dağıtım
 
-Site **Cloudflare Workers** üzerinde çalışacak şekilde yapılandırıldı ([OpenNext adaptörü](https://opennext.js.org/cloudflare) ile).
-
-> **Neden Pages değil Workers?** Cloudflare ve Next.js ekibi Next.js için artık Workers + OpenNext'i
-> öneriyor. Pages tarafındaki `@cloudflare/next-on-pages` yalnızca Edge runtime destekliyor ve bakım
-> modunda. Workers da aynı panelde yönetilir, özel alan adı ve ücretsiz plan aynı şekilde geçerlidir.
-
-### Panelden (GitHub'a bağlı, otomatik dağıtım)
-
-1. Cloudflare panel → **Workers & Pages → Create → Workers → Import a repository**, `tavsiyehane` deposunu seçin.
-2. Derleme ayarları:
-   - **Build command:** `npm run cf:build`
-   - **Deploy command:** `npx wrangler deploy`
-3. **Settings → Variables and Secrets** altına Supabase değerlerini ekleyin (aşağıya bakın), sonra yeniden dağıtın.
-
-### Terminalden (tek seferlik)
-
-```bash
-npx wrangler login
-npm run cf:deploy
-```
-
-Dağıtmadan önce yerelde gerçek Workers runtime'ında denemek için:
-
-```bash
-npm run cf:preview
-```
+1. [vercel.com](https://vercel.com) → **Add New → Project** → `tavsiyehane` deposunu içe aktarın.
+2. Framework otomatik algılanır (Next.js); derleme ayarlarına dokunmaya gerek yok.
+3. **Settings → Environment Variables** altına aşağıdaki değerleri ekleyip yeniden dağıtın.
 
 ### Ortam değişkenleri
 
 | Değişken | Nerede gerekir | Not |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | **Derleme anında** | `NEXT_PUBLIC_` ile başlayan değişkenler derlemede koda gömülür; Cloudflare'de *build* değişkeni olarak tanımlanmalı. |
+| `NEXT_PUBLIC_SUPABASE_URL` | **Derleme anında** | `NEXT_PUBLIC_` ile başlayan değişkenler derlemede koda gömülür. Değiştirince yeniden dağıtmak gerekir. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Derleme anında** | Aynı şekilde. Bu anahtar zaten tarayıcıya açıktır, gizli değildir. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | İsteğe bağlı | Bot koruması. Tanımlı değilse kayıt akışı doğrulamasız çalışır. |
 | `NEXT_PUBLIC_SITE_URL` | İsteğe bağlı | Ayarlanmazsa site adresi isteğin kendi alan adından türetilir. Özel alan adında canonical adresi sabitlemek için tanımlayın. |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Gerekmez** | Yalnızca yerelde `npm run seed` için. Cloudflare'e **eklemeyin**. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Gerekmez** | Yalnızca yerelde `npm run seed` için. Vercel'e **eklemeyin** — sızarsa tüm RLS korumasını atlar. |
 
-Supabase anahtarları tanımlanmazsa site üretimde de demo veriyle sorunsuz açılır.
+Supabase anahtarları tanımlanmazsa site üretimde de yerleşik veriyle sorunsuz açılır.
 
-### Bilinen kısıt
+### Dağıtımdan sonra
 
-Next.js 16 `middleware.ts`'i `proxy.ts` olarak yeniden adlandırdı ve Proxy'yi zorunlu olarak Node.js
-runtime'da çalıştırıyor; OpenNext adaptörü bunu henüz desteklemiyor. Bu nedenle oturum tazeleme katmanı
-bilinçli olarak eski `src/middleware.ts` sözleşmesinde tutuluyor — derlemede bir deprecation uyarısı
-verir ama çalışır. Adaptör desteği geldiğinde dosya `proxy.ts`, fonksiyon `proxy` olarak geri alınmalı.
-Takip: [workers-sdk#13755](https://github.com/cloudflare/workers-sdk/issues/13755).
+```
+https://<alan-adiniz>/durum        insan gözüyle
+https://<alan-adiniz>/api/durum    JSON, sorun varsa HTTP 503
+```
+
+Durum sayfası ortam değişkenlerinin yerinde olup olmadığını, veritabanının cevap
+verip vermediğini ve doğrulama bekleyen kayıtları tek ekranda gösterir. Hiçbir
+anahtar veya anahtar parçası dönmez; değişkenler yalnızca **var/yok** olarak
+raporlanır.
+
+> **Daha önce Cloudflare Workers'a dağıtılıyordu.** OpenNext adaptörü, wrangler
+> yapılandırması ve Cloudflare'e özel görsel yükleyici kaldırıldı. Geri dönmek
+> gerekirse `git log -- wrangler.jsonc open-next.config.ts` bunları getirir.
+> Cloudflare'de takıldığımız kısıt (Proxy'nin Node runtime gerektirmesi) Vercel'de
+> yok; oturum katmanı bu yüzden güncel `src/proxy.ts` sözleşmesine alındı.
 
 ## Komutlar
 
@@ -230,10 +219,10 @@ Takip: [workers-sdk#13755](https://github.com/cloudflare/workers-sdk/issues/1375
 | `npm run start`     | Üretim sunucusu (Node.js)                       |
 | `npm run lint`      | ESLint                                          |
 | `npm run typecheck` | Yalnızca TypeScript tip kontrolü                |
+| `npm run test`      | Birim testleri (Vitest)                         |
+| `npm run verify`    | typecheck + lint + test + build                 |
 | `npm run seed`      | Demo verisini Supabase'e yükler                 |
-| `npm run cf:build`  | Cloudflare Worker paketini üretir               |
-| `npm run cf:preview`| Worker'ı yerelde gerçek runtime ile çalıştırır  |
-| `npm run cf:deploy` | Derleyip Cloudflare'e dağıtır                   |
+| `npm run stale`     | Doğrulama bekleyen kayıtları listeler           |
 
 ## Mimari özeti
 
