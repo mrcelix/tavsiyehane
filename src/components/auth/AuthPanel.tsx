@@ -11,7 +11,7 @@ import {
   isValidEmail,
   passwordStrength,
 } from "./authMessages";
-import { Turnstile, turnstileEnabled } from "./Turnstile";
+import { Captcha, captchaEnabled } from "./Captcha";
 import type { AuthMode } from "./AuthModalProvider";
 
 const INPUT =
@@ -115,9 +115,9 @@ export function AuthPanel({
       }
     }
 
-    // Turnstile açıksa jeton olmadan istek göndermek anlamsız: Supabase reddeder
+    // Doğrulama açıksa jeton olmadan istek göndermek anlamsız: Supabase reddeder
     // ve kullanıcı ham captcha hatası görür.
-    if (turnstileEnabled() && !captcha) {
+    if (captchaEnabled() && !captcha) {
       setMsg({ kind: "error", text: "Bot doğrulamasını tamamlayın." });
       return;
     }
@@ -341,7 +341,7 @@ export function AuthPanel({
 
         {/* Bot doğrulaması kayıt ve şifre sıfırlamada; girişte yok, çünkü giriş
             için zaten geçerli bir hesap gerekiyor ve orada asıl koruma şifre. */}
-        {ekran !== "giris" && <Turnstile onToken={setCaptcha} />}
+        {ekran !== "giris" && <Captcha onToken={setCaptcha} />}
 
         {msg && (
           <p

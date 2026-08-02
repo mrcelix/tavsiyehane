@@ -47,7 +47,7 @@ export async function collectStatus(): Promise<SystemStatus> {
   const degiskenler = [
     { ad: "NEXT_PUBLIC_SUPABASE_URL", etiket: "Supabase adresi", tanimli: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) },
     { ad: "NEXT_PUBLIC_SUPABASE_ANON_KEY", etiket: "Supabase anahtarı", tanimli: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) },
-    { ad: "NEXT_PUBLIC_TURNSTILE_SITE_KEY", etiket: "Turnstile bot koruması", tanimli: Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) },
+    { ad: "NEXT_PUBLIC_CAPTCHA_SITE_KEY", etiket: "Bot koruması (captcha)", tanimli: Boolean(process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY) },
     { ad: "NEXT_PUBLIC_SITE_URL", etiket: "Site adresi", tanimli: Boolean(process.env.NEXT_PUBLIC_SITE_URL) },
   ];
 
@@ -84,7 +84,7 @@ export async function collectStatus(): Promise<SystemStatus> {
   if (!degiskenler[0].tanimli || !degiskenler[1].tanimli) {
     eksikler.push("Supabase anahtarları tanımlı değil; site yerleşik veriyle çalışıyor.");
   }
-  if (!degiskenler[2].tanimli) eksikler.push("Turnstile site anahtarı yok; kayıtta bot doğrulaması kapalı.");
+  if (!degiskenler[2].tanimli) eksikler.push("Captcha site anahtarı yok; kayıtta bot doğrulaması kapalı.");
   if (!degiskenler[3].tanimli) eksikler.push("Site adresi tanımlı değil; mutlak bağlantılar tahmin ediliyor.");
   if (veritabani.baglanti === "hata") eksikler.push("Veritabanına ulaşılamıyor.");
   if (bekleyen.length > 0) eksikler.push(`${bekleyen.length} kayıt yeniden doğrulama bekliyor.`);

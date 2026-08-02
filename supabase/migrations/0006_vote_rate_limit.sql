@@ -3,7 +3,7 @@
 --
 -- Oylama sitesinin baş tehdidi Sybil saldırısıdır. Savunma katmanlı:
 --   1. Doğrulanmış e-posta zorunlu           (0004)
---   2. Kayıtta bot doğrulaması (Turnstile)   — Supabase Auth ayarı
+--   2. Kayıtta bot doğrulaması (captcha)     — Supabase Auth ayarı
 --   3. Oy ağırlığı: hesap yaşı + çeşitlilik  (0002)
 --   4. Hız sınırı                            (bu dosya)
 --

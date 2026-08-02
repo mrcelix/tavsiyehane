@@ -58,7 +58,7 @@ Ardından `/panel` üzerinden yorum moderasyonu, sponsorluk ve içerik yönetimi
 > rotaya 404 dönmeye başlar. Belirtiyi görünce panik yapmayın: sunucuyu durdurun,
 > `.next` klasörünü silin, yeniden başlatın.
 
-### Bot koruması (Turnstile)
+### Bot koruması (captcha)
 
 Oylama sitesinin baş tehdidi Sybil saldırısı: toplu hesap açıp toplu oy vermek.
 Savunma dört katmanlı — doğrulanmış e-posta (`0004`), kayıtta bot doğrulaması,
@@ -68,16 +68,27 @@ Bot doğrulaması **kayıt** akışında, oy anında değil: kök neden toplu he
 açmaktır ve her oyda bot testi çıkarmak gerçek kullanıcıyı sınava sokup oylamayı
 öldürür.
 
-1. Cloudflare → **Turnstile → Add site** → alan adınızı girin.
-2. Site key'i `.env.local`'e ekleyin:
+Varsayılan sağlayıcı **hCaptcha** — bağımsız bir servistir, siteyi nerede
+barındırdığınızdan etkilenmez. Cloudflare Turnstile de destekleniyor ama bir
+Cloudflare hesabı gerektirir.
+
+1. [hcaptcha.com](https://www.hcaptcha.com) → hesap açın → **New Site** → alan
+   adınızı ekleyin.
+2. Site key'i `.env.local`'e (ve Vercel ortam değişkenlerine) ekleyin:
    ```
-   NEXT_PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAA...
+   NEXT_PUBLIC_CAPTCHA_SITE_KEY=10000000-ffff-ffff-ffff-000000000001
+   NEXT_PUBLIC_CAPTCHA_PROVIDER=hcaptcha
    ```
 3. Secret key'i Supabase → **Authentication → Settings → Bot and Abuse Protection**
-   → Enable Captcha protection → provider **Turnstile** → secret'ı yapıştırın.
+   → Enable Captcha protection → provider **hCaptcha** → secret'ı yapıştırın.
 
 Site key tanımlı değilse widget hiç çizilmez ve akış aynen çalışır; ikisini
 birlikte açın, yalnızca Supabase tarafını açarsanız kayıt jetonsuz reddedilir.
+
+> Sağlayıcı `src/components/auth/Captcha.tsx` içindeki tablodan seçilir. İki
+> servisin API'si neredeyse aynı olduğu için değiştirmek script adresi ve global
+> nesne adından ibaret — proje Turnstile'dan hCaptcha'ya bu yüzden tek dosyada
+> geçebildi.
 
 ### Tazelik ve bakım
 
@@ -186,7 +197,8 @@ listesinde tanımlı olmalı — liste bilinçli olarak dar, çünkü her adrest
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | **Derleme anında** | `NEXT_PUBLIC_` ile başlayan değişkenler derlemede koda gömülür. Değiştirince yeniden dağıtmak gerekir. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Derleme anında** | Aynı şekilde. Bu anahtar zaten tarayıcıya açıktır, gizli değildir. |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | İsteğe bağlı | Bot koruması. Tanımlı değilse kayıt akışı doğrulamasız çalışır. |
+| `NEXT_PUBLIC_CAPTCHA_SITE_KEY` | İsteğe bağlı | Bot koruması. Tanımlı değilse kayıt akışı doğrulamasız çalışır. |
+| `NEXT_PUBLIC_CAPTCHA_PROVIDER` | İsteğe bağlı | `hcaptcha` (varsayılan) veya `turnstile`. |
 | `NEXT_PUBLIC_SITE_URL` | İsteğe bağlı | Ayarlanmazsa site adresi isteğin kendi alan adından türetilir. Özel alan adında canonical adresi sabitlemek için tanımlayın. |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Gerekmez** | Yalnızca yerelde `npm run seed` için. Vercel'e **eklemeyin** — sızarsa tüm RLS korumasını atlar. |
 
