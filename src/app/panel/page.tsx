@@ -1,200 +1,126 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getBundle } from "@/lib/data";
-import { createSupabaseServer, getCurrentProfile } from "@/lib/supabase/server";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { formatDate } from "@/lib/format";
-import { itemHref } from "@/lib/routes";
-import { Check, X } from "lucide-react";
-import { BadgeChip } from "@/components/BadgeChip";
-import { StarRating } from "@/components/StarRating";
+import { AlertTriangle, Database } from "lucide-react";
 import { pageMetadata } from "@/lib/seo";
-import { moderateReviewAction, toggleSponsorAction, touchItemAction } from "./actions";
-import type { Review } from "@/lib/types";
+import { getBundle } from "@/lib/data";
+import { createSupabaseServer } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { staleItems } from "@/lib/freshness";
+import { liveCategories } from "@/lib/categories";
+import { Baslik, Dugme, Kart } from "@/components/admin/ui";
+import { icerigiIceAktarAction } from "./icerik/actions";
 
 export const metadata: Metadata = pageMetadata({
   title: "Yönetim Paneli",
-  description: "Yorum moderasyonu, sponsorluk görünürlüğü ve içerik yönetimi.",
+  description: "İçerik, kategori, üye ve istatistik yönetimi.",
   path: "/panel",
   noIndex: true,
 });
 
+export const dynamic = "force-dynamic";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default async function PanelPage() {
-  const demo = !isSupabaseConfigured();
-  const profile = await getCurrentProfile();
-  const isAdmin = profile?.role === "admin";
-
-  if (!demo && !isAdmin) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-14 text-center">
-        <h1 className="text-2xl font-extrabold">Yönetim Paneli</h1>
-        <p className="mt-3 rounded-xl bg-[var(--down-soft)] p-4 text-sm text-[var(--down)] ring-1 ring-[color-mix(in_oklab,var(--down)_30%,transparent)]">
-          Bu sayfa yalnızca <strong>admin</strong> rolündeki üyeler içindir.
-          {!profile && (
-            <>
-              {" "}<Link href="/giris" className="font-semibold underline">Giriş yapın</Link>.
-            </>
-          )}
-        </p>
-      </div>
-    );
-  }
-
   const bundle = await getBundle();
+  const yapilandirildi = isSupabaseConfigured();
 
-  // Bekleyen yorumlar (yalnızca gerçek DB'de anlamlı)
-  let pending: Review[] = [];
-  if (!demo) {
+  let bekleyenYorum = 0;
+  let dbKayit = 0;
+  if (yapilandirildi) {
     const supabase = await createSupabaseServer();
-    const { data } = await supabase!.from("reviews").select("*").eq("status", "pending").order("created_at");
-    pending = (data ?? []).map((r: any) => ({
-      id: r.id,
-      itemId: r.item_id,
-      userName: r.user_name ?? "Üye",
-      rating: r.rating,
-      criteria: r.criteria ?? {},
-      comment: r.comment ?? "",
-      isVerified: r.is_verified ?? false,
-      status: r.status,
-      createdAt: r.created_at,
-    }));
+    if (supabase) {
+      const [{ count: yorum }, { count: kayit }] = await Promise.all([
+        (supabase as any).from("reviews").select("id", { count: "exact", head: true }).eq("status", "pending"),
+        (supabase as any).from("items").select("id", { count: "exact", head: true }),
+      ]);
+      bekleyenYorum = yorum ?? 0;
+      dbKayit = kayit ?? 0;
+    }
   }
 
-  const itemTitle = new Map(bundle.items.map((i) => [i.id, i.title]));
+  const bayat = staleItems(bundle.items.filter((i) => i.provenance.kind === "editor"));
+  const veritabaniBos = yapilandirildi && dbKayit === 0;
+
+  const kutular = [
+    { etiket: "Toplam kayıt", deger: bundle.items.length, href: "/panel/icerik" },
+    { etiket: "Yayındaki kategori", deger: liveCategories(bundle.categories).length, href: "/panel/kategoriler" },
+    { etiket: "Bekleyen yorum", deger: yapilandirildi ? bekleyenYorum : "—", href: "/panel/yorumlar" },
+    { etiket: "Doğrulama bekleyen", deger: bayat.length, href: "/panel/icerik" },
+  ];
 
   return (
-    <div className="mx-auto max-w-[1220px] px-4 py-8">
-      <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Yönetim Paneli</h1>
-      {demo && (
-        <p className="mt-3 rounded-xl bg-[var(--gold-soft)] p-4 text-sm text-[var(--gold-ink)] ring-1 ring-[color-mix(in_oklab,var(--gold)_30%,transparent)]">
-          <strong>Demo modu:</strong> Panel salt okunur önizlemede. Supabase bağlanıp <code>profiles.role = &apos;admin&apos;</code> yapılan hesapla
-          giriş yapıldığında moderasyon ve düzenleme aktifleşir.
-        </p>
+    <div className="space-y-5">
+      <h1 className="text-2xl font-extrabold tracking-tight">Özet</h1>
+
+      {veritabaniBos && (
+        <Kart className="border-[color-mix(in_oklab,var(--gold)_45%,transparent)] bg-[var(--gold-soft)]">
+          <h2 className="flex items-center gap-2 text-base font-bold text-[var(--gold-ink)]">
+            <AlertTriangle size={18} /> Panelden içerik yönetmeden önce bir adım
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--gold-ink)]">
+            Veritabanındaki <strong>items</strong> tablosu boş. Site şu an koddaki yerleşik içerikten besleniyor
+            ({bundle.items.length} kayıt). Panelden <strong>tek bir kayıt</strong> eklerseniz tablo dolu sayılır ve site
+            yalnızca o kaydı gösterir — diğer {bundle.items.length} kayıt görünmez olur.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--gold-ink)]">
+            Aşağıdaki düğme yerleşik içeriği veritabanına taşır. Çakışan kayıt güncellenir, hiçbir şey silinmez.
+            Örnek verinin sentetik oyları taşınmaz — uydurma oy veritabanına yazılırsa gerçek oylardan ayırt
+            edilemez hale gelir.
+          </p>
+          <form action={icerigiIceAktarAction} className="mt-4">
+            <Dugme type="submit">
+              <Database size={13} className="mr-1.5 inline" />
+              Yerleşik içeriği veritabanına aktar
+            </Dugme>
+          </form>
+        </Kart>
       )}
 
-      {/* Özet kartları */}
-      <div className="mt-6 grid gap-3 sm:grid-cols-4">
-        {[
-          { label: "Toplam içerik", value: bundle.items.length },
-          { label: "Onaylı yorum", value: bundle.reviews.length },
-          { label: "Bekleyen yorum", value: demo ? "—" : pending.length },
-          { label: "Sponsorlu içerik", value: bundle.items.filter((i) => i.isSponsored).length },
-        ].map((s) => (
-          <div key={s.label} className="rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-4">
-            <p className="text-xs uppercase tracking-wide text-[var(--muted-2)]">{s.label}</p>
-            <p className="mt-1 text-2xl font-extrabold">{s.value}</p>
-          </div>
+      <div className="grid gap-3 sm:grid-cols-4">
+        {kutular.map((k) => (
+          <Link
+            key={k.etiket}
+            href={k.href}
+            className="rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-4 transition-colors hover:border-[var(--brand)]"
+          >
+            <p className="text-[11px] uppercase tracking-wide text-[var(--muted-2)]">{k.etiket}</p>
+            <p className="mt-1 font-num text-2xl font-extrabold">{k.deger}</p>
+          </Link>
         ))}
       </div>
 
-      {/* Yorum moderasyonu */}
-      <section className="mt-8 rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5">
-        <h2 className="font-bold">Yorum Moderasyonu</h2>
-        <p className="mt-1 text-xs text-[var(--muted-2)]">Yeni yorumlar onaylanana kadar yayınlanmaz.</p>
-        {pending.length === 0 ? (
-          <p className="mt-4 rounded-xl bg-[var(--mist)] p-4 text-sm text-[var(--muted)]">
-            {demo ? "Demo modunda moderasyon kuyruğu boş görünür." : "Bekleyen yorum yok."}
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-3">
-            {pending.map((r) => (
-              <li key={r.id} className="rounded-xl border border-[var(--line)] p-4">
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <span className="font-semibold">{r.userName}</span>
-                  <StarRating value={r.rating} small />
-                  <span className="text-[var(--muted-2)]">→ {itemTitle.get(r.itemId) ?? r.itemId}</span>
-                  <span className="ml-auto text-xs text-[var(--muted-2)]">{formatDate(r.createdAt)}</span>
-                </div>
-                <p className="mt-2 text-sm text-[var(--ink-2)]">{r.comment}</p>
-                <div className="mt-3 flex gap-2">
-                  <form action={moderateReviewAction}>
-                    <input type="hidden" name="id" value={r.id} />
-                    <input type="hidden" name="status" value="approved" />
-                    <button className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--up)] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90">
-                      <Check size={13} /> Onayla
-                    </button>
-                  </form>
-                  <form action={moderateReviewAction}>
-                    <input type="hidden" name="id" value={r.id} />
-                    <input type="hidden" name="status" value="rejected" />
-                    <button className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--down)] px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90">
-                      <X size={13} /> Reddet
-                    </button>
-                  </form>
-                </div>
+      {bayat.length > 0 && (
+        <Kart>
+          <Baslik aciklama="Tazelik eşiğini geçmiş kayıtlar; en eskisi başta. Fiyat en hızlı eskiyen alandır.">
+            Doğrulama bekleyenler
+          </Baslik>
+          <ul className="divide-y divide-[var(--line)] text-sm">
+            {bayat.slice(0, 10).map((i) => (
+              <li key={i.slug} className="flex items-center justify-between gap-4 py-2">
+                <Link href={`/panel/icerik/${i.slug}`} className="hover:text-[var(--brand)]">
+                  {i.title}
+                </Link>
+                <span className="shrink-0 text-xs text-[var(--muted-2)]">{i.categorySlug}</span>
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </Kart>
+      )}
 
-      {/* İçerik yönetimi */}
-      <section className="mt-8 rounded-[14px] border border-[var(--line)] bg-[var(--card)] p-5">
-        <h2 className="font-bold">İçerik Yönetimi</h2>
-        <p className="mt-1 text-xs text-[var(--muted-2)]">
-          Sponsorluk görünürlüğü buradan yönetilir; tavsiye puanına asla dokunmaz. &quot;Güncelle&quot; son güncelleme tarihini tazeler.
-        </p>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[760px] text-sm">
-            <thead>
-              <tr className="border-b border-[var(--line)] text-left text-xs uppercase tracking-wide text-[var(--muted-2)]">
-                <th className="py-2 pr-3">Başlık</th>
-                <th className="py-2 pr-3">Tip</th>
-                <th className="py-2 pr-3">Puan</th>
-                <th className="py-2 pr-3">Rozetler</th>
-                <th className="py-2 pr-3">Güncelleme</th>
-                <th className="py-2 text-right">İşlemler</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--line)]">
-              {bundle.items.map((it) => (
-                <tr key={it.id}>
-                  <td className="max-w-64 py-2.5 pr-3">
-                    <Link href={itemHref(it)} className="font-medium hover:text-[var(--brand)]">{it.title}</Link>
-                  </td>
-                  <td className="py-2.5 pr-3 capitalize text-[var(--muted)]">{it.type}</td>
-                  <td className="py-2.5 pr-3 font-bold tabular-nums">{it.score}</td>
-                  <td className="py-2.5 pr-3">
-                    <div className="flex max-w-56 flex-wrap gap-1">
-                      {it.badges.map((b) => <BadgeChip key={b} badge={b} small />)}
-                    </div>
-                  </td>
-                  <td className="py-2.5 pr-3 text-[var(--muted-2)]">{formatDate(it.updatedAt)}</td>
-                  <td className="py-2.5 text-right">
-                    <div className="flex justify-end gap-2">
-                      <form action={toggleSponsorAction}>
-                        <input type="hidden" name="id" value={it.id} />
-                        <input type="hidden" name="current" value={String(it.isSponsored)} />
-                        <button
-                          disabled={demo}
-                          className={`rounded-lg px-2.5 py-1 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40 ${
-                            it.isSponsored
-                              ? "bg-[var(--gold-soft)] text-[var(--gold-ink)] hover:opacity-80"
-                              : "bg-[var(--mist-2)] text-[var(--ink-2)] hover:bg-[var(--line)]"
-                          }`}
-                        >
-                          {it.isSponsored ? "Sponsorluğu kaldır" : "Sponsor yap"}
-                        </button>
-                      </form>
-                      <form action={touchItemAction}>
-                        <input type="hidden" name="id" value={it.id} />
-                        <button
-                          disabled={demo}
-                          className="rounded-lg bg-[var(--brand-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--brand-ink)] hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                          Güncelle
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <Kart>
+        <Baslik aciklama="Sistem durumu ayrı bir sayfada; ortam değişkenleri ve veritabanı yanıt süresi orada.">
+          Bağlantılar
+        </Baslik>
+        <div className="flex flex-wrap gap-2 text-sm">
+          <Link href="/durum" className="rounded-[10px] bg-[var(--mist-2)] px-3 py-2 font-semibold text-[var(--ink-2)] hover:bg-[var(--line)]">
+            Sistem durumu
+          </Link>
+          <Link href="/metodoloji" className="rounded-[10px] bg-[var(--mist-2)] px-3 py-2 font-semibold text-[var(--ink-2)] hover:bg-[var(--line)]">
+            Puanlama metodolojisi
+          </Link>
         </div>
-      </section>
+      </Kart>
     </div>
   );
 }

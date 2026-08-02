@@ -8,6 +8,7 @@ import { TrustMarquee } from "@/components/layout/TrustMarquee";
 import { Footer } from "@/components/layout/Footer";
 import { CompareTray } from "@/components/CompareTray";
 import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
+import { EventTracker } from "@/components/EventTracker";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -81,6 +82,9 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <CompareTray />
+          {/* Ölçüm: kim olduğu değil, hangi kaydın ilgi çektiği. Kimlik ve
+              çerez kullanmaz (bkz. components/EventTracker). */}
+          <EventTracker />
         </AuthModalProvider>
       </body>
     </html>
