@@ -68,11 +68,11 @@ export async function ItemDetail({ item }: { item: Item }) {
     <div className="mx-auto max-w-[1220px] px-6 py-10">
       {/* Kırıntı */}
       <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-sm text-[var(--muted-2)]">
-        <Link href={TYPE_LABELS[item.type].hub} className="transition-colors hover:text-[var(--brand)]">
+        <Link href={TYPE_LABELS[item.type].hub} className="py-1.5 transition-colors hover:text-[var(--brand)]">
           {TYPE_LABELS[item.type].plural}
         </Link>
         <span>/</span>
-        <Link href={categoryHref(item.type, item.categorySlug)} className="transition-colors hover:text-[var(--brand)]">
+        <Link href={categoryHref(item.type, item.categorySlug)} className="py-1.5 transition-colors hover:text-[var(--brand)]">
           {category?.name}
         </Link>
         {loc && (
@@ -225,7 +225,7 @@ export async function ItemDetail({ item }: { item: Item }) {
                     href={s.url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="underline decoration-dotted underline-offset-2 hover:text-[var(--brand)]"
+                    className="inline-block py-1 underline decoration-dotted underline-offset-2 hover:text-[var(--brand)]"
                   >
                     {s.label}
                   </a>

@@ -32,7 +32,12 @@ export async function Header() {
           <MobileMenu groups={groups} />
         </div>
 
-        <Link href="/" className="shrink-0 font-display text-xl font-extrabold tracking-tight sm:text-2xl">
+        {/* Dikey dolgu dokunma hedefi için: metin yüksekliği 28px kalıyordu,
+            başlık satırı 64px olduğu hâlde tıklanabilir alan dardı. */}
+        <Link
+          href="/"
+          className="flex h-11 shrink-0 items-center font-display text-xl font-extrabold tracking-tight sm:text-2xl"
+        >
           <span className="text-[var(--ink)]">Tavsiye</span>
           <span className="text-[var(--gold)]">Hane</span>
         </Link>

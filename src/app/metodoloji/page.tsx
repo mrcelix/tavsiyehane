@@ -37,7 +37,7 @@ export default function MetodolojiPage() {
       <section className={`mt-8 ${PANEL}`}>
         <h2 className="flex items-center gap-2 text-base font-bold">
           <ShieldCheck size={17} className="text-[var(--brand)]" />
-          Puanın iki dayanağı vardır ve hangisi olduğu her zaman yazar
+          Puanın üç dayanağı vardır ve hangisi olduğu her zaman yazar
         </h2>
         <ol className="mt-3 grid gap-3 sm:grid-cols-3">
           <li className="rounded-xl border border-[var(--line)] p-3">
@@ -59,8 +59,8 @@ export default function MetodolojiPage() {
           <li className="rounded-xl border border-[var(--line)] p-3">
             <p className="text-sm font-bold">3. Editör değerlendirmesi</p>
             <p className="mt-1 text-sm leading-relaxed text-[var(--ink-2)]">
-              İkisi de yoksa. Puan, editörün <strong>doğrulanabilir</strong> kriterlerine dayanır ve
-              kayıt &quot;Editör değerlendirmesi&quot; olarak etiketlenir.
+              İkisi de yoksa. Puan, editörün <strong>doğrulanabilir</strong>{" "}
+              kriterlerine dayanır ve kayıt &quot;Editör değerlendirmesi&quot; olarak etiketlenir.
             </p>
           </li>
         </ol>

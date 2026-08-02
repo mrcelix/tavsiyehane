@@ -17,11 +17,19 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/ara?sihirbaz=1", label: "İhtiyaç sihirbazı" },
       { href: "/karsilastir", label: "Karşılaştırma" },
       { href: "/favoriler", label: "Favoriler" },
+      { href: "/blog", label: "Blog" },
       { href: "/metodoloji", label: "Nasıl puanlıyoruz" },
       { href: "/isletme", label: "İşletmeniz için" },
     ],
   },
 ];
+
+/*
+ * Yıl modül düzeyinde hesaplanır, render sırasında değil: React bileşenleri saf
+ * olmak zorunda ve `new Date()` render içinde yasak. Değer sunucu her
+ * başladığında tazelenir — elle yazılan bir yıl ise sessizce eskir.
+ */
+const YIL = new Date().getFullYear();
 
 export function Footer() {
   return (
@@ -38,10 +46,16 @@ export function Footer() {
         {COLUMNS.map((col) => (
           <div key={col.title}>
             <h3 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">{col.title}</h3>
-            <ul className="space-y-1.5 text-[var(--ink-2)]">
+            {/* Bağlantılar blok ve dikey dolgulu: metin yüksekliğinde bir satır
+                (17-20px) parmakla ıskalanıyor. Negatif marj, dolgunun sütunu
+                sağa kaydırmasını engelliyor. */}
+            <ul className="-mx-2 text-[var(--ink-2)]">
               {col.links.map((l) => (
                 <li key={l.href}>
-                  <Link className="transition-colors hover:text-[var(--brand)]" href={l.href}>
+                  <Link
+                    className="block rounded-lg px-2 py-2 transition-colors hover:bg-[var(--mist)] hover:text-[var(--brand)] sm:py-1"
+                    href={l.href}
+                  >
                     {l.label}
                   </Link>
                 </li>
@@ -62,8 +76,17 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-[1220px] px-6 text-xs text-[var(--muted-2)]">
-        © 2026 TavsiyeHane — Demo sürüm. Puan ve yorumlar örnek veridir.
+      {/* Eskiden "Demo sürüm. Puan ve yorumlar örnek veridir." yazıyordu. Bu
+          artık doğru değil: gerçek katalog kayıtları kaynaklarıyla yayımlanıyor
+          ve örnek olanlar zaten kayıt üzerinde "Örnek veri" rozetiyle
+          işaretleniyor. Sitenin tamamını örnek ilan etmek, gerçek veriyi de
+          değersizleştirir. */}
+      <div className="mx-auto mt-8 max-w-[1220px] px-6 text-xs leading-relaxed text-[var(--muted-2)]">
+        © {YIL} TavsiyeHane. Örnek veri olarak işaretlenen kayıtlar dışındaki bilgiler kaynağı ve
+        doğrulama tarihiyle birlikte yayımlanır.{" "}
+        <Link href="/metodoloji" className="inline-block py-1.5 underline hover:text-[var(--brand)]">
+          Nasıl puanlıyoruz
+        </Link>
       </div>
     </footer>
   );
