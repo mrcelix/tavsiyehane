@@ -5,10 +5,13 @@ import { headers } from "next/headers";
  *
  * Öncelik sırası:
  *  1. NEXT_PUBLIC_SITE_URL (özel alan adı için en doğrusu — canonical adresi sabitler)
- *  2. İsteğin kendi host başlığı (Cloudflare Workers'ta workers.dev adresi de dahil)
+ *  2. İsteğin kendi host başlığı — Vercel önizleme dağıtımlarında da doğru çalışır
  *  3. Yerel geliştirme adresi
  *
  * Böylece ortam değişkeni ayarlanmadığında bile üretimde localhost adresi sızmaz.
+ * Yine de üretimde 1. seçeneği tanımlayın: önizleme dağıtımları kendi geçici
+ * adreslerini canonical olarak ilan ederse arama motoru asıl alan adı yerine
+ * onları indeksleyebilir.
  */
 export async function getSiteUrl(): Promise<string> {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
