@@ -98,6 +98,14 @@ const kontroller = [
   { dosya: "0004_verified_only.sql", ad: "is_email_verified()", test: () => fonksiyonVar("is_email_verified") },
   { dosya: "0005_images.sql", ad: "items.image_credit", test: () => sutunVar("items", "image_credit") },
   { dosya: "0006_vote_rate_limit.sql", ad: "vote_rate_limit()", test: () => fonksiyonVar("vote_rate_limit") },
+  { dosya: "0007_admin.sql", ad: "items.editor_criteria", test: () => sutunVar("items", "editor_criteria") },
+  { dosya: "0007_admin.sql", ad: "categories.sira", test: () => sutunVar("categories", "sira") },
+  { dosya: "0007_admin.sql", ad: "site_settings tablosu", test: () => sutunVar("site_settings", "anahtar") },
+  { dosya: "0007_admin.sql", ad: "posts tablosu", test: () => sutunVar("posts", "slug") },
+  { dosya: "0007_admin.sql", ad: "events tablosu", test: () => sutunVar("events", "tur") },
+  // audit_log yalnızca admin okuyabilir; anon anahtarla 200 dönmesi RLS'in
+  // çalıştığını değil, tablonun var olduğunu gösterir (boş sonuç da 200'dür).
+  { dosya: "0007_admin.sql", ad: "audit_log tablosu", test: () => sutunVar("audit_log", "eylem") },
 ];
 
 console.log();

@@ -25,6 +25,8 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
    - `supabase/migrations/0004_verified_only.sql` (oy ve yorum için e-posta doğrulaması zorunlu)
    - `supabase/migrations/0005_images.sql` (görsel alanları + item-images depolama kovası)
    - `supabase/migrations/0006_vote_rate_limit.sql` (saatlik oy sınırı + indeks)
+   - `supabase/migrations/0007_admin.sql` (panel altyapısı: eksik kayıt alanları, blog, olay ve denetim kaydı)
+   - `supabase/migrations/0008_signals_nullable.sql` (sinyal kolonu boş geçilebilir)
 3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı

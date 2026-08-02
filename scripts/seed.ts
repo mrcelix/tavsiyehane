@@ -1,6 +1,24 @@
 /**
- * Demo verisini Supabase'e yükler.
- * Kullanım: .env.local dosyasında NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY tanımlıyken
+ * Yerleşik içeriği Supabase'e aktarır.
+ *
+ * Panel Özet sayfasındaki "Yerleşik içeriği veritabanına aktar" düğmesiyle AYNI
+ * işi yapar; tek fark, bu script `service_role` anahtarıyla çalıştığı için
+ * admin oturumu gerektirmez. İkisinin aynı davranması bilinçli: iki farklı
+ * içe aktarma yolu, iki farklı veritabanı durumu demek olurdu.
+ *
+ * NE AKTARILIR: kategoriler ve kayıtlar.
+ *
+ * NE AKTARILMAZ ve neden:
+ *  - Örnek verinin sentetik OYLARI. Uydurma oy veritabanına yazılırsa gerçek
+ *    oylardan ayırt edilemez hale gelir ve tüm puanlama iddiası çöker.
+ *  - Örnek YORUMLAR ("Ece L., 5 yıldız"). Bunlar kurgu; gerçek yorum tablosuna
+ *    girerse moderasyon kuyruğunda ve sayılarda gerçek yorum gibi görünürler.
+ *  - Örnek SATICI teklifleri ve fiyat geçmişi — aynı sebep.
+ *
+ * Sonuç: örnek kayıtlar sitede durmaya devam eder ve "Örnek veri" rozetiyle
+ * görünür; puanları editör kriterlerinden hesaplanır. Gerçek katalog kayıtları
+ * (telefon) kaynaklarıyla birlikte aktarılır.
+ *
  *   npm run seed
  */
 import { config } from "dotenv";
@@ -21,112 +39,72 @@ const supabase = createClient(url, serviceKey, { auth: { persistSession: false }
 
 async function main() {
   const bundle = getDemoBundle();
-  console.log(`Yükleniyor: ${bundle.categories.length} kategori, ${bundle.items.length} içerik, ${bundle.reviews.length} yorum…`);
+  const gercek = bundle.items.filter((i) => i.provenance.kind === "editor").length;
 
-  // Kategoriler
-  {
-    const { error } = await supabase.from("categories").upsert(
-      bundle.categories.map((c) => ({ id: c.id, slug: c.slug, name: c.name, type: c.type, icon: c.icon, description: c.description }))
-    );
-    if (error) throw new Error("categories: " + error.message);
-  }
+  console.log(`Kategori : ${bundle.categories.length}`);
+  console.log(`Kayıt    : ${bundle.items.length} (${gercek} gerçek, ${bundle.items.length - gercek} örnek)`);
+  console.log();
 
-  // İçerikler
-  {
-    const { error } = await supabase.from("items").upsert(
-      bundle.items.map((i) => ({
-        id: i.id,
-        slug: i.slug,
-        title: i.title,
-        description: i.description,
-        type: i.type,
-        category_slug: i.categorySlug,
-        brand: i.brand,
-        city: i.city ?? null,
-        district: i.district ?? null,
-        price: i.price ?? null,
-        price_min: i.priceMin ?? null,
-        price_max: i.priceMax ?? null,
-        price_level: i.priceLevel ?? null,
-        score: i.score,
-        score_breakdown: i.scoreBreakdown,
-        why_recommended: i.whyRecommended,
-        attrs: i.attrs,
-        pros: i.pros,
-        cons: i.cons,
-        suitable_for: i.suitableFor,
-        not_suitable_for: i.notSuitableFor,
-        badges: i.badges,
-        is_sponsored: i.isSponsored,
-        rating_avg: i.ratingAvg,
-        rating_count: i.ratingCount,
-        updated_at: i.updatedAt,
-      }))
-    );
+  const kategoriler = bundle.categories.map((c, i) => ({
+    id: c.id,
+    slug: c.slug,
+    name: c.name,
+    type: c.type,
+    icon: c.icon,
+    description: c.description,
+    sira: i,
+    status: c.status ?? "yayinda",
+  }));
+  const { error: kErr } = await supabase.from("categories").upsert(kategoriler, { onConflict: "slug" });
+  if (kErr) throw new Error("categories: " + kErr.message);
+  console.log(`✓ ${kategoriler.length} kategori`);
+
+  const kayitlar = bundle.items.map((i) => ({
+    id: i.id,
+    slug: i.slug,
+    title: i.title,
+    description: i.description,
+    type: i.type,
+    category_slug: i.categorySlug,
+    brand: i.brand,
+    city: i.city ?? null,
+    district: i.district ?? null,
+    price: i.price ?? null,
+    price_min: i.priceMin ?? null,
+    price_max: i.priceMax ?? null,
+    price_level: i.priceLevel ?? null,
+    why_recommended: i.whyRecommended,
+    attrs: i.attrs,
+    pros: i.pros,
+    cons: i.cons,
+    suitable_for: i.suitableFor,
+    not_suitable_for: i.notSuitableFor,
+    is_sponsored: i.isSponsored,
+    // Sentetik oy taşınmaz (yukarıdaki açıklama).
+    signals: i.provenance.kind === "demo" ? null : i.signals,
+    external_signals: i.external ?? null,
+    editor_criteria: i.editorial.criteria,
+    provenance_kind: i.provenance.kind,
+    verified_at: i.provenance.verifiedAt ?? null,
+    sources: i.provenance.sources ?? null,
+    image_url: i.image?.url ?? null,
+    image_alt: i.image?.alt ?? null,
+    image_credit: i.image?.credit ?? null,
+    image_license: i.image?.license ?? null,
+    image_source_url: i.image?.sourceUrl ?? null,
+    updated_at: i.updatedAt,
+  }));
+
+  // Parça parça: tek istekte yüzlerce satır göndermek zaman aşımına düşer.
+  for (let i = 0; i < kayitlar.length; i += 40) {
+    const parca = kayitlar.slice(i, i + 40);
+    const { error } = await supabase.from("items").upsert(parca, { onConflict: "id" });
     if (error) throw new Error("items: " + error.message);
+    console.log(`✓ ${Math.min(i + 40, kayitlar.length)}/${kayitlar.length} kayıt`);
   }
 
-  // Satıcılar
-  {
-    const { error } = await supabase.from("offers").upsert(
-      bundle.offers.map((o) => ({
-        id: o.id,
-        item_id: o.itemId,
-        seller_name: o.sellerName,
-        seller_rating: o.sellerRating,
-        price: o.price,
-        in_stock: o.inStock,
-        url: o.url,
-      }))
-    );
-    if (error) throw new Error("offers: " + error.message);
-  }
-
-  // Fiyat geçmişi (tazele: önce sil)
-  {
-    await supabase.from("price_history").delete().neq("item_id", "");
-    const rows = Object.entries(bundle.priceHistory).flatMap(([itemId, points]) =>
-      points.map((p) => ({ item_id: itemId, price: p.price, recorded_at: p.date }))
-    );
-    const { error } = await supabase.from("price_history").insert(rows);
-    if (error) throw new Error("price_history: " + error.message);
-  }
-
-  // Yorumlar (demo yorumları onaylı; user_id boş)
-  {
-    await supabase.from("reviews").delete().is("user_id", null);
-    const { error } = await supabase.from("reviews").insert(
-      bundle.reviews.map((r) => ({
-        item_id: r.itemId,
-        user_id: null,
-        user_name: r.userName,
-        rating: r.rating,
-        criteria: r.criteria,
-        comment: r.comment,
-        is_verified: r.isVerified,
-        status: r.status,
-        created_at: r.createdAt,
-      }))
-    );
-    if (error) throw new Error("reviews: " + error.message);
-  }
-
-  // Listeler
-  {
-    const { error } = await supabase.from("lists").upsert(
-      bundle.lists.map((l) => ({ id: l.id, slug: l.slug, title: l.title, description: l.description, updated_at: l.updatedAt }))
-    );
-    if (error) throw new Error("lists: " + error.message);
-
-    const { error: e2 } = await supabase.from("list_items").upsert(
-      bundle.lists.flatMap((l) =>
-        l.itemSlugs.map((slug, idx) => ({ list_id: l.id, item_id: slug, position: idx }))
-      )
-    );
-    if (e2) throw new Error("list_items: " + e2.message);
-  }
-
-  console.log("✓ Seed tamamlandı. Site artık Supabase verisiyle çalışacak.");
+  console.log("\nTamam. Site artık Supabase verisiyle çalışıyor.");
+  console.log("Puan, rozet ve listeler her okumada yeniden hesaplanır; veritabanında saklanmaz.");
 }
 
 main().catch((e) => {

@@ -114,14 +114,24 @@ export const getBundle = cache(async (): Promise<DataBundle> => {
       return getDemoBundle();
     }
 
-    const categories: Category[] = cats.data.map((c: any) => ({
-      id: c.id,
-      slug: c.slug,
-      name: c.name,
-      type: c.type,
-      icon: c.icon ?? "📦",
-      description: c.description ?? "",
-    }));
+    /*
+     * `status` ve `sira` okunmazsa panelden yapılan ayar hiçbir işe yaramaz:
+     * hazırlanıyor işaretlenmiş kategori yayında görünür (içi boş bir sayfa
+     * hem kullanıcıyı hem arama motorunu yanıltır) ve sıralama uygulanmaz.
+     */
+    const categories: Category[] = [...cats.data]
+      // Sıralama ham satırlar üzerinde: `sira` Category tipine ait değil,
+      // yalnızca kategorilerin hangi düzende geleceğini belirler.
+      .sort((a: any, b: any) => (a.sira ?? 0) - (b.sira ?? 0))
+      .map((c: any) => ({
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        type: c.type,
+        icon: c.icon ?? "📦",
+        description: c.description ?? "",
+        status: c.status === "hazirlaniyor" ? ("hazirlaniyor" as const) : ("yayinda" as const),
+      }));
 
     const mappedOffers: Offer[] = (offers.data ?? []).map((o: any) => ({
       id: o.id,

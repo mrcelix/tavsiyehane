@@ -38,13 +38,6 @@ export async function Header() {
           >
             Listeler
           </Link>
-          <Link
-            href="/ara?sihirbaz=1"
-            className="flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-sm font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
-          >
-            <Sparkles size={15} className="text-[var(--gold)]" />
-            Sihirbaz
-          </Link>
         </nav>
 
         <div className="ml-auto flex min-w-0 flex-1 justify-end lg:max-w-sm">
@@ -52,6 +45,17 @@ export async function Header() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
+          {/* Sihirbaz simge olarak, karşılaştırmanın solunda. Metin kaldırıldığı
+              için erişilebilir ad `aria-label`da: simge tek başına ekran
+              okuyucuya hiçbir şey söylemez. */}
+          <Link
+            href="/ara?sihirbaz=1"
+            aria-label="İhtiyaç sihirbazı"
+            title="İhtiyaç sihirbazı"
+            className="hidden h-10 w-10 items-center justify-center rounded-[10px] text-[var(--gold)] transition-colors hover:bg-[var(--mist)] sm:flex"
+          >
+            <Sparkles size={18} />
+          </Link>
           <Link
             href="/karsilastir"
             aria-label="Karşılaştırma"
