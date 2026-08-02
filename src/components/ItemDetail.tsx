@@ -93,7 +93,10 @@ export async function ItemDetail({ item }: { item: Item }) {
         )}
       >
         <div className="flex flex-col gap-5 sm:flex-row">
-          <figure className="m-0 shrink-0 self-start">
+          {/* `self-start` yalnızca satır düzeninde (sm ve üstü): sütun düzeninde
+              hizalamayı başa çekmek öğeyi germekten çıkarıp genişliğini içeriğe
+              indiriyor ve görsel ince bir şeride dönüşüyordu. */}
+          <figure className="m-0 w-full shrink-0 sm:w-auto sm:self-start">
             {item.image ? (
               <Image
                 src={item.image.url}
@@ -115,7 +118,7 @@ export async function ItemDetail({ item }: { item: Item }) {
             )}
             {/* Telif künyesi görselin yanında durur; kaynağı bilinmeyen görsel yayımlanmaz. */}
             {item.image && (
-              <figcaption className="mt-1.5 max-w-28 text-[10px] leading-tight text-[var(--muted-2)]">
+              <figcaption className="mt-1.5 text-[10px] leading-tight text-[var(--muted-2)] sm:max-w-28">
                 {item.image.sourceUrl ? (
                   <a href={item.image.sourceUrl} target="_blank" rel="noopener noreferrer nofollow" className="underline">
                     {item.image.credit}

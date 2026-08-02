@@ -9,6 +9,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CompareTray } from "@/components/CompareTray";
 import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
 import { EventTracker } from "@/components/EventTracker";
+import { SearchPalette } from "@/components/SearchPalette";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -85,6 +86,8 @@ export default function RootLayout({
           {/* Ölçüm: kim olduğu değil, hangi kaydın ilgi çektiği. Kimlik ve
               çerez kullanmaz (bkz. components/EventTracker). */}
           <EventTracker />
+          {/* Arama paleti düzende tek örnek: Ctrl+K ve "/" her sayfada çalışır. */}
+          <SearchPalette />
         </AuthModalProvider>
       </body>
     </html>

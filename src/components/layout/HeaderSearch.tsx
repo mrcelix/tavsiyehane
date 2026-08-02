@@ -1,50 +1,49 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
 import { Search } from "lucide-react";
+import { aramayiAc } from "@/components/SearchPalette";
 
-/** §5 arama tetikleyici: h 40px, mist zemin, hover'da paper + line kenarlık, sağda kbd ipucu. */
+/**
+ * Arama tetikleyicisi.
+ *
+ * Artık bir form değil, paleti açan bir düğme. Sebebi: kutuya yazıp Enter'a
+ * basmak kullanıcıyı arama sayfasına atıyordu; palet ise yazarken sonuç
+ * gösteriyor ve doğrudan kayda gidiyor. İki ayrı arama girişi tutmak
+ * (kutu + palet) ikisinin farklı davranması demek olurdu.
+ *
+ * Masaüstünde kutu görünümünü koruyor — kullanıcı orada bir arama alanı
+ * bekliyor. Mobilde yalnızca simge: dar ekranda kutu, hamburger ve logo aynı
+ * satıra sığmıyor.
+ */
 export function HeaderSearch() {
-  const router = useRouter();
-  const [q, setQ] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        inputRef.current?.focus();
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (q.trim()) router.push(`/ara?q=${encodeURIComponent(q.trim())}`);
-  }
-
   return (
-    <form onSubmit={submit} className="w-full">
-      <div className="group relative">
+    <>
+      {/* Masaüstü: kutu görünümlü tetikleyici */}
+      <button
+        type="button"
+        onClick={aramayiAc}
+        aria-label="Ara"
+        className="group relative hidden h-10 w-full items-center rounded-md border border-transparent bg-[var(--mist)] pl-9 pr-16 text-left text-sm text-[var(--muted-2)] transition-colors hover:border-[var(--line)] hover:bg-[var(--paper)] sm:flex"
+      >
         <Search
           size={16}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-2)] transition-colors group-focus-within:text-[var(--brand)]"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-2)] transition-colors group-hover:text-[var(--brand)]"
         />
-        <input
-          ref={inputRef}
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Ne arıyorsun?"
-          aria-label="Ara"
-          className="h-10 w-full rounded-md border border-transparent bg-[var(--mist)] pl-9 pr-16 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--muted-2)] hover:border-[var(--line)] hover:bg-[var(--paper)] focus:border-[var(--brand)] focus:bg-[var(--paper)] focus:ring-2 focus:ring-[var(--brand-soft)]"
-        />
+        Ne arıyorsun?
         <kbd className="pointer-events-none absolute right-3 top-1/2 hidden h-6 -translate-y-1/2 items-center rounded border border-[var(--line)] bg-[var(--paper)] px-1.5 text-[10px] font-medium text-[var(--muted)] lg:flex">
           Ctrl K
         </kbd>
-      </div>
-    </form>
+      </button>
+
+      {/* Mobil: yalnızca simge */}
+      <button
+        type="button"
+        onClick={aramayiAc}
+        aria-label="Ara"
+        className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] sm:hidden"
+      >
+        <Search size={20} />
+      </button>
+    </>
   );
 }

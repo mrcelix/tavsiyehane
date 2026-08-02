@@ -94,6 +94,14 @@ try {
   await new Promise((r) => ws.addEventListener("open", r, { once: true }));
   const cdp = oturum(ws);
   await cdp("Page.enable");
+  // `--window-size` viewport'u belirlemiyor (pencere kromu + ölçekleme);
+  // gerçek genişlik CDP ile dayatılır.
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width: Number(gen),
+    height: Number(yuk),
+    deviceScaleFactor: 1,
+    mobile: Number(gen) < 640,
+  });
   const yuklendi = cdp.olay("Page.loadEventFired");
   await cdp("Page.navigate", { url });
   await yuklendi;

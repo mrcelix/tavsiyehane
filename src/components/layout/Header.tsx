@@ -24,8 +24,15 @@ export async function Header() {
     <header
       className="sticky top-0 z-40 border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--paper)_90%,transparent)] backdrop-blur-lg supports-[backdrop-filter]:bg-[color-mix(in_oklab,var(--paper)_75%,transparent)]"
     >
-      <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4 px-4">
-        <Link href="/" className="shrink-0 font-display text-2xl font-extrabold tracking-tight">
+      {/* Dar ekranda boşluk 4 birim kalırsa logo + simgeler taşıyordu; mobilde 2. */}
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-2 px-3 sm:gap-4 sm:px-4">
+        {/* Hamburger mobilde en başta: menüye ulaşmak için önce sayfayı taramak
+            zorunda kalmamalı. Masaüstünde gizli, yerini kategori menüsü alıyor. */}
+        <div className="lg:hidden">
+          <MobileMenu groups={groups} />
+        </div>
+
+        <Link href="/" className="shrink-0 font-display text-xl font-extrabold tracking-tight sm:text-2xl">
           <span className="text-[var(--ink)]">Tavsiye</span>
           <span className="text-[var(--gold)]">Hane</span>
         </Link>
@@ -40,7 +47,8 @@ export async function Header() {
           </Link>
         </nav>
 
-        <div className="ml-auto flex min-w-0 flex-1 justify-end lg:max-w-sm">
+        {/* Mobilde simge olduğu için esnemesine gerek yok; masaüstünde kutu genişler. */}
+        <div className="ml-auto flex min-w-0 shrink-0 justify-end sm:flex-1 lg:max-w-sm">
           <HeaderSearch />
         </div>
 
@@ -90,16 +98,12 @@ export async function Header() {
               {emailInitials(profile.email)}
             </Link>
           ) : (
-            <span className="hidden sm:inline-flex">
-              {/* Sayfaya götürmek yerine modal: kullanıcı baktığı listeyi kaybetmiyor.
-                  /giris ve /kayit sayfaları doğrudan bağlantı için duruyor. */}
-              <AuthTrigger
-                reason={authReady ? undefined : "Demo modunda üyelik kapalı; kurulum sonrası aktifleşir."}
-              />
-            </span>
+            /* Sayfaya götürmek yerine modal: kullanıcı baktığı listeyi kaybetmiyor.
+               /giris ve /kayit sayfaları doğrudan bağlantı için duruyor. */
+            <AuthTrigger
+              reason={authReady ? undefined : "Demo modunda üyelik kapalı; kurulum sonrası aktifleşir."}
+            />
           )}
-
-          <MobileMenu groups={groups} />
         </div>
       </div>
     </header>
