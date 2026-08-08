@@ -45,6 +45,30 @@ describe("buildFacets", () => {
     expect(buildFacets([])).toEqual([]);
   });
 
+  it("rozet boyutunu tek değerde bile üretir", () => {
+    // Diğer boyutlardan farklı: rozet kendi kutusunda gösteriliyor ve
+    // "kategoride yalnızca sponsorlu var" da filtrelenebilir bir sonuçtur.
+    const rozet = buildFacets([kayit("a", {}, { badges: ["sponsorlu"] }), kayit("b", {})]).find(
+      (f) => f.param === "rozet"
+    );
+    expect(rozet?.values).toEqual([{ value: "sponsorlu", count: 1 }]);
+  });
+
+  it("rozetleri sayıya göre değil tanım sırasına göre dizer", () => {
+    // Kutu kategoriden kategoriye yeniden dizilmemeli.
+    const kohort = [
+      kayit("a", {}, { badges: ["sponsorlu"] }),
+      kayit("b", {}, { badges: ["sponsorlu"] }),
+      kayit("c", {}, { badges: ["kategori-lideri"] }),
+    ];
+    const rozet = buildFacets(kohort).find((f) => f.param === "rozet");
+    expect(rozet!.values.map((v) => v.value)).toEqual(["kategori-lideri", "sponsorlu"]);
+  });
+
+  it("rozeti olmayan kohortta rozet boyutu üretmez", () => {
+    expect(buildFacets([kayit("a", {}), kayit("b", {})]).find((f) => f.param === "rozet")).toBeUndefined();
+  });
+
   it("kayıtları gruplayan alanı filtre boyutu yapar", () => {
     const kohort = [
       kayit("a", { Garanti: "2 yıl distribütör" }),

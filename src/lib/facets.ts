@@ -43,16 +43,22 @@ export function buildFacets(items: Item[]): Facet[] {
   if (items.length === 0) return [];
   const out: Facet[] = [];
 
-  // Rozetler
+  // Rozetler.
+  // İki farkı var: (1) tek değer bile anlamlı, çünkü kendi kutusuyla gösteriliyor
+  // ve "kategoride yalnızca bu rozet var" bilgisi de bir sonuçtur — bu yüzden
+  // MIN_DISTINCT eşiğine tabi değil. (2) Sıra sayıya göre değil, BADGES'teki
+  // tanım sırasına göre: kutu kategoriden kategoriye yeniden dizilirse kullanıcı
+  // aradığı rozeti her seferinde baştan arar.
   const rozetSay = new Map<BadgeKey, number>();
   for (const it of items) for (const b of it.badges) rozetSay.set(b, (rozetSay.get(b) ?? 0) + 1);
-  if (rozetSay.size >= MIN_DISTINCT) {
+  if (rozetSay.size > 0) {
+    const sira = Object.keys(BADGES) as BadgeKey[];
     out.push({
       param: "rozet",
       label: "Rozetler",
       values: [...rozetSay.entries()]
         .map(([k, count]) => ({ value: k, count }))
-        .sort((a, b) => b.count - a.count),
+        .sort((a, b) => sira.indexOf(a.value as BadgeKey) - sira.indexOf(b.value as BadgeKey)),
     });
   }
 

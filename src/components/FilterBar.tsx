@@ -52,6 +52,21 @@ export function FilterBar({
 
   const activeKeys = ["sehir", "marka", "maksfiyat", "minpuan", "rozet"].filter((k) => params.get(k));
 
+  /*
+   * Rozet kutusu listelenen kayıtlardan doğar, sabit rozet tablosundan değil:
+   * mekân listesinde "Kategori lideri" seçeneği sunup 0 sonuç göstermek,
+   * seçeneği hiç sunmamaktan kötüdür. Marka ve şehir kutuları da böyle çalışır.
+   */
+  const rozetler = facets.find((f) => f.param === "rozet")?.values ?? [];
+  const seciliRozet = params.get("rozet") ?? "";
+  // Kohortta karşılığı olmayan bir rozet URL'den gelmiş olabilir (eski bağlantı,
+  // daralmış liste). Seçenek olarak yine de basılır — yoksa kutu "Tümü" görünür
+  // ama filtre uygulanmaya devam eder ve kullanıcı 0 sonucun sebebini göremez.
+  const rozetSecenekleri =
+    seciliRozet && !rozetler.some((r) => r.value === seciliRozet)
+      ? [...rozetler, { value: seciliRozet, count: 0 }]
+      : rozetler;
+
   return (
     <div className="flex flex-wrap items-end gap-x-2 gap-y-3">
       <SlidersHorizontal size={15} className="mb-2.5 hidden shrink-0 text-[var(--muted-2)] sm:block" />
@@ -121,19 +136,25 @@ export function FilterBar({
         </Select>
       </Field>
 
-      <Field label="Rozet" width="w-[168px]">
-        <Select value={params.get("rozet") ?? ""} onChange={(e) => set("rozet", e.target.value)} aria-label="Rozet" className={CTRL}>
-          <option value="">Tümü</option>
-          {(Object.keys(BADGES) as BadgeKey[]).map((k) => (
-            <option key={k} value={k}>
-              {BADGES[k].label}
-            </option>
-          ))}
-        </Select>
-      </Field>
+      {rozetSecenekleri.length > 0 && (
+        <Field label="Rozet" width="w-[168px]">
+          <Select value={seciliRozet} onChange={(e) => set("rozet", e.target.value)} aria-label="Rozet" className={CTRL}>
+            <option value="">Tümü</option>
+            {rozetSecenekleri.map((r) => (
+              <option key={r.value} value={r.value}>
+                {BADGES[r.value as BadgeKey]?.label ?? r.value}
+                {r.count > 0 && ` (${r.count})`}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      )}
 
       <div className="pb-1">
-        <AdvancedFilters facets={facets} />
+        {/* Rozet burada kendi kutusuyla duruyor; panelde ikinci bir rozet listesi
+            aynı `rozet` parametresini çok seçimli yazar ve iki denetim birbirinin
+            değerini ezer. */}
+        <AdvancedFilters facets={facets.filter((f) => f.param !== "rozet")} />
       </div>
 
       <div className="ml-auto flex items-center gap-3 pb-1">
