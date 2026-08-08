@@ -14,7 +14,8 @@
     "test:coverage": "vitest run --coverage",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run build",
     "seed": "tsx scripts/seed.ts",
-    "stale": "tsx scripts/stale-check.ts"
+    "stale": "tsx scripts/stale-check.ts",
+    "signals": "node scripts/ingest-signals.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

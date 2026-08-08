@@ -122,8 +122,23 @@ Bu ölçümler **oy değildir**. Oy sayısı sıfır kalır ve sıfır görünü
 ayrı bir dayanak olarak etiketlenir, kaynağı ve ölçüm tarihi kayıtta gösterilir.
 
 Ölçümler elle yazılmaz — kaynağı olmayan sinyal, uydurulmuş sinyalden ayırt
-edilemez. Google Trends'ten (veya kullandığınız kaynaktan) şu biçimde bir JSON
-hazırlayıp içe aktarın:
+edilemez. Akış üç adım:
+
+**1. İskeleti üretin.** Hangi kayıtları ölçeceğinizi slug'lardan hatırlamak zor
+olduğu için şablon başlıkları da yazar:
+
+```bash
+npm run signals -- --sablon telefon
+```
+
+`olcumler-telefon.json` dosyası oluşur; başka bir ad için `--cikti` ekleyin.
+Çıktıyı `>` ile yönlendirmeyin: PowerShell 5.1 dosyayı UTF-16 olarak kaydeder ve
+`npm run` kendi başlık satırlarını da stdout'a yazar — ikisi de JSON'u bozar.
+Var olan dosyanın üzerine yazılmaz, doldurduğunuz ölçümler kaybolmasın diye.
+
+**2. Doldurun.** Google Trends'te (veya kullandığınız kaynakta) her kaydı arayıp
+`null` değerlerin yerine ölçümü yazın, `kaynak.url`'ye ölçümü aldığınız adresi
+koyun. `_baslik` alanı yalnızca sizin içindir, içe aktarımda yok sayılır.
 
 ```json
 {
@@ -135,13 +150,23 @@ hazırlayıp içe aktarın:
 }
 ```
 
+**3. İçe aktarın.**
+
 ```bash
-node scripts/ingest-signals.mjs olcumler.json
+npm run signals -- olcumler-telefon.json --db
 ```
 
 Önce kuru çalıştırır ve ne olacağını yazar; uygulamak için `--yaz` ekleyin.
-Kaynağı veya ölçüm tarihi eksik girdi reddedilir. Bir kategoride kayıtların en
-az yarısında ölçüm varsa o kategori dış sinyal dayanağına geçer.
+Kaynağı, ölçüm tarihi veya kaynak adresi eksik girdi reddedilir.
+
+`--db` iki hedefi birden günceller: Supabase'deki `items.external_signals`
+(sitenin gerçekten okuduğu yer) ve varsa `src/data/catalog/*.ts`. Bayrağı
+vermezseniz yalnızca katalog dosyaları yazılır ve **site değişmez**. Yalnızca
+veritabanına yazılan bir ölçüm, `npm run seed` ya da panelden içerik aktarımı
+çalıştığında silinir — aktarımın kaynağı koddur; script bu durumda uyarır.
+
+Bir kategoride kayıtların en az yarısında ölçüm varsa o kategori dış sinyal
+dayanağına geçer.
 
 ### Kayıt görselleri
 
@@ -237,6 +262,7 @@ raporlanır.
 | `npm run verify`    | typecheck + lint + test + build                 |
 | `npm run seed`      | Demo verisini Supabase'e yükler                 |
 | `npm run stale`     | Doğrulama bekleyen kayıtları listeler           |
+| `npm run signals`   | Dış sinyal ölçümlerini içe aktarır              |
 
 ## Mimari özeti
 
