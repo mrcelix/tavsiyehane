@@ -43,5 +43,11 @@ next-env.d.ts
 # ornek env dosyasi repoya dahil
 !.env.local.example
 
+# dis sinyal olcum dosyalari (scripts/ingest-signals.mjs --sablon)
+# Ara dosyalardir: olcumun kendisi kaynagi ve tarihiyle birlikte katalog
+# dosyalarina ve veritabanina isleniyor, kayit orada tutuluyor.
+olcumler-*.json
+olcumler.json
+
 # vercel
 .vercel/
