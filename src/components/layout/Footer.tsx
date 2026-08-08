@@ -14,7 +14,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
   {
     title: "Araçlar",
     links: [
-      { href: "/ara?sihirbaz=1", label: "İhtiyaç sihirbazı" },
+      { href: "/ara?sihirbaz=1", label: "Tavsiye Sihirbazı" },
       { href: "/karsilastir", label: "Karşılaştırma" },
       { href: "/favoriler", label: "Favoriler" },
       { href: "/blog", label: "Blog" },

@@ -131,7 +131,7 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
                   onClick={() => setOpen(false)}
                   className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand)] hover:underline"
                 >
-                  İhtiyaç sihirbazını dene <ArrowRight size={13} />
+                  Tavsiye Sihirbazı&apos;nı dene <ArrowRight size={13} />
                 </Link>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, Scale, Sparkles } from "lucide-react";
+import { Heart, Scale, Wand2 } from "lucide-react";
 import { getBundle } from "@/lib/data";
 import { buildMenu } from "@/lib/menu";
 import { getCurrentProfile } from "@/lib/supabase/server";
@@ -44,6 +44,15 @@ export async function Header() {
 
         <nav className="hidden items-center gap-1 lg:flex">
           <CategoryMenu groups={groups} />
+          {/* Sihirbaz artık adıyla ve kategorilerin hemen sağında: simge olarak
+              sağ kümede dururken ne olduğu anlaşılmıyordu. */}
+          <Link
+            href="/ara?sihirbaz=1"
+            className="flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-sm font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
+          >
+            <Wand2 size={15} className="text-[var(--gold)]" />
+            Tavsiye Sihirbazı
+          </Link>
           <Link
             href="/listeler"
             className="flex h-9 items-center rounded-[10px] px-3 text-sm font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
@@ -58,17 +67,6 @@ export async function Header() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
-          {/* Sihirbaz simge olarak, karşılaştırmanın solunda. Metin kaldırıldığı
-              için erişilebilir ad `aria-label`da: simge tek başına ekran
-              okuyucuya hiçbir şey söylemez. */}
-          <Link
-            href="/ara?sihirbaz=1"
-            aria-label="İhtiyaç sihirbazı"
-            title="İhtiyaç sihirbazı"
-            className="hidden h-10 w-10 items-center justify-center rounded-[10px] text-[var(--gold)] transition-colors hover:bg-[var(--mist)] sm:flex"
-          >
-            <Sparkles size={18} />
-          </Link>
           <Link
             href="/karsilastir"
             aria-label="Karşılaştırma"

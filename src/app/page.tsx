@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, Handshake, MapPinned, Package, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
 import { getBundle } from "@/lib/data";
-import { sortItems, uniqueCities } from "@/lib/query";
+import { sortItems } from "@/lib/query";
 import { categoryHref } from "@/lib/menu";
+import { itemHref } from "@/lib/routes";
 import { liveCategories } from "@/lib/categories";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { jsonLd, pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/seo";
-import { HeroPicker } from "@/components/HeroPicker";
+import { HeroExplorer, type HeroCategory } from "@/components/HeroExplorer";
 import { RotatingWord } from "@/components/RotatingWord";
 import { ItemGrid } from "@/components/ItemGrid";
 import { Overline } from "@/components/ui/Card";
@@ -91,14 +92,32 @@ export default async function HomePage() {
     { icon: ShieldCheck, value: String(yayindaki.length), label: "kategoride şeffaf puanlama" },
   ];
 
-  // Hero formu için kompakt veri — tüm bundle istemciye taşınmaz.
-  // Yalnızca yayındaki kategoriler; form kullanıcıyı boş sayfaya götürmemeli.
-  const pickerCategories = yayindaki.map((c) => ({ slug: c.slug, name: c.name, type: c.type }));
-  const citiesByType = {
-    urun: [],
-    hizmet: uniqueCities(bundle, "hizmet"),
-    mekan: uniqueCities(bundle, "mekan"),
-  };
+  /*
+   * Hero keşif kartı için kompakt veri — tüm bundle istemciye taşınmaz.
+   * Kategori başına yalnızca ilk beş kayıt ve kaydın kartta görünen alanları
+   * gidiyor. Yalnızca yayındaki kategoriler: kart kullanıcıyı boş bir sayfaya
+   * götürmemeli.
+   */
+  const heroCategories: HeroCategory[] = yayindaki.map((c) => {
+    const kayitlar = sortItems(
+      bundle.items.filter((i) => i.categorySlug === c.slug),
+      "puan"
+    );
+    return {
+      slug: c.slug,
+      name: c.name,
+      type: c.type,
+      count: kayitlar.length,
+      href: categoryHref(c.type, c.slug),
+      top: kayitlar.slice(0, 5).map((i) => ({
+        slug: i.slug,
+        title: i.title,
+        brand: i.brand,
+        score: i.score,
+        href: itemHref(i),
+      })),
+    };
+  });
 
   return (
     <div>
@@ -151,8 +170,10 @@ export default async function HomePage() {
           style={{ background: "radial-gradient(circle, rgba(239,160,19,.16), transparent 70%)" }}
         />
 
-        {/* İki sütun: solda mesaj, sağda seçim formu. Dar ekranda alt alta düşer. */}
-        <div className="relative mx-auto grid max-w-[1220px] items-center gap-10 px-6 lg:grid-cols-[1fr_minmax(360px,420px)]">
+        {/* İki sütun: solda mesaj, sağda canlı keşif kartı. Dar ekranda alt alta
+            düşer. Kart iki panelli olduğu için mesajdan geniş: eski formun 420px
+            sütununda kategori listesi ile ilk beş yan yana sığmıyor. */}
+        <div className="relative mx-auto grid max-w-[1220px] items-center gap-10 px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div className="text-center lg:text-left">
             <h1 className="text-[34px] font-black leading-tight tracking-tight text-white md:text-[40px]">
               <RotatingWord items={HERO_WORDS} />
@@ -182,12 +203,12 @@ export default async function HomePage() {
               className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white"
             >
               <Sparkles size={15} className="text-[#EFA013]" />
-              Adım adım ilerlemeyi tercih ederim
+              Tavsiye Sihirbazı&apos;yla adım adım ilerle
               <ArrowRight size={14} />
             </Link>
           </div>
 
-          <HeroPicker categories={pickerCategories} citiesByType={citiesByType} />
+          <HeroExplorer categories={heroCategories} />
         </div>
 
         {/* Hero güven şeridi */}

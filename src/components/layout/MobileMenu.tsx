@@ -70,7 +70,7 @@ export function MobileMenu({ groups }: { groups: MenuGroup[] }) {
             <div className="mt-auto border-t border-[var(--line)] pt-3">
               {[
                 { href: "/listeler", label: "En iyi listeleri" },
-                { href: "/ara?sihirbaz=1", label: "İhtiyaç sihirbazı" },
+                { href: "/ara?sihirbaz=1", label: "Tavsiye Sihirbazı" },
                 { href: "/karsilastir", label: "Karşılaştırma" },
                 { href: "/favoriler", label: "Favorilerim" },
                 { href: "/isletme", label: "İşletmeniz için" },

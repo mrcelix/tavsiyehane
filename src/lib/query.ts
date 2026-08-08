@@ -195,32 +195,12 @@ export function alternativesFor(bundle: DataBundle, item: Item, limit = 4): Item
   ).slice(0, limit);
 }
 
-/** İhtiyaç sihirbazı: cevaplara göre filtrele + önceliğe göre sırala. */
-export interface WizardAnswers {
-  type?: ItemType;
-  categorySlug?: string;
-  budget?: number; // TL üst sınır (mekânda 1-4 seviye)
-  priority?: string; // puan bileşeni anahtarı veya "puan"
-  city?: string;
-}
-
-export function wizardResults(bundle: DataBundle, w: WizardAnswers): Item[] {
-  let items = filterItems(bundle, {
-    type: w.type,
-    categorySlug: w.categorySlug,
-    city: w.city || undefined,
-    maxPrice: w.type !== "mekan" ? w.budget : undefined,
-    maxPriceLevel: w.type === "mekan" && w.budget ? Math.min(4, Math.max(1, Math.round(w.budget))) : undefined,
-  });
-  if (w.priority && w.priority !== "puan") {
-    items = [...items].sort(
-      (a, b) => (b.scoreBreakdown[w.priority!] ?? 0) - (a.scoreBreakdown[w.priority!] ?? 0) || b.score - a.score
-    );
-  } else {
-    items = sortItems(items, "puan");
-  }
-  return items;
-}
+/*
+ * Sihirbazın cevap/filtre mantığı buradan `lib/wizard.ts`e taşındı: cevaplar
+ * artık URL'de tutuluyor ve adım seçenekleri de aynı yerde üretiliyor. İkisini
+ * ayrı dosyalarda tutmak, filtre ile adım sayımlarının farklı kurallara
+ * kaymasına açık kapı bırakıyordu.
+ */
 
 export function uniqueCities(bundle: DataBundle, type?: ItemType): string[] {
   const set = new Set<string>();
