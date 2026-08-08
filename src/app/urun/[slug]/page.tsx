@@ -16,6 +16,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: item.whyRecommended,
     path: `/urun/${item.slug}`,
     type: "article",
+    // Örnek kayıt indekslenmez: uydurma bir ürünü arama sonucuna sokmak,
+    // onu gerçek diye sunmaktır (bkz. app/sitemap.ts).
+    noIndex: item.provenance.kind === "demo",
   });
 }
 

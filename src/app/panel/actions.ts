@@ -24,6 +24,27 @@ export async function moderateReviewAction(fd: FormData) {
   }, ["/panel/yorumlar"]);
 }
 
+/**
+ * Teklif talebinin durumunu ilerletir.
+ *
+ * "iletildi" damgasını sistem değil admin vurur, çünkü iletme işini şimdilik
+ * insan yapıyor (otomatik e-posta yok). Damgayı yazılım atsaydı, kimsenin
+ * göndermediği bir talep "iletildi" görünürdü.
+ */
+export async function updateQuoteStatusAction(fd: FormData) {
+  const id = metin(fd, "id");
+  const status = metin(fd, "status");
+  if (!id || !status || !["yeni", "iletildi", "kapandi"].includes(status)) return;
+  await adminIslem(
+    "teklif.durum",
+    { tur: "quote_request", id, detay: { status } },
+    async ({ supabase }) => {
+      await (supabase as any).from("quote_requests").update({ status }).eq("id", id);
+    },
+    ["/panel/teklifler"]
+  );
+}
+
 export async function toggleSponsorAction(fd: FormData) {
   const id = metin(fd, "id");
   const current = fd.get("current") === "true";

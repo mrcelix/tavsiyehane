@@ -461,7 +461,7 @@ export async function ItemDetail({ item }: { item: Item }) {
               <p className="mb-3 mt-1 text-xs text-[var(--brand-ink)] opacity-80">
                 {item.brand} firmasından ücretsiz fiyat teklifi isteyin.
               </p>
-              <QuoteForm businessName={item.brand} />
+              <QuoteForm itemId={item.id} businessName={item.brand} />
             </section>
           )}
 

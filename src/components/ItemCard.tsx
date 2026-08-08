@@ -7,6 +7,7 @@ import { locationText, priceSummary } from "@/lib/format";
 import { freshnessOf, freshnessWarning } from "@/lib/freshness";
 import { cn } from "@/lib/cn";
 import { CARD_BASE } from "./ui/Card";
+import { Badge } from "./ui/Badge";
 import { CoverArt } from "./CoverArt";
 import { ScoreRing } from "./ScoreRing";
 import { BadgeChip } from "./BadgeChip";
@@ -36,6 +37,18 @@ export function ItemCard({ item }: { item: Item }) {
       {item.isSponsored && (
         <span className="absolute -top-2.5 left-4 z-10">
           <BadgeChip badge="sponsorlu" small />
+        </span>
+      )}
+
+      {/* Örnek kayıt listede de işaretlenir.
+          Rozet yalnızca detay sayfasındaydı; oysa kullanıcı çoğu kararı listede
+          veriyor ve orada uydurma kayıt gerçeğinden ayırt edilemiyordu. Uyarıyı
+          tıklandıktan sonra göstermek, göstermemekten çok da iyi değil. */}
+      {item.provenance.kind === "demo" && (
+        <span className="absolute -top-2.5 right-4 z-10">
+          <Badge variant="down" className="shadow-[var(--shadow-card)]">
+            Örnek veri
+          </Badge>
         </span>
       )}
 

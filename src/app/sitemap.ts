@@ -51,12 +51,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  const itemPages: MetadataRoute.Sitemap = bundle.items.map((i) => ({
-    url: `${BASE}${itemHref(i)}`,
-    lastModified: new Date(i.updatedAt),
-    changeFrequency: "weekly",
-    priority: 0.6,
-  }));
+  /*
+   * Örnek kayıtlar site haritasına GİRMEZ.
+   *
+   * Bunlar uydurma ürün ve işletmelerdir: adı, fiyatı, ilçesi ve puanı var ama
+   * karşılığı yok. Arama motoruna verilirse gerçek bir tavsiye gibi indeklenir
+   * ve var olmayan bir işletme, gerçek bir işletmeyle aynı sonuç sayfasında
+   * yarışır. Site haritası "şunları indeksle" demektir; uydurma kaydı oraya
+   * koymak, onu gerçek diye sunmaktır.
+   *
+   * Aynı kayıtlar detay sayfalarında `noindex` de taşır (bkz. lib/seo.ts
+   * kullanan detay sayfaları) — site haritasından çıkarmak tek başına yetmez,
+   * çünkü liste sayfalarından bağlantıyla da bulunabilirler.
+   */
+  const itemPages: MetadataRoute.Sitemap = bundle.items
+    .filter((i) => i.provenance.kind !== "demo")
+    .map((i) => ({
+      url: `${BASE}${itemHref(i)}`,
+      lastModified: new Date(i.updatedAt),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    }));
 
   const listPages: MetadataRoute.Sitemap = bundle.lists.map((l) => ({
     url: `${BASE}/liste/${l.slug}`,

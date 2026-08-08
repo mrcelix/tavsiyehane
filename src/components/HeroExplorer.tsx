@@ -74,7 +74,11 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
       </div>
 
       {/* Tip seçimi */}
-      <div role="tablist" aria-label="Ne arıyorsun?" className="mt-4 inline-flex rounded-[12px] bg-[var(--mist)] p-1">
+      <div
+        role="tablist"
+        aria-label="Ne arıyorsun?"
+        className="mt-4 flex rounded-[12px] bg-[var(--mist)] p-1 sm:inline-flex"
+      >
         {TABS.map((t) => (
           <button
             key={t.value}
@@ -83,7 +87,9 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
             aria-selected={type === t.value}
             onClick={() => setType(t.value)}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[13px] font-bold transition-all",
+              // Mobilde 44px: parmakla vurulacak hedef, imleçle vurulacak
+              // hedefle aynı boyutta olamaz.
+              "inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[13px] font-bold transition-all max-sm:min-h-11 max-sm:flex-1",
               type === t.value
                 ? "bg-[var(--paper)] text-[var(--ink)] shadow-[0_1px_2px_rgb(0_0_0/0.05)]"
                 : "text-[var(--muted)] hover:text-[var(--ink)]"
@@ -101,7 +107,11 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
           <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Kategori · <span className="font-num">{kategoriler.length}</span>
           </p>
-          <div className="flex flex-col gap-1">
+          {/* Mobilde yatay kaydırılan şerit, masaüstünde alt alta liste.
+              Altı kategoriyi telefonda alt alta dizmek kartı 270px uzatıyor ve
+              hero'yu iki ekrana çıkarıyordu; şeritte hepsi tek satırda ve
+              dokunma hedefi de büyüyor. */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 sm:flex-col sm:gap-1 sm:overflow-x-visible sm:pb-0">
             {kategoriler.map((c) => {
               const acik = c.slug === aktif.slug;
               return (
@@ -111,7 +121,8 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
                   onClick={() => setSecilenSlug(c.slug)}
                   aria-pressed={acik}
                   className={cn(
-                    "flex items-center justify-between gap-2 rounded-[10px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+                    "flex shrink-0 items-center justify-between gap-2 rounded-[10px] border px-3 py-2 text-left text-[13px] font-semibold whitespace-nowrap transition-colors",
+                    "max-sm:min-h-11 sm:w-full sm:shrink sm:whitespace-normal",
                     acik
                       ? "border-[var(--brand)] bg-[var(--brand-soft)] text-[var(--brand-ink)]"
                       : "border-[var(--line)] text-[var(--ink-2)] hover:border-[var(--brand)]/40 hover:bg-[var(--mist)]"

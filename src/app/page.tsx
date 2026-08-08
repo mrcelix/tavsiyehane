@@ -9,6 +9,7 @@ import { liveCategories } from "@/lib/categories";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { cn } from "@/lib/cn";
 import { jsonLd, pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/seo";
 import { HeroExplorer, type HeroCategory } from "@/components/HeroExplorer";
 import { RotatingWord } from "@/components/RotatingWord";
@@ -185,12 +186,18 @@ export default async function HomePage() {
               doğrulanmış yorumlar.
             </p>
 
+            {/* Beş çip telefonda dört satıra sarıp 202px yer kaplıyordu.
+                Mobilde ilk üçü görünüyor — üçü de farklı bir tipi örnekliyor,
+                yani örneğin işini yapmaya devam ediyor. */}
             <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
-              {EXAMPLE_QUERIES.map((q) => (
+              {EXAMPLE_QUERIES.map((q, i) => (
                 <Link
                   key={q}
                   href={`/ara?q=${encodeURIComponent(q)}`}
-                  className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-white/40 hover:bg-white/10"
+                  className={cn(
+                    "rounded-full border border-white/15 bg-white/5 px-3.5 py-2 text-sm font-medium transition-colors hover:border-white/40 hover:bg-white/10",
+                    i >= 3 && "hidden sm:inline-block"
+                  )}
                   style={{ color: "#C7CEE8" }}
                 >
                   {q}
