@@ -113,19 +113,27 @@ export default async function AraPage({ searchParams }: Props) {
     );
   }
 
-  // Varsayılan: sihirbaz
+  /*
+   * Varsayılan: sihirbaz. Başlık bilinçli olarak kısa ve tek satır — sihirbazın
+   * kendisi üç sütun ve ekranda görünen alanda kalmalı; uzun bir giriş metni,
+   * asıl işi ekranın altına itiyordu.
+   */
   return (
-    <div className="mx-auto max-w-[1220px] px-6 py-12">
-      <div className="mx-auto mb-8 max-w-2xl text-center">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--brand)]">Tavsiye Sihirbazı</p>
-        <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-[28px]">Sana uygun olanı bulalım</h1>
-        <p className="mt-2 text-[var(--muted)]">
-          Her soru ön tanımlı seçeneklerle geliyor ve her seçeneğin yanında kaç tavsiye bırakacağı yazıyor. Boş sonuca
-          düşmeden daraltırsın.
+    <div className="mx-auto max-w-[1320px] px-6 py-6">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--brand)]">Tavsiye Sihirbazı</p>
+          <h1 className="mt-0.5 text-[22px] font-extrabold tracking-tight">Sana uygun olanı bulalım</h1>
+        </div>
+        <p className="max-w-md text-[13px] text-[var(--muted)]">
+          Her soru ön tanımlı seçeneklerle geliyor; seçeneğin yanındaki sayı kaç tavsiye bırakacağını gösteriyor. Boş
+          sonuca düşmeden daraltırsın.
         </p>
       </div>
-      <Wizard bundle={bundle} answers={answers} />
-      <div className="mx-auto mt-10 max-w-xl text-center text-sm text-[var(--muted-2)]">
+
+      <Wizard bundle={bundle} answers={answers} stepKey={typeof sp.adim === "string" ? sp.adim : undefined} />
+
+      <div className="mx-auto mt-8 max-w-xl text-center text-sm text-[var(--muted-2)]">
         veya doğrudan ara:
         <div className="mt-3">
           <SearchBox />

@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { ItemType } from "@/lib/types";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "./ui/Button";
+import { RankBadge } from "./RankBadge";
 
 /**
  * Hero'daki canlı keşif kartı.
@@ -45,29 +46,6 @@ const TABS: { value: ItemType; label: string; icon: React.ReactNode }[] = [
   { value: "hizmet", label: "Hizmet", icon: <Handshake size={15} /> },
   { value: "mekan", label: "Mekân", icon: <MapPinned size={15} /> },
 ];
-
-/** İlk üç sıra madalya rengiyle, kalanı düz numarayla. */
-function SiraNisani({ sira }: { sira: number }) {
-  const stil =
-    sira === 1
-      ? "bg-[var(--gold-soft)] text-[var(--gold-ink)]"
-      : sira === 2
-        ? "bg-[var(--mist-2)] text-[var(--ink-2)]"
-        : sira === 3
-          ? "bg-[color-mix(in_oklab,var(--gold)_16%,var(--mist))] text-[var(--gold-ink)]"
-          : "text-[var(--muted-2)]";
-  return (
-    <span
-      aria-hidden
-      className={cn(
-        "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg font-num text-[11px] font-bold",
-        stil
-      )}
-    >
-      {sira}
-    </span>
-  );
-}
 
 export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
   const [type, setType] = useState<ItemType>("urun");
@@ -165,7 +143,7 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
                     href={it.href}
                     className="group flex items-center gap-2.5 rounded-[10px] px-1.5 py-1.5 transition-colors hover:bg-[var(--mist)]"
                   >
-                    <SiraNisani sira={i + 1} />
+                    <RankBadge rank={i + 1} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13px] font-semibold leading-tight transition-colors group-hover:text-[var(--brand)]">
                         {it.title}

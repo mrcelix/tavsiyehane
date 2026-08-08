@@ -101,6 +101,11 @@ export function wizardHref(
     skip?: string;
     /** İşareti kaldır — adım yeniden sorulur. */
     unskip?: string;
+    /**
+     * Görüntülenecek adımı sabitler. Cevabı silmeden geri dönmeyi sağlar:
+     * sol raydan tamamlanmış bir adıma dönmek, o cevabı kaybetmek olmamalı.
+     */
+    adim?: string;
     sonuc?: boolean;
   } = {}
 ): string {
@@ -162,6 +167,9 @@ export function wizardHref(
 
   const p = answersToParams(next);
   if (!opts.sonuc) p.set("sihirbaz", "1");
+  // Seçenek bağlantıları `adim` taşımaz: cevap verilince sihirbaz kendiliğinden
+  // sıradaki cevapsız adıma geçmeli, sabitlenmiş adımda takılı kalmamalı.
+  if (opts.adim && !opts.sonuc) p.set("adim", opts.adim);
   return `/ara?${p.toString()}`;
 }
 
