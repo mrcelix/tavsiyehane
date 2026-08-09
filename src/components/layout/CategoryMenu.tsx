@@ -39,7 +39,7 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
         onClick={() => setOpen((v) => !v)}
         onMouseEnter={() => setOpen(true)}
         aria-expanded={open}
-        className="flex h-9 items-center gap-1.5 rounded-[10px] bg-[var(--brand)] px-3 text-sm font-bold text-white shadow-[var(--shadow-primary)] transition-colors hover:bg-[var(--brand-ink)] dark:text-[#0b1120]"
+        className="flex h-9 items-center gap-1.5 rounded-[10px] bg-[var(--brand)] px-3 text-[13px] font-bold text-white shadow-[var(--shadow-primary)] transition-colors hover:bg-[var(--brand-ink)] dark:text-[#0b1120]"
       >
         <LayoutGrid size={15} />
         Kategoriler
@@ -60,7 +60,7 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
                     key={g.type}
                     onMouseEnter={() => setActiveType(g.type)}
                     onFocus={() => setActiveType(g.type)}
-                    className={`mb-1 flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-left text-sm font-semibold transition-colors ${
+                    className={`mb-1 flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-left text-[13px] font-semibold transition-colors ${
                       g.type === active.type
                         ? "bg-[var(--brand-soft)] text-[var(--brand-ink)]"
                         : "text-[var(--ink-2)] hover:bg-white/70 hover:text-[var(--brand)] dark:hover:bg-white/5"
@@ -73,7 +73,7 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
                 <Link
                   href="/listeler"
                   onClick={() => setOpen(false)}
-                  className="mt-3 flex items-center gap-2 rounded-[10px] px-3 py-2 text-xs font-semibold text-[var(--muted)] transition-colors hover:text-[var(--brand)]"
+                  className="mt-3 flex items-center gap-2 rounded-[10px] px-3 py-2 text-[11px] font-semibold text-[var(--muted)] transition-colors hover:text-[var(--brand)]"
                 >
                   <TrendingUp size={14} />
                   En iyi listeleri
@@ -82,7 +82,7 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
 
               {/* Orta: kategoriler */}
               <div className="p-4">
-                <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
                   {active.label} kategorileri
                 </p>
                 <div className="grid grid-cols-2 gap-1">
@@ -93,13 +93,13 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
                         key={e.slug}
                         href={e.href}
                         onClick={() => setOpen(false)}
-                        className="group flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-sm font-semibold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--brand)]"
+                        className="group flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] font-semibold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--brand)]"
                       >
                         <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${accent.bg} ${accent.text}`}>
                           <CategoryIcon slug={e.slug} size={15} />
                         </span>
                         <span className="flex-1">{e.name}</span>
-                        <span className="font-num text-xs text-[var(--muted)] group-hover:text-[var(--brand)]">{e.count}</span>
+                        <span className="font-num text-[11px] text-[var(--muted)] group-hover:text-[var(--brand)]">{e.count}</span>
                       </Link>
                     );
                   })}
@@ -107,7 +107,7 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
                 <Link
                   href={active.hub}
                   onClick={() => setOpen(false)}
-                  className="mt-3 inline-flex items-center gap-1.5 px-3 text-xs font-bold text-[var(--brand)] hover:underline"
+                  className="mt-3 inline-flex items-center gap-1.5 px-3 text-[11px] font-bold text-[var(--brand)] hover:underline"
                 >
                   Tüm {active.label.toLocaleLowerCase("tr")} <ArrowRight size={13} />
                 </Link>
@@ -118,18 +118,18 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
                 <Badge variant="halo" className="mb-3">
                   Şeffaf puanlama
                 </Badge>
-                <p className="text-xs leading-relaxed text-[var(--muted)]">
+                <p className="text-[11px] leading-relaxed text-[var(--muted)]">
                   Her kategori tipinin kendi puanlama modeli var. Bir telefonla bir temizlik firması aynı ölçütle
                   sıralanmaz.
                 </p>
-                <div className="mt-4 flex items-start gap-2 text-xs text-[var(--ink-2)]">
+                <div className="mt-4 flex items-start gap-2 text-[11px] text-[var(--ink-2)]">
                   <ShieldCheck size={15} className="mt-0.5 shrink-0 text-[var(--up)]" />
                   <span>Görünürlük satılabilir; tavsiye puanı satılmaz.</span>
                 </div>
                 <Link
                   href="/ara?sihirbaz=1"
                   onClick={() => setOpen(false)}
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand)] hover:underline"
+                  className="mt-4 inline-flex items-center gap-1.5 text-[11px] font-bold text-[var(--brand)] hover:underline"
                 >
                   Tavsiye Sihirbazı&apos;nı dene <ArrowRight size={13} />
                 </Link>

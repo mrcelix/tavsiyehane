@@ -44,7 +44,7 @@ export function MobileMenu({ groups }: { groups: MenuGroup[] }) {
 
             {groups.map((g) => (
               <div key={g.type} className="mb-4">
-                <p className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
+                <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
                   {g.label}
                 </p>
                 {g.entries.map((e) => {
@@ -54,13 +54,13 @@ export function MobileMenu({ groups }: { groups: MenuGroup[] }) {
                       key={e.slug}
                       href={e.href}
                       onClick={() => setOpen(false)}
-                      className="flex items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-sm font-semibold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)]"
+                      className="flex items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-[13px] font-semibold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)]"
                     >
                       <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${accent.bg} ${accent.text}`}>
                         <CategoryIcon slug={e.slug} size={15} />
                       </span>
                       <span className="flex-1">{e.name}</span>
-                      <span className="font-num text-xs text-[var(--muted)]">{e.count}</span>
+                      <span className="font-num text-[11px] text-[var(--muted)]">{e.count}</span>
                     </Link>
                   );
                 })}
@@ -79,7 +79,7 @@ export function MobileMenu({ groups }: { groups: MenuGroup[] }) {
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-[10px] px-3 py-2.5 text-sm font-semibold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)]"
+                  className="block rounded-[10px] px-3 py-2.5 text-[13px] font-semibold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)]"
                 >
                   {l.label}
                 </Link>

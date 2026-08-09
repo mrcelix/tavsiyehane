@@ -9,7 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 export function TopBar() {
   return (
     <div className="hidden border-b border-[var(--line)] bg-[var(--mist)] md:block">
-      <div className="mx-auto flex h-8 max-w-[1280px] items-center justify-between px-4 text-xs text-[var(--muted)]">
+      <div className="mx-auto flex h-8 max-w-[1280px] items-center justify-between px-4 text-[11px] text-[var(--muted)]">
         <div className="flex items-center gap-4">
           <button className="flex items-center gap-1.5 transition-colors hover:text-[var(--brand)]">
             <MapPin size={14} />

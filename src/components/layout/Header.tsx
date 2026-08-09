@@ -48,14 +48,14 @@ export async function Header() {
               sağ kümede dururken ne olduğu anlaşılmıyordu. */}
           <Link
             href="/ara?sihirbaz=1"
-            className="flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-sm font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
+            className="flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
           >
             <Wand2 size={15} className="text-[var(--gold)]" />
             Tavsiye Sihirbazı
           </Link>
           <Link
             href="/listeler"
-            className="flex h-9 items-center rounded-[10px] px-3 text-sm font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
+            className="flex h-9 items-center rounded-[10px] px-3 text-[13px] font-bold text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] hover:text-[var(--ink)]"
           >
             Listeler
           </Link>
