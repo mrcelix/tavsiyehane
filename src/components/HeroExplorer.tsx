@@ -63,22 +63,21 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
 
   return (
     <div className="mx-auto w-full rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-5">
-      <div className="flex items-start justify-between gap-3">
+      {/* Başlık solda, tip seçimi sağ üstte: sekmeler kendi satırını bırakınca
+          kart bir satır kısalıyor ve "ne seçiyorum" ile "neye göre seçiyorum"
+          aynı hizada duruyor. Dar ekranda alt alta düşer, sekmeler tam genişlik
+          alır. */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-base font-bold tracking-tight">Ne tavsiye ediliyor?</p>
           <p className="mt-0.5 text-[13px] text-[var(--muted)]">Tip seç, kategoriyi gör, listeyi aç</p>
         </div>
-        <span className="shrink-0 rounded-full bg-[var(--up-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--up)]">
-          10 saniye
-        </span>
-      </div>
 
-      {/* Tip seçimi */}
-      <div
-        role="tablist"
-        aria-label="Ne arıyorsun?"
-        className="mt-4 flex rounded-[12px] bg-[var(--mist)] p-1 sm:inline-flex"
-      >
+        <div
+          role="tablist"
+          aria-label="Ne arıyorsun?"
+          className="flex rounded-[12px] bg-[var(--mist)] p-1 max-sm:w-full"
+        >
         {TABS.map((t) => (
           <button
             key={t.value}
@@ -98,7 +97,8 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
             {t.icon}
             {t.label}
           </button>
-        ))}
+          ))}
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] sm:gap-5">
