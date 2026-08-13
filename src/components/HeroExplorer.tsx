@@ -63,12 +63,14 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
 
   return (
     <div className="mx-auto w-full rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-5">
-      {/* Başlık solda, tip seçimi sağ üstte: sekmeler kendi satırını bırakınca
-          kart bir satır kısalıyor ve "ne seçiyorum" ile "neye göre seçiyorum"
-          aynı hizada duruyor. Dar ekranda alt alta düşer, sekmeler tam genişlik
-          alır. */}
+      {/* Tip seçimi solda, başlık sağda. Sekmeler kendi satırını bırakınca kart
+          bir satır kısalıyor; ikisi aynı hizada duruyor.
+          DOM SIRASI BAŞLIK ÖNCE: yer değişimi `order` ile ve yalnızca sm'den
+          itibaren yapılıyor. Ekran okuyucu ve klavye sırası "önce ne olduğunu
+          söyle, sonra seçenekleri ver" kalıyor; dar ekranda da başlık üstte,
+          sekmeler altında tam genişlikte. */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="sm:order-2 sm:text-right">
           <p className="text-base font-bold tracking-tight">Ne tavsiye ediliyor?</p>
           <p className="mt-0.5 text-[13px] text-[var(--muted)]">Tip seç, kategoriyi gör, listeyi aç</p>
         </div>
@@ -76,7 +78,7 @@ export function HeroExplorer({ categories }: { categories: HeroCategory[] }) {
         <div
           role="tablist"
           aria-label="Ne arıyorsun?"
-          className="flex rounded-[12px] bg-[var(--mist)] p-1 max-sm:w-full"
+          className="flex rounded-[12px] bg-[var(--mist)] p-1 max-sm:w-full sm:order-1"
         >
         {TABS.map((t) => (
           <button
