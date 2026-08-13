@@ -30,15 +30,31 @@ interface PageMetaInput {
   type?: "website" | "article";
   /** Arama/filtre gibi indekslenmemesi gereken sayfalar */
   noIndex?: boolean;
+  /**
+   * Bağlantıları da taranmasın.
+   *
+   * `noindex` tek başına taramayı DURDURMAZ; varsayılan `follow: true` tam
+   * tersine "indeksleme ama bağlantıları takip et" demektir. Sorgu
+   * parametreleriyle sonsuz sayıda benzersiz adres üreten sayfalarda (sihirbaz)
+   * bu, tarayıcıyı kombinasyon uzayında gezmeye davet eder.
+   */
+  noFollow?: boolean;
 }
 
 /** Her sayfada aynı OpenGraph/Twitter/canonical setini üretir. */
-export function pageMetadata({ title, description, path, type = "website", noIndex }: PageMetaInput): Metadata {
+export function pageMetadata({
+  title,
+  description,
+  path,
+  type = "website",
+  noIndex,
+  noFollow,
+}: PageMetaInput): Metadata {
   return {
     title,
     description,
     alternates: { canonical: path },
-    ...(noIndex ? { robots: { index: false, follow: true } } : {}),
+    ...(noIndex ? { robots: { index: false, follow: !noFollow } } : {}),
     openGraph: {
       type,
       siteName: SITE_NAME,

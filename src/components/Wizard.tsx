@@ -59,6 +59,7 @@ export function Wizard({
               <li key={s.key}>
                 <Link
                   href={wizardHref(answers, {}, { adim: s.key })}
+                  rel="nofollow"
                   aria-current={aktif ? "step" : undefined}
                   className={cn(
                     "flex items-start gap-2 rounded-[10px] px-2 py-1.5 transition-colors",
@@ -145,6 +146,8 @@ export function Wizard({
                 <Link
                   key={`${step.key}-${o.label}`}
                   href={o.href}
+                  // Üçüncü katman: robots.txt'i yok sayan tarayıcılar da olur.
+                  rel="nofollow"
                   className={cn(
                     "flex items-center gap-2.5 rounded-xl border-2 p-3 text-left transition-all",
                     o.selected
@@ -189,6 +192,7 @@ export function Wizard({
             {step.skipHref && (
               <Link
                 href={step.skipHref}
+                rel="nofollow"
                 className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--muted)] transition-colors hover:text-[var(--brand)]"
               >
                 {step.multi ? "Devam et" : "Fark etmez, atla"}

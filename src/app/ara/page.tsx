@@ -16,6 +16,13 @@ export const metadata: Metadata = pageMetadata({
   description: "İhtiyacını yaz ya da Tavsiye Sihirbazı'yla adım adım daralt: sana özel tavsiye listesi oluşturalım.",
   path: "/ara",
   noIndex: true,
+  /*
+   * Sihirbazın her seçeneği benzersiz sorgu dizisi taşıyan gerçek bir bağlantı;
+   * tip × kategori × şehir × bütçe × öncelik × çoklu seçim facet'leri çarpılınca
+   * adres uzayı pratikte sınırsız. `follow` açık kalırsa tarayıcı bu uzayda
+   * gezer ve her adım sunucuda yeniden hesaplanır.
+   */
+  noFollow: true,
 });
 
 interface Props {
