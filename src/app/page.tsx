@@ -9,7 +9,6 @@ import { liveCategories } from "@/lib/categories";
 import { CategoryIcon, TYPE_ACCENT } from "@/lib/category-icons";
 import { TYPE_LABELS, type ItemType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
-import { cn } from "@/lib/cn";
 import { jsonLd, pageMetadata, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/seo";
 import { HeroExplorer, type HeroCategory } from "@/components/HeroExplorer";
 import { RotatingWord } from "@/components/RotatingWord";
@@ -155,9 +154,12 @@ export default async function HomePage() {
         }}
       />
 
-      {/* Hero — §1.3'teki token dışı sabit renkler; her iki temada da koyu kalır */}
+      {/* Hero — §1.3'teki token dışı sabit renkler; her iki temada da koyu kalır.
+          Dolgu 64px'ten 40px'e indi: hero'nun yüksekliğini zaten keşif kartı
+          belirliyor (466px), üstteki ve alttaki boşluk onun etrafında duran
+          ölü alandı. */}
       <section
-        className="relative overflow-hidden py-12 sm:py-16"
+        className="relative overflow-hidden py-8 sm:py-10"
         style={{ background: "linear-gradient(165deg, #16203A 0%, #1E2B4D 100%)" }}
       >
         <div
@@ -174,30 +176,36 @@ export default async function HomePage() {
         {/* İki sütun: solda mesaj, sağda canlı keşif kartı. Dar ekranda alt alta
             düşer. Kart iki panelli olduğu için mesajdan geniş: eski formun 420px
             sütununda kategori listesi ile ilk beş yan yana sığmıyor. */}
-        <div className="relative mx-auto grid max-w-[1220px] items-center gap-10 px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-          <div className="text-center lg:text-left">
+        <div className="relative mx-auto grid max-w-[1220px] items-center gap-8 px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+          {/* `min-w-0`: grid hücresi varsayılan `min-width:auto` ile içeriğine
+              göre genişliyor. Çip şeridi `nowrap` olduğu için hücreyi 510px'e
+              itiyor, hero'nun `overflow-hidden`ı da taşan kısmı kesiyordu —
+              şerit kaydırılamıyor, üçüncü çip erişilemez oluyordu. */}
+          <div className="min-w-0 text-center lg:text-left">
             <h1 className="text-[34px] font-black leading-tight tracking-tight text-white md:text-[40px]">
               <RotatingWord items={HERO_WORDS} />
               <br />
               kolay karar ver
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg lg:mx-0" style={{ color: "#B6BEDC" }}>
+            <p className="mx-auto mt-3 max-w-xl text-base lg:mx-0" style={{ color: "#B6BEDC" }}>
               Ürün, hizmet ve mekân tavsiyelerinde her alanda en iyiler. Şeffaf puanlama, kategoriye özel kriterler,
               doğrulanmış yorumlar.
             </p>
 
-            {/* Beş çip telefonda dört satıra sarıp 202px yer kaplıyordu.
-                Mobilde ilk üçü görünüyor — üçü de farklı bir tipi örnekliyor,
-                yani örneğin işini yapmaya devam ediyor. */}
-            <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
-              {EXAMPLE_QUERIES.map((q, i) => (
+            {/* Hero'da ilk üçü gösteriliyor, tamamı /ara sayfasında.
+                Beşi her ekranda üç satıra sarıp 127px yiyordu: sol sütunun
+                genişliğini viewport değil `max-w-[1220px]` belirliyor, yani
+                ekran büyüdükçe çipler açılmıyor. Üçü de farklı bir tipi
+                örnekliyor (ürün / ürün / hizmet), örnek olma işlevi sürüyor. */}
+            {/* Mobilde yatay kaydırılan şerit, sm'den itibaren sarma.
+                375px'te üç çip alt alta düşüp 127px yiyordu; şeritte 44px.
+                Kartın içindeki kategori şeridiyle aynı çözüm. */}
+            <div className="mt-4 flex gap-2 overflow-x-auto pb-1 max-sm:justify-start sm:flex-wrap sm:justify-center sm:overflow-x-visible sm:pb-0 lg:justify-start">
+              {EXAMPLE_QUERIES.slice(0, 3).map((q) => (
                 <Link
                   key={q}
                   href={`/ara?q=${encodeURIComponent(q)}`}
-                  className={cn(
-                    "rounded-full border border-white/15 bg-white/5 px-3.5 py-2 text-sm font-medium transition-colors hover:border-white/40 hover:bg-white/10",
-                    i >= 3 && "hidden sm:inline-block"
-                  )}
+                  className="shrink-0 whitespace-nowrap rounded-full border border-white/15 bg-white/5 px-3.5 py-2 text-[13px] font-medium transition-colors hover:border-white/40 hover:bg-white/10 sm:shrink sm:whitespace-normal"
                   style={{ color: "#C7CEE8" }}
                 >
                   {q}
@@ -207,7 +215,7 @@ export default async function HomePage() {
 
             <Link
               href="/ara?sihirbaz=1"
-              className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white"
             >
               <Sparkles size={15} className="text-[#EFA013]" />
               Tavsiye Sihirbazı&apos;yla adım adım ilerle
@@ -219,9 +227,9 @@ export default async function HomePage() {
         </div>
 
         {/* Hero güven şeridi */}
-        <div className="relative mx-auto mt-10 max-w-[1220px] px-6">
+        <div className="relative mx-auto mt-6 max-w-[1220px] px-6">
           <div
-            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-white/10 pt-6 text-[12.5px] font-semibold lg:justify-start"
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-white/10 pt-4 text-[12.5px] font-semibold lg:justify-start"
             style={{ color: "#8C96B8" }}
           >
             {HERO_STATS.map((s) => (
