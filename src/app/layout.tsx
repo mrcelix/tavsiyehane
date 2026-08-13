@@ -8,6 +8,7 @@ import { TrustMarquee } from "@/components/layout/TrustMarquee";
 import { Footer } from "@/components/layout/Footer";
 import { CompareTray } from "@/components/CompareTray";
 import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
+import { Analytics } from "@vercel/analytics/next";
 import { EventTracker } from "@/components/EventTracker";
 import { SearchPalette } from "@/components/SearchPalette";
 
@@ -88,6 +89,10 @@ export default function RootLayout({
           <EventTracker />
           {/* Arama paleti düzende tek örnek: Ctrl+K ve "/" her sayfada çalışır. */}
           <SearchPalette />
+          {/* Vercel Analytics — sayfa görüntülemesi ve trafik kaynağı. Kendi
+              `EventTracker`ımızla çakışmaz: o hangi KAYDIN ilgi çektiğini
+              ölçüp puanlamayı besler, bu ise sitenin trafiğini gösterir. */}
+          <Analytics />
         </AuthModalProvider>
       </body>
     </html>

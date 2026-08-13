@@ -1,9 +1,10 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import type { Category, DataBundle, Item, ListDef, Offer, PricePoint, Review } from "./types";
 import { getDemoBundle } from "@/data/demo";
 import { buildEditorial, scoreAll } from "./scoring";
 import { computeBadges } from "./badges";
-import { createSupabaseServer } from "./supabase/server";
+import { createSupabasePublic } from "./supabase/config";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -92,11 +93,32 @@ function mapReview(r: any): Review {
 
 /**
  * Tüm okuma katmanının tek girişi. Supabase yapılandırılmış ve dolu ise oradan,
- * aksi halde yerleşik demo veriden okur. İstek başına önbelleklenir (React cache).
+ * aksi halde yerleşik demo veriden okur.
+ *
+ * İKİ ÖNBELLEK KATMANI VAR ve ikisi farklı işi yapıyor:
+ *
+ *  1. `cache` (React)          — aynı istek içinde tekrar tekrar çağrılırsa
+ *                                veritabanına bir kez gidilir.
+ *  2. `unstable_cache` (Next)  — İSTEKLER ARASI. Katalog herkese aynı görünür ve
+ *                                dakikada bir değişmez; her sayfa görüntülemesi
+ *                                için 7 sorgu atmanın karşılığı yok.
+ *
+ * İkincisi olmadan tek bir tarayıcı ziyareti bile veritabanını dövüyordu:
+ * 12 saatte 85K istek ~600K sorgu demekti (bkz. robots.txt'teki tarama notu).
+ *
+ * TAZELİK: `revalidate` 60 saniye, ayrıca panelden yapılan her yazma
+ * `revalidateTag(BUNDLE_TAG)` ile önbelleği anında düşürüyor (lib/admin.ts) —
+ * yönetici değişikliği bir dakika beklemez.
+ *
+ * `createSupabaseServer` yerine çerezsiz istemci kullanılıyor: önbellek kapsamı
+ * içinde `cookies()` okunamaz. Katalog zaten oturumdan bağımsız.
  */
-export const getBundle = cache(async (): Promise<DataBundle> => {
-  const supabase = await createSupabaseServer();
-  if (!supabase) return getDemoBundle();
+export const BUNDLE_TAG = "bundle";
+
+const readBundle = unstable_cache(
+  async (): Promise<DataBundle> => {
+    const supabase = createSupabasePublic();
+    if (!supabase) return getDemoBundle();
 
   try {
     const [cats, items, reviews, offers, hist, lists, listItems] = await Promise.all([
@@ -174,7 +196,12 @@ export const getBundle = cache(async (): Promise<DataBundle> => {
       lists: mappedLists,
       source: "supabase",
     };
-  } catch {
-    return getDemoBundle();
-  }
-});
+    } catch {
+      return getDemoBundle();
+    }
+  },
+  [BUNDLE_TAG],
+  { tags: [BUNDLE_TAG], revalidate: 60 }
+);
+
+export const getBundle = cache(readBundle);

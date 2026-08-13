@@ -1,5 +1,6 @@
 import "server-only";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { BUNDLE_TAG } from "./data";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServer, getCurrentProfile } from "./supabase/server";
 
@@ -57,6 +58,19 @@ export async function adminIslem<T>(
     /* denetim kaydı yazılamadı — işlem geçerli */
   }
 
+  /*
+   * Katalog önbelleği (lib/data.ts) istekler arası ve 60 saniyelik. Yönetici
+   * bir kaydı değiştirdiğinde o süreyi beklemek, panelde "kaydedildi" görüp
+   * sitede eski hâli görmek demek olurdu. Etiketi burada düşürüyoruz: yazma
+   * işleminin tek çıkışı bu sarmalayıcı olduğu için tek yer yeterli.
+   *
+   * `revalidateTag` DEĞİL `updateTag`: ilki "bayat işaretle, arka planda
+   * tazele" anlamına gelir ve kaydeden yönetici bir sonraki istekte hâlâ eski
+   * veriyi görür. `updateTag` bir sonraki isteği taze veri gelene kadar
+   * bekletir — tam da "kendi yazdığını oku" durumu. Yalnızca Server Action
+   * içinden çağrılabilir; bu sarmalayıcının tüm çağıranları öyle.
+   */
+  updateTag(BUNDLE_TAG);
   for (const yol of ["/panel", ...tazelenecek]) revalidatePath(yol);
   return sonuc;
 }
