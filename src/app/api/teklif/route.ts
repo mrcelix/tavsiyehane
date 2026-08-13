@@ -40,13 +40,26 @@ export async function POST(request: Request) {
      * demek, formun eski hâline dönmek olur. Ne olduğunu söylüyoruz.
      */
     const tabloYok = /relation .*quote_requests.* does not exist|schema cache/i.test(error.message);
+    if (tabloYok) {
+      return NextResponse.json(
+        { error: "Teklif alma şu an kapalı. Lütfen işletmeyle doğrudan iletişime geçin." },
+        { status: 503 }
+      );
+    }
+
+    /*
+     * Hız sınırı mesajı doğrudan kullanıcıya döner: 0009'daki tetikleyici o
+     * metni tam bunun için yazıyor ("bir süre sonra tekrar deneyin"). Genel bir
+     * hataya çevirmek, ne olduğunu ve ne yapacağını bilen tek cümleyi çöpe
+     * atmak olurdu — 0006'daki oy sınırıyla aynı yaklaşım.
+     */
+    if (error.code === "23514" && /saatlik/i.test(error.message)) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
+
     return NextResponse.json(
-      {
-        error: tabloYok
-          ? "Teklif alma şu an kapalı. Lütfen işletmeyle doğrudan iletişime geçin."
-          : "Talep kaydedilemedi. Lütfen biraz sonra tekrar deneyin.",
-      },
-      { status: tabloYok ? 503 : 500 }
+      { error: "Talep kaydedilemedi. Lütfen biraz sonra tekrar deneyin." },
+      { status: 500 }
     );
   }
 
