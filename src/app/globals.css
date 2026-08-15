@@ -399,6 +399,37 @@ html.dark .badge-invert {
 }
 
 /* ============================================================
+   7.5 ÜSTÜ ÖRTEN YÜZEYLERİN ARKA PLANI (.overlay-veil / .overlay-dialog)
+
+   Menü ve popup açıldığında arkası karartılır ve bulanıklaştırılır.
+
+   Tek yerde tanımlı: dört ayrı yüzey var (mega menü, mobil menü, gelişmiş
+   filtre paneli, giriş modalı ve arama paleti) ve önceden her biri kendi
+   değerini taşıyordu — %40/%45/%50 karartma, sm/md bulanıklık. Aynı işi yapan
+   dört yüzeyin üç farklı görünmesi, tasarımın kendisinden çok bakımsızlığı
+   anlatıyordu.
+
+   İki kural aynı değerleri taşır: div ile örtülen yüzeyler `.overlay-veil`,
+   yerleşik `<dialog>` kullananlar `::backdrop` sözde öğesi. Değerler bilinçli
+   olarak elle iki yere yazıldı — `::backdrop` içinde özel değişken kalıtımı
+   eski tarayıcılarda güvenilir değil.
+   ============================================================ */
+
+/* Önek ELLE YAZILMIYOR: `-webkit-backdrop-filter`i de yazınca minifier ikisini
+   aynı bildirim sayıp STANDART olanı düşürdü ve derlemede yalnızca önekli hâli
+   kaldı — Firefox'ta bulanıklık kaybolurdu. Derleyici hedef tarayıcılara göre
+   öneki kendisi ekliyor (Tailwind'in kendi `backdrop-blur` sınıfı da öyle). */
+.overlay-veil {
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.overlay-dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(6px);
+}
+
+/* ============================================================
    8. BUTON PARILTISI (.btn-shine)
    ============================================================ */
 

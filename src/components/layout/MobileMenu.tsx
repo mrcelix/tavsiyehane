@@ -25,7 +25,7 @@ export function MobileMenu({ groups }: { groups: MenuGroup[] }) {
           <button
             aria-label="Menüyü kapat"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="overlay-veil absolute inset-0"
           />
           <div className="absolute right-0 top-0 flex h-full w-[300px] max-w-[85vw] animate-fade-in flex-col overflow-y-auto border-l border-[var(--line)] bg-[var(--paper)] p-4">
             <div className="mb-4 flex items-center justify-between">

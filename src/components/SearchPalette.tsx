@@ -170,7 +170,7 @@ export function SearchPalette() {
         if (e.target === ref.current) kapat();
       }}
       aria-label="Arama"
-      className="mx-auto mt-[8vh] w-[min(680px,calc(100vw-1.5rem))] rounded-[16px] border border-[var(--line)] bg-[var(--card)] p-0 text-[var(--ink)] shadow-[var(--shadow-pop)] backdrop:bg-black/45 backdrop:backdrop-blur-md"
+      className="overlay-dialog mx-auto mt-[8vh] w-[min(680px,calc(100vw-1.5rem))] rounded-[16px] border border-[var(--line)] bg-[var(--card)] p-0 text-[var(--ink)] shadow-[var(--shadow-pop)]"
     >
       <div className="flex items-center gap-2 border-b border-[var(--line)] px-4">
         <Search size={18} className="shrink-0 text-[var(--muted-2)]" />

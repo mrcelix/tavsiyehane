@@ -59,7 +59,7 @@ export function AdvancedFilters({ facets }: { facets: Facet[] }) {
           <button
             aria-label="Filtre panelini kapat"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="overlay-veil absolute inset-0"
           />
 
           <aside className="absolute left-0 top-0 flex h-full w-[330px] max-w-[88vw] animate-fade-in flex-col border-r border-[var(--line)] bg-[var(--paper)]">

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronDown, LayoutGrid, ShieldCheck, TrendingUp } from "lucide-react";
 import type { MenuGroup } from "@/lib/menu";
@@ -48,6 +49,18 @@ export function CategoryMenu({ groups }: { groups: MenuGroup[] }) {
         </span>
         <ChevronDown size={13} className={open ? "rotate-180 transition-transform" : "transition-transform"} />
       </button>
+
+      {/* Perde `document.body`e portallanıyor, header'ın içine değil.
+          Sebebi yığın bağlamı: header `z-40` ve kendi bağlamını kuruyor, yani
+          içine konan bir perde ya panelin üstüne çıkar ya da logoyu, aramayı ve
+          menüyü açan butonu da karartır. Body'de `z-30` ile header'ın altında,
+          sayfa içeriğinin üstünde kalıyor — menü çubuğu net, arkası kararmış.
+          Tıklayınca kapanması için işaretçi olaylarını almalı: dışarı tıklamayı
+          zaten mevcut `mousedown` dinleyicisi yakalıyor.
+
+          Bağlanma bayrağı yok: `open` yalnızca kullanıcı etkileşimiyle açılıyor,
+          dolayısıyla portal ne sunucuda ne de ilk hidrasyon çiziminde oluşuyor. */}
+      {open && createPortal(<div aria-hidden className="overlay-veil fixed inset-0 z-30 animate-fade-in" />, document.body)}
 
       {open && (
         <div className="absolute left-0 top-full z-50 pt-2">

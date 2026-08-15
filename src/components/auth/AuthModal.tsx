@@ -45,7 +45,7 @@ export function AuthModal({
         if (e.target === ref.current) ref.current?.close();
       }}
       aria-label="Giriş ve kayıt"
-      className="m-auto w-[min(440px,calc(100vw-2rem))] rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-0 text-[var(--ink)] shadow-[var(--shadow-pop)] backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+      className="overlay-dialog m-auto w-[min(440px,calc(100vw-2rem))] rounded-[18px] border border-[var(--line)] bg-[var(--card)] p-0 text-[var(--ink)] shadow-[var(--shadow-pop)]"
     >
       <div className="relative max-h-[85vh] overflow-y-auto p-6">
         <button
