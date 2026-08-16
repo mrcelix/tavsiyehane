@@ -10,7 +10,20 @@ export const SITE_DESCRIPTION =
  * Tanımlı değilse (yerel geliştirme) metadataBase verilmez — böylece
  * paylaşım etiketlerine yanlışlıkla localhost adresi yazılmaz.
  */
-const envUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
+/*
+ * `NEXT_PUBLIC_SITE_URL` tanımlı değilse Vercel'in kendi ürettiği üretim adresi
+ * kullanılır. Sebebi somut: değişken ne yerelde ne Vercel'de tanımlıydı, bu
+ * yüzden ÜRETİMDE `og:image` ve `og:url` hiç basılmıyordu — site nereye
+ * paylaşılırsa paylaşılsın kartsız, çıplak bir bağlantı olarak görünüyordu.
+ *
+ * `VERCEL_PROJECT_PRODUCTION_URL` her zaman asıl üretim alan adını verir;
+ * önizleme dağıtımlarında bile değişmez, dolayısıyla önizleme adresleri
+ * canonical olarak ilan edilmez. Özel alan adı bağlandığında yine de
+ * `NEXT_PUBLIC_SITE_URL` tanımlanmalı: önceliği o alır.
+ */
+const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+const envUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "") || (vercelUrl ? `https://${vercelUrl}` : undefined);
 export const SITE_URL = envUrl || null;
 export const metadataBase = envUrl ? new URL(envUrl) : undefined;
 

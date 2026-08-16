@@ -1,5 +1,11 @@
 import { Suspense } from "react";
 import { getBundle } from "@/lib/data";
+import { itemHref } from "@/lib/routes";
+import { breadcrumbLd, jsonLd } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site-url";
+import { categoryHref } from "@/lib/menu";
+import { slugify } from "@/lib/format";
+import { TYPE_LABELS } from "@/lib/types";
 import { filterItems, sortItems, uniqueBrands, uniqueCities, type SortKey } from "@/lib/query";
 import { buildFacets } from "@/lib/facets";
 import type { ItemType } from "@/lib/types";
@@ -62,8 +68,58 @@ export async function Listing({
   });
   const sorted = sortItems(filtered, (s(searchParams.sirala) as SortKey) ?? "puan");
 
+  /*
+   * SIRALI LİSTE YAPISAL VERİSİ
+   *
+   * Bu sayfalar sitenin asıl arama hedefleri ("en iyi telefon", "İstanbul ev
+   * temizliği") ama tek bir yapısal veri taşımıyorlardı — detay sayfalarında
+   * Product/LocalBusiness vardı, listelerde hiçbir şey yoktu. `ItemList`,
+   * sıralamanın kendisini arama motoruna anlatan şey.
+   *
+   * ÖRNEK KAYITLAR DIŞARIDA: onların detay sayfaları `noindex` taşıyor
+   * (bkz. app/sitemap.ts). İndekslenmeyecek adresleri sıralı listede saymak,
+   * arama motoruna gösterip kapıyı yüzüne kapatmak olurdu. Hiç gerçek kayıt
+   * yoksa şema hiç basılmıyor.
+   */
+  // Adres `getSiteUrl()` ile isteğin kendisinden türetiliyor, derleme anındaki
+  // `SITE_URL` sabitinden değil: o değişken tanımlı olmayınca şema hiç
+  // basılmıyordu ve bunu ancak üretimde fark ederdik.
+  const kok = await getSiteUrl();
+  const indekslenebilir = sorted.filter((i) => i.provenance.kind !== "demo");
+  const itemListLd =
+    indekslenebilir.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: title,
+          numberOfItems: indekslenebilir.length,
+          itemListOrder: "https://schema.org/ItemListOrderDescending",
+          itemListElement: indekslenebilir.slice(0, 30).map((it, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            url: `${kok}${itemHref(it)}`,
+            name: it.title,
+          })),
+        }
+      : null;
+
+  // Kırıntı yolu: detay sayfalarında vardı, listelerde yoktu. Arama sonucunda
+  // "tavsiyehane → Ürünler → Telefon" yolunu gösteren şey bu.
+  const hub = TYPE_LABELS[type].hub;
+  const kirintilar = [
+    { name: "Ana sayfa", path: "/" },
+    { name: TYPE_LABELS[type].plural, path: hub },
+    ...(categorySlug ? [{ name: title, path: categoryHref(type, categorySlug, city ? slugify(city) : "tumu") }] : []),
+  ];
+
   return (
     <div className="mx-auto max-w-[1220px] px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd([breadcrumbLd(kirintilar), ...(itemListLd ? [itemListLd] : [])]),
+        }}
+      />
       <div className="mb-5">
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-[28px]">{title}</h1>
         {subtitle && <p className="mt-1.5 max-w-3xl text-[var(--muted)]">{subtitle}</p>}
