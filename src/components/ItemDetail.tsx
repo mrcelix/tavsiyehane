@@ -68,11 +68,11 @@ export async function ItemDetail({ item }: { item: Item }) {
     <div className="mx-auto max-w-[1220px] px-6 py-10">
       {/* Kırıntı */}
       <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-sm text-[var(--muted-2)]">
-        <Link href={TYPE_LABELS[item.type].hub} className="py-1.5 transition-colors hover:text-[var(--brand)]">
+        <Link href={TYPE_LABELS[item.type].hub} className="inline-flex items-center py-1.5 transition-colors hover:text-[var(--brand)] max-sm:min-h-11">
           {TYPE_LABELS[item.type].plural}
         </Link>
         <span>/</span>
-        <Link href={categoryHref(item.type, item.categorySlug)} className="py-1.5 transition-colors hover:text-[var(--brand)]">
+        <Link href={categoryHref(item.type, item.categorySlug)} className="inline-flex items-center py-1.5 transition-colors hover:text-[var(--brand)] max-sm:min-h-11">
           {category?.name}
         </Link>
         {loc && (
@@ -225,7 +225,7 @@ export async function ItemDetail({ item }: { item: Item }) {
                     href={s.url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="inline-block py-1 underline decoration-dotted underline-offset-2 hover:text-[var(--brand)]"
+                    className="inline-flex items-center py-1 underline decoration-dotted underline-offset-2 hover:text-[var(--brand)] max-sm:min-h-11"
                   >
                     {s.label}
                   </a>
@@ -338,7 +338,7 @@ export async function ItemDetail({ item }: { item: Item }) {
                 href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-1.5 rounded-[10px] bg-[var(--mist-2)] px-3.5 py-2 text-sm font-semibold text-[var(--ink)] transition-colors hover:bg-[var(--line)]"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-[10px] bg-[var(--mist-2)] px-3.5 py-2 text-sm font-semibold text-[var(--ink)] transition-colors hover:bg-[var(--line)] max-sm:min-h-11"
               >
                 <Map size={15} /> Haritada göster
               </a>

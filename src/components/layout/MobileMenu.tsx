@@ -15,7 +15,7 @@ export function MobileMenu({ groups }: { groups: MenuGroup[] }) {
       <button
         onClick={() => setOpen(true)}
         aria-label="Menüyü aç"
-        className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] lg:hidden"
+        className="flex h-11 w-11 items-center justify-center rounded-[10px] text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] lg:hidden"
       >
         <Menu size={20} />
       </button>

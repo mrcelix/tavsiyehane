@@ -38,11 +38,11 @@ export function SearchBox({ initial = "" }: { initial?: string }) {
           onChange={(e) => setQ(e.target.value)}
           placeholder="Ne arıyorsun? Örn: 25.000 TL altı telefon"
           aria-label="Arama"
-          className="h-10 min-w-0 flex-1 bg-transparent text-base text-[var(--ink)] outline-none placeholder:text-[var(--muted-2)]"
+          className="h-11 min-w-0 flex-1 bg-transparent text-base text-[var(--ink)] outline-none placeholder:text-[var(--muted-2)]"
         />
         <button
           type="submit"
-          className="btn-shine h-10 shrink-0 rounded-xl bg-[var(--gold)] px-5 text-sm font-bold text-white shadow-[var(--shadow-gold)] transition-colors hover:bg-[var(--gold-ink)]"
+          className="btn-shine h-11 shrink-0 rounded-xl bg-[var(--gold)] px-5 text-sm font-bold text-white shadow-[var(--shadow-gold)] transition-colors hover:bg-[var(--gold-ink)]"
         >
           Ara
         </button>

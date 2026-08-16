@@ -40,7 +40,7 @@ export function HeaderSearch() {
         type="button"
         onClick={aramayiAc}
         aria-label="Ara"
-        className="flex h-10 w-10 items-center justify-center rounded-[10px] text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] sm:hidden"
+        className="flex h-11 w-11 items-center justify-center rounded-[10px] text-[var(--ink-2)] transition-colors hover:bg-[var(--mist)] sm:hidden"
       >
         <Search size={20} />
       </button>

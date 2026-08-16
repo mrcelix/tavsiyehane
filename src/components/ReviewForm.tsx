@@ -10,14 +10,16 @@ import { Textarea } from "./ui/Field";
 
 function Stars({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
-    // Negatif dış boşluk + iç boşluk: görsel aralık dar kalır, dokunma alanı ~34px olur.
+    /* Negatif dış boşluk + iç boşluk: görsel aralık dar kalır, dokunma alanı
+       büyür. Mobilde 44px — puan vermek formun ilk adımı ve 34px'lik yıldızı
+       parmakla ıskalamak, yorum yazmayı en baştan zorlaştırıyordu. */
     <span className="-m-1 inline-flex">
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
           type="button"
           onClick={() => onChange(n)}
-          className="p-2 transition-transform hover:scale-110"
+          className="flex items-center justify-center p-2 transition-transform hover:scale-110 max-sm:min-h-11 max-sm:min-w-11"
           aria-label={`${n} yıldız`}
         >
           <Star
@@ -92,7 +94,12 @@ export function ReviewForm({ itemId, type }: { itemId: string; type: ItemType })
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" variant="primary" disabled={state === "sending" || !rating || !comment.trim()}>
+        <Button
+          type="submit"
+          variant="primary"
+          className="max-sm:min-h-11"
+          disabled={state === "sending" || !rating || !comment.trim()}
+        >
           {state === "sending" ? "Gönderiliyor…" : "Yorumu Gönder"}
         </Button>
         {state === "demo" && (

@@ -62,7 +62,7 @@ export function Wizard({
                   rel="nofollow"
                   aria-current={aktif ? "step" : undefined}
                   className={cn(
-                    "flex items-start gap-2 rounded-[10px] px-2 py-1.5 transition-colors",
+                    "flex items-start gap-2 rounded-[10px] px-2 py-1.5 transition-colors max-sm:min-h-11",
                     aktif ? "bg-[var(--brand-soft)]" : "hover:bg-[var(--mist)]"
                   )}
                 >
@@ -105,7 +105,7 @@ export function Wizard({
 
         <Link
           href="/ara?sihirbaz=1"
-          className="mt-2 inline-flex items-center gap-1 px-2 text-[12px] font-semibold text-[var(--muted)] transition-colors hover:text-[var(--brand)]"
+          className="mt-2 inline-flex items-center gap-1 px-2 text-[12px] font-semibold text-[var(--muted)] transition-colors hover:text-[var(--brand)] max-sm:min-h-11"
         >
           <RotateCcw size={12} /> Baştan başla
         </Link>

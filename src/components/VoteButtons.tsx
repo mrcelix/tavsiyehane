@@ -157,7 +157,11 @@ export function VoteButtons({ itemId, counts, compact = false }: Props) {
                 "inline-flex items-center gap-1.5 rounded-full border font-semibold transition-all",
                 // Dokunma hedefi: dar ekranda 36px yükseklik. Kartlardaki
                 // kompakt oy düğmeleri 31px'ti ve parmakla ıskalanıyordu.
-                compact ? "h-9 px-3 text-[11px] sm:h-auto sm:px-2.5 sm:py-1.5" : "px-3 py-2 text-[13px]",
+                // Mobilde 44px: kartın üzerindeki asıl etkileşim bu düğmeler ve
+                // 36px parmakla ıskalanıyordu. sm'den itibaren eski yoğunluk.
+                compact
+                  ? "h-11 px-3 text-[11px] sm:h-auto sm:px-2.5 sm:py-1.5"
+                  : "px-3 py-2 text-[13px] max-sm:min-h-11",
                 secili ? o.tone : "border-[var(--line)] bg-[var(--paper)] text-[var(--muted)] hover:border-[var(--muted-2)]"
               )}
             >

@@ -53,7 +53,9 @@ export function Footer() {
               {col.links.map((l) => (
                 <li key={l.href}>
                   <Link
-                    className="block rounded-lg px-2 py-2 transition-colors hover:bg-[var(--mist)] hover:text-[var(--brand)] sm:py-1"
+                    // Mobilde 44px. Önceki düzeltme dolguyu artırmıştı ama satır
+                    // 36px'te kalmıştı; ölçüt 44 olduğu için hâlâ altındaydı.
+                    className="flex items-center rounded-lg px-2 py-2 transition-colors hover:bg-[var(--mist)] hover:text-[var(--brand)] max-sm:min-h-11 sm:block sm:py-1"
                     href={l.href}
                   >
                     {l.label}
@@ -84,7 +86,10 @@ export function Footer() {
       <div className="mx-auto mt-8 max-w-[1220px] px-6 text-xs leading-relaxed text-[var(--muted-2)]">
         © {YIL} TavsiyeHane. Örnek veri olarak işaretlenen kayıtlar dışındaki bilgiler kaynağı ve
         doğrulama tarihiyle birlikte yayımlanır.{" "}
-        <Link href="/metodoloji" className="inline-block py-1.5 underline hover:text-[var(--brand)]">
+        <Link
+          href="/metodoloji"
+          className="inline-flex items-center py-1.5 underline hover:text-[var(--brand)] max-sm:min-h-11"
+        >
           Nasıl puanlıyoruz
         </Link>
       </div>

@@ -205,7 +205,7 @@ export default async function HomePage() {
                 <Link
                   key={q}
                   href={`/ara?q=${encodeURIComponent(q)}`}
-                  className="shrink-0 whitespace-nowrap rounded-full border border-white/15 bg-white/5 px-3.5 py-2 text-[13px] font-medium transition-colors hover:border-white/40 hover:bg-white/10 sm:shrink sm:whitespace-normal"
+                  className="flex shrink-0 items-center whitespace-nowrap rounded-full border border-white/15 bg-white/5 px-3.5 py-2 text-[13px] font-medium transition-colors hover:border-white/40 hover:bg-white/10 max-sm:min-h-11 sm:inline-block sm:shrink sm:whitespace-normal"
                   style={{ color: "#C7CEE8" }}
                 >
                   {q}
@@ -215,7 +215,7 @@ export default async function HomePage() {
 
             <Link
               href="/ara?sihirbaz=1"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 transition-colors hover:text-white max-sm:min-h-11"
             >
               <Sparkles size={15} className="text-[#EFA013]" />
               Tavsiye Sihirbazı&apos;yla adım adım ilerle
@@ -293,7 +293,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/listeler"
-            className="inline-flex items-center gap-1 text-sm font-bold text-[var(--brand)] hover:underline"
+            className="inline-flex items-center gap-1 text-sm font-bold text-[var(--brand)] hover:underline max-sm:min-h-11"
           >
             Tümü <ArrowRight size={14} />
           </Link>

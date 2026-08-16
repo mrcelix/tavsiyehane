@@ -20,7 +20,9 @@ export function AuthTrigger({
 }) {
   const { open } = useAuthModal();
   return (
-    <Button variant={variant} size="sm" onClick={() => open(mode, reason)}>
+    /* `sm` boyutu 32px; header'daki tek metin düğmesi bu ve mobilde parmakla
+       ıskalanıyordu. Yalnızca dar ekranda 44px'e çıkıyor. */
+    <Button variant={variant} size="sm" className="max-sm:min-h-11" onClick={() => open(mode, reason)}>
       {label}
     </Button>
   );
