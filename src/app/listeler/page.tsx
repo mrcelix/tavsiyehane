@@ -3,6 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { getBundle } from "@/lib/data";
 import { formatDate } from "@/lib/format";
+import { ButtonLink } from "@/components/ui/Button";
 
 export const metadata: Metadata = pageMetadata({
   title: "En İyi Listeleri",
@@ -18,6 +19,27 @@ export default async function ListelerPage() {
       <p className="mt-1.5 text-[var(--muted)]">
         Editör ekibinin ihtiyaç senaryolarına göre derlediği, düzenli güncellenen rehberler.
       </p>
+      {/* Boş durum: sayfa header'dan bağlantılı ve liste yokken bomboş açılıyordu.
+          Ziyaretçiyi boş bir ekranda bırakmak yerine ne olduğunu söyleyip
+          çalışan yollara yönlendiriyoruz. */}
+      {bundle.lists.length === 0 && (
+        <div className="mt-6 rounded-[14px] border border-dashed border-[var(--line)] bg-[var(--card)] p-8 text-center">
+          <p className="text-base font-bold">Henüz yayımlanmış rehber yok.</p>
+          <p className="mx-auto mt-1.5 max-w-md text-sm text-[var(--muted)]">
+            Rehberler editör derlemesidir ve hazır olduklarında burada yayımlanır. O zamana kadar kategorilerden
+            ilerleyebilir ya da sihirbazla ihtiyacınızı daraltabilirsiniz.
+          </p>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <ButtonLink href="/ara?sihirbaz=1" variant="primary">
+              Tavsiye Sihirbazı
+            </ButtonLink>
+            <ButtonLink href="/urunler" variant="outline">
+              Kategorilere göz at
+            </ButtonLink>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {bundle.lists.map((l) => (
           <Link

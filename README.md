@@ -28,6 +28,7 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
    - `supabase/migrations/0007_admin.sql` (panel altyapısı: eksik kayıt alanları, blog, olay ve denetim kaydı)
    - `supabase/migrations/0008_signals_nullable.sql` (sinyal kolonu boş geçilebilir)
    - `supabase/migrations/0009_quotes.sql` (teklif talepleri + saatlik sınır)
+   - `supabase/migrations/0010_business_claims.sql` (işletme başvuruları + saatlik sınır)
 3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı

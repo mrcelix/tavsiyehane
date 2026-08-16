@@ -22,6 +22,63 @@ export function readFavs(): FavEntry[] {
 export function writeFavs(list: FavEntry[]) {
   localStorage.setItem(KEY, JSON.stringify(list));
   window.dispatchEvent(new Event("favs-changed"));
+  buluta(list);
+}
+
+/**
+ * Favorileri buluta yazar — yalnızca oturum açıksa.
+ *
+ * Sessizce başarısız olur ve bu bilinçli: giriş yapmamış ziyaretçinin favorisi
+ * tarayıcıda çalışmaya devam etmeli, ağ hatası da favori eklemeyi bozmamalı.
+ * Bulut burada yedek, tek kaynak değil.
+ */
+let oturumYok = false;
+
+function buluta(list: FavEntry[]) {
+  // Oturum olmadığı bir kez anlaşıldıysa bir daha sorulmaz: aksi halde giriş
+  // yapmamış ziyaretçi her kalbe bastığında boşuna istek gider.
+  if (oturumYok) return;
+  fetch("/api/favoriler", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ slugs: list.map((e) => e.slug) }),
+    keepalive: true,
+  })
+    .then((r) => r.json())
+    .then((v) => {
+      if (v?.authRequired || v?.demo) oturumYok = true;
+    })
+    .catch(() => {});
+}
+
+/**
+ * Oturum açıksa buluttaki listeyle yereli BİRLEŞTİRİR.
+ *
+ * Birleşim, üzerine yazma değil: bir cihazda eklenip diğerinde bilinmeyen
+ * favorinin kaybolmaması için. Silme eşitlemesi `writeFavs` üzerinden
+ * yürüyor — kullanıcı bir şeyi kaldırdığında tam liste gönderiliyor.
+ */
+export async function favorileriEsitle(): Promise<void> {
+  try {
+    const r = await fetch("/api/favoriler");
+    const veri = await r.json().catch(() => null);
+    if (!veri || veri.authRequired || veri.demo) {
+      oturumYok = true;
+      return;
+    }
+
+    const bulut: FavEntry[] = veri.favoriler ?? [];
+    const yerel = readFavs();
+    const birlesik = [...yerel];
+    for (const b of bulut) if (!birlesik.some((y) => y.slug === b.slug)) birlesik.push(b);
+
+    const degisti = birlesik.length !== yerel.length || birlesik.length !== bulut.length;
+    localStorage.setItem(KEY, JSON.stringify(birlesik));
+    window.dispatchEvent(new Event("favs-changed"));
+    if (degisti) buluta(birlesik);
+  } catch {
+    // Ağ yoksa yerel liste geçerli kalır.
+  }
 }
 
 export function FavoriteButton({ item, large = false }: { item: FavEntry; large?: boolean }) {

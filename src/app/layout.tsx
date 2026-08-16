@@ -10,6 +10,7 @@ import { CompareTray } from "@/components/CompareTray";
 import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
 import { Analytics } from "@vercel/analytics/next";
 import { EventTracker } from "@/components/EventTracker";
+import { FavoriteSync } from "@/components/FavoriteSync";
 import { SearchPalette } from "@/components/SearchPalette";
 
 /*
@@ -188,6 +189,8 @@ export default function RootLayout({
           {/* Ölçüm: kim olduğu değil, hangi kaydın ilgi çektiği. Kimlik ve
               çerez kullanmaz (bkz. components/EventTracker). */}
           <EventTracker />
+          {/* Favorileri buluttan çekip yerelle birleştirir (üye girişi varsa). */}
+          <FavoriteSync />
           {/* Arama paleti düzende tek örnek: Ctrl+K ve "/" her sayfada çalışır. */}
           <SearchPalette />
           {/* Vercel Analytics — sayfa görüntülemesi ve trafik kaynağı. Kendi

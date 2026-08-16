@@ -45,6 +45,21 @@ export async function updateQuoteStatusAction(fd: FormData) {
   );
 }
 
+/** İşletme başvurusunun durumunu ilerletir; damgayı insan vurur. */
+export async function updateClaimStatusAction(fd: FormData) {
+  const id = metin(fd, "id");
+  const status = metin(fd, "status");
+  if (!id || !status || !["yeni", "incelemede", "onaylandi", "reddedildi"].includes(status)) return;
+  await adminIslem(
+    "isletme.durum",
+    { tur: "business_claim", id, detay: { status } },
+    async ({ supabase }) => {
+      await (supabase as any).from("business_claims").update({ status }).eq("id", id);
+    },
+    ["/panel/isletmeler"]
+  );
+}
+
 export async function toggleSponsorAction(fd: FormData) {
   const id = metin(fd, "id");
   const current = fd.get("current") === "true";
