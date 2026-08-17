@@ -22,6 +22,23 @@ function anahtarDeger(ham: string[]): Record<string, string> {
   return out;
 }
 
+/**
+ * Kaynak künyeleri. Satır başına bir kaynak: `Etiket | adres | tarih`.
+ * Adres ve tarih isteğe bağlı; etiketsiz satır atlanır çünkü etiketsiz kaynak
+ * kayıtta gösterilemez. Hiç kaynak yoksa `null` yazılır — boş dizi, "kaynak
+ * girildi ama boş" gibi okunuyordu.
+ */
+function kaynaklar(fd: FormData): { label: string; url?: string; checkedAt?: string }[] | null {
+  const out = liste(fd, "sources")
+    .map((satir) => {
+      const [label, url, checkedAt] = satir.split("|").map((p) => p.trim());
+      if (!label) return null;
+      return { label, ...(url ? { url } : {}), ...(checkedAt ? { checkedAt } : {}) };
+    })
+    .filter(Boolean) as { label: string; url?: string; checkedAt?: string }[];
+  return out.length > 0 ? out : null;
+}
+
 /** Editör kriterleri: boş bırakılan kriter YAZILMAZ — bkz. lib/scoring.ts. */
 function kriterler(fd: FormData): Record<string, number> {
   const out: Record<string, number> = {};
@@ -74,6 +91,7 @@ function govde(fd: FormData) {
     editor_criteria: kriterler(fd),
     provenance_kind: "editor",
     verified_at: metin(fd, "verified_at") ?? new Date().toISOString(),
+    sources: kaynaklar(fd),
     image_url: imageUrl,
     image_alt: imageAlt,
     image_credit: imageCredit,

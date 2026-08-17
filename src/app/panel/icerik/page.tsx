@@ -11,7 +11,7 @@ import { cn } from "@/lib/cn";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  searchParams: Promise<{ tip?: string; ara?: string; kategori?: string }>;
+  searchParams: Promise<{ tip?: string; ara?: string; kategori?: string; durum?: string }>;
 }
 
 const TIPLER: ItemType[] = ["urun", "hizmet", "mekan"];
@@ -23,10 +23,26 @@ export default async function IcerikPage({ searchParams }: Props) {
   const tip = TIPLER.includes(sp.tip as ItemType) ? (sp.tip as ItemType) : undefined;
   const ara = (sp.ara ?? "").toLocaleLowerCase("tr");
 
+  /*
+   * Durum süzgeci. Tazelik sitenin iddiası ("bayat kayıt gizlenmez, bayat
+   * olduğu söylenir") ama panelde onu bulmanın yolu yoktu: yönetici hangi
+   * kaydın doğrulama beklediğini görmek için tek tek bakmak zorundaydı.
+   * Örnek veri süzgeci de aynı sebeple: hangi kayıtların gerçek olduğunu
+   * ayırmak, katalogu büyütürken en sık sorulan soru.
+   */
+  const durum = sp.durum ?? "";
   const kayitlar = bundle.items
     .filter((i) => !tip || i.type === tip)
     .filter((i) => !sp.kategori || i.categorySlug === sp.kategori)
     .filter((i) => !ara || i.title.toLocaleLowerCase("tr").includes(ara) || i.slug.includes(ara))
+    .filter((i) => {
+      if (durum === "bayat") return i.provenance.kind === "editor" && freshnessOf(i) === "bayat";
+      if (durum === "eskiyor") return i.provenance.kind === "editor" && freshnessOf(i) === "eskiyor";
+      if (durum === "ornek") return i.provenance.kind === "demo";
+      if (durum === "gercek") return i.provenance.kind === "editor";
+      if (durum === "sponsorlu") return i.isSponsored;
+      return true;
+    })
     .sort((a, b) => a.title.localeCompare(b.title, "tr"));
 
   return (
@@ -44,6 +60,21 @@ export default async function IcerikPage({ searchParams }: Props) {
       <Kart>
         {/* Filtre formu GET: seçim URL'de kalır, paylaşılabilir ve geri tuşuyla çalışır. */}
         <form className="flex flex-wrap items-end gap-2">
+          <label className="text-xs font-semibold text-[var(--ink-2)]">
+            <span className="mb-1 block">Durum</span>
+            <select
+              name="durum"
+              defaultValue={sp.durum ?? ""}
+              className="rounded-[10px] border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-sm"
+            >
+              <option value="">Tümü</option>
+              <option value="bayat">Doğrulama bekleyen</option>
+              <option value="eskiyor">Eskiyor</option>
+              <option value="gercek">Gerçek kayıt</option>
+              <option value="ornek">Örnek veri</option>
+              <option value="sponsorlu">Sponsorlu</option>
+            </select>
+          </label>
           <label className="text-xs font-semibold text-[var(--ink-2)]">
             <span className="mb-1 block">Tip</span>
             <select name="tip" defaultValue={sp.tip ?? ""} className="rounded-[10px] border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-sm">

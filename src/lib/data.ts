@@ -4,6 +4,7 @@ import type { Category, DataBundle, Item, ListDef, Offer, PricePoint, Review } f
 import { getDemoBundle } from "@/data/demo";
 import { buildEditorial, scoreAll } from "./scoring";
 import { computeBadges } from "./badges";
+import { generateLists } from "./lists";
 import { createSupabasePublic } from "./supabase/config";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -186,14 +187,33 @@ const readBundle = unstable_cache(
         .filter(Boolean) as string[],
     }));
 
+    // Puan göreli olduğu için kohort üzerinden hesaplanır; rozetler koşullardan türer.
+    const puanlanmis = scoreAll(mappedItems).map((it) => ({ ...it, badges: computeBadges(it) }));
+
+    /*
+     * CANLI LİSTELER burada üretiliyor — demo yolunda üretilip Supabase yolunda
+     * üretilmiyordu, yani özellik yayında ölüydü: `/listeler` header'dan
+     * bağlantılıyken hep boş açılıyordu.
+     *
+     * Listeler elle doldurulmaz, koşuldan doğar (lib/lists.ts): "kategori
+     * lideri olanlar", "bu hafta yükselenler". Koşulu sağlayan kayıt yoksa
+     * liste hiç üretilmiyor — boş bir rehber yayımlamak, olmayan bir seçkiyi
+     * varmış gibi göstermek olurdu.
+     *
+     * Tablodaki elle tanımlanmış listeler korunuyor: aynı slug varsa tablodaki
+     * kazanır, çünkü onu bilerek biri yazmıştır.
+     */
+    const uretilenListeler = generateLists(puanlanmis);
+    const tablodakiSluglar = new Set(mappedLists.map((l) => l.slug));
+    const tumListeler = [...mappedLists, ...uretilenListeler.filter((l) => !tablodakiSluglar.has(l.slug))];
+
     return {
       categories,
-      // Puan göreli olduğu için kohort üzerinden hesaplanır; rozetler koşullardan türer.
-      items: scoreAll(mappedItems).map((it) => ({ ...it, badges: computeBadges(it) })),
+      items: puanlanmis,
       reviews: (reviews.data ?? []).map(mapReview),
       offers: mappedOffers,
       priceHistory,
-      lists: mappedLists,
+      lists: tumListeler,
       source: "supabase",
     };
     } catch {

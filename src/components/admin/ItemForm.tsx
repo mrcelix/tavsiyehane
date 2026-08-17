@@ -195,6 +195,27 @@ export function ItemForm({
             </span>
           </label>
         </div>
+
+        {/* KAYNAKLAR — sitenin güvenilirlik iddiasının dayandığı alan, panelde
+            hiç yoktu: doğrulama tarihi girilebiliyordu ama neye dayandığı
+            girilemiyordu. "Kaynağı ve doğrulama tarihi kayıtta gösterilir"
+            demek, ikisinin de düzenlenebilir olmasını gerektirir. */}
+        <div className="mt-4">
+          <Alan
+            etiket="Kaynaklar"
+            ipucu="Satır başına bir kaynak: Etiket | https://adres | 2026-08-01 (adres ve tarih isteğe bağlı). Kayıt sayfasında künye olarak görünür."
+          >
+            <textarea
+              name="sources"
+              rows={3}
+              defaultValue={(item?.provenance.sources ?? [])
+                .map((s) => [s.label, s.url, s.checkedAt].filter(Boolean).join(" | "))
+                .join("\n")}
+              placeholder="Apple Türkiye — ürün sayfası | https://apple.com/tr | 2026-08-01"
+              className={GIRDI}
+            />
+          </Alan>
+        </div>
       </Kart>
 
       <div className="flex gap-2">
