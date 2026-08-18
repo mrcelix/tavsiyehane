@@ -6,6 +6,9 @@ import { getSiteUrl } from "@/lib/site-url";
 import { categoryHref } from "@/lib/menu";
 import { slugify } from "@/lib/format";
 import { TYPE_LABELS } from "@/lib/types";
+import { EDITOR_MODELS } from "@/lib/scoring";
+import { agirlikOku, AGIRLIK_ONEK, kisiselPuan, yayimlanmisAgirliklar } from "@/lib/personal-score";
+import { WeightPanel } from "./WeightPanel";
 import { filterItems, sortItems, uniqueBrands, uniqueCities, type SortKey } from "@/lib/query";
 import { buildFacets } from "@/lib/facets";
 import type { ItemType } from "@/lib/types";
@@ -67,6 +70,38 @@ export async function Listing({
     facets: secilenFacets,
   });
   const sorted = sortItems(filtered, (s(searchParams.sirala) as SortKey) ?? "puan");
+
+  /*
+   * "SENİN PUANIN" — kullanıcı ağırlıkları URL'de ise sıralama onunla yeniden
+   * hesaplanır. Resmî puan değişmez; kart ikisini yan yana gösterir.
+   * Hesap sunucuda: istemcide ikinci bir puanlama kopyası bir gün resmî
+   * puandan sapardı.
+   */
+  const agirliklar = agirlikOku(searchParams, type);
+  const kisiselPuanlar = agirliklar
+    ? Object.fromEntries(sorted.map((i) => [i.slug, kisiselPuan(i, agirliklar)]))
+    : undefined;
+  const gosterilecek = kisiselPuanlar
+    ? [...sorted].sort((a, b) => (kisiselPuanlar[b.slug] ?? 0) - (kisiselPuanlar[a.slug] ?? 0) || b.score - a.score)
+    : sorted;
+
+  /* Ağırlık formu GET ile gönderiliyor; diğer filtreler gizli alanlarla
+     korunur, yoksa ağırlık değiştirmek seçili şehri ya da markayı düşürürdü.
+     Ağırlık alanları hariç tutulur — onları formun kendisi üretiyor. */
+  const digerParametreler: [string, string][] = [];
+  for (const [ad, v] of Object.entries(searchParams)) {
+    if (ad.startsWith(AGIRLIK_ONEK)) continue;
+    for (const tek of Array.isArray(v) ? v : v ? [v] : []) digerParametreler.push([ad, tek]);
+  }
+  const temizSorgu = new URLSearchParams(digerParametreler).toString();
+
+  const varsayilanAgirliklar = yayimlanmisAgirliklar(type);
+  const agirlikKriterleri = EDITOR_MODELS[type].map((d) => ({
+    key: d.key,
+    label: d.label,
+    hint: d.hint,
+    varsayilan: varsayilanAgirliklar[d.key],
+  }));
 
   /*
    * SIRALI LİSTE YAPISAL VERİSİ
@@ -136,13 +171,24 @@ export async function Listing({
             cities={city ? [] : uniqueCities(bundle, type)}
             showPrice={type !== "mekan"}
             brandLabel={brandLabel ?? (type === "urun" ? "Marka" : "İşletme")}
-            resultCount={sorted.length}
+            resultCount={gosterilecek.length}
             facets={facets}
           />
         </Suspense>
       </div>
 
-      <ItemGrid items={sorted} />
+      {/* "Senin puanın" paneli listenin hemen üstünde: ağırlığı değiştirince
+          altındaki sıralamanın değiştiği aynı ekranda görünmeli. */}
+      <div className="mb-5">
+        <WeightPanel
+          kriterler={agirlikKriterleri}
+          aktif={agirliklar}
+          digerParametreler={digerParametreler}
+          temizHref={temizSorgu ? `?${temizSorgu}` : "?"}
+        />
+      </div>
+
+      <ItemGrid items={gosterilecek} kisisel={kisiselPuanlar} />
     </div>
   );
 }

@@ -16,7 +16,10 @@ import { CompareButton } from "./CompareButton";
 import { FavoriteButton } from "./FavoriteButton";
 import { VoteButtons } from "./VoteButtons";
 
-export function ItemCard({ item }: { item: Item }) {
+export function ItemCard({ item, kisisel }: { item: Item; kisisel?: number }) {
+  // "Senin puanın" açıkken kartta İKİ puan görünür: resmî olan ve kullanıcının
+  // ağırlıklarıyla hesaplanan. Fark da yazılır — asıl anlatan şey o.
+  const fark = kisisel === undefined ? 0 : kisisel - item.score;
   const loc = locationText(item);
   const price = priceSummary(item);
   const visibleBadges = item.badges.filter((b) => b !== "sponsorlu").slice(0, 2);
@@ -101,7 +104,22 @@ export function ItemCard({ item }: { item: Item }) {
               </p>
             </div>
             <span className="flex shrink-0 flex-col items-center gap-0.5">
-              <ScoreRing score={item.score} size={44} />
+              <ScoreRing score={kisisel ?? item.score} size={44} />
+              {kisisel !== undefined && (
+                <span className="whitespace-nowrap text-[9px] font-bold uppercase tracking-wide text-[var(--brand)]">
+                  sana göre
+                  {fark !== 0 && (
+                    <span className={fark > 0 ? "text-[var(--up)]" : "text-[var(--down)]"}>
+                      {" "}
+                      {fark > 0 ? "+" : ""}
+                      {fark}
+                    </span>
+                  )}
+                </span>
+              )}
+              {kisisel !== undefined && (
+                <span className="whitespace-nowrap text-[9px] text-[var(--muted-2)]">genel {item.score}</span>
+              )}
               {/* Puanın neye dayandığı kartta da görünür: editör notu ile topluluk
                   puanı aynı görünürse kullanıcı ikisini aynı sanır. */}
               {item.scoreBasis !== "topluluk" && (
