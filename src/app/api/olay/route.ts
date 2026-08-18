@@ -32,6 +32,9 @@ export async function POST(request: Request) {
       item_id: typeof body.itemId === "string" ? body.itemId.slice(0, 120) : null,
       yol: typeof body.yol === "string" ? body.yol.slice(0, 200) : null,
       hedef: typeof body.hedef === "string" ? body.hedef.slice(0, 300) : null,
+      // Sekmeye özel, kimliğe bağlanamayan dize (bkz. 0012). Canlı ziyaretçi
+      // sayımı bunsuz "kaç kişi" değil "kaç yenileme" sayardı.
+      oturum: typeof body.oturum === "string" ? body.oturum.slice(0, 64) : null,
     });
   } catch {
     /* istatistik kaydı sitenin çalışmasını etkilemez */

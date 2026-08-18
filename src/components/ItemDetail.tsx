@@ -34,6 +34,7 @@ import { StarRating } from "./StarRating";
 import { BreakdownBars } from "./BreakdownBars";
 import { PriceHistoryChart } from "./PriceHistoryChart";
 import { ScoreHistory } from "./ScoreHistory";
+import { LiveVisitorBadge } from "./LiveVisitorBadge";
 import { ItemGrid } from "./ItemGrid";
 import { ReviewForm } from "./ReviewForm";
 import { QuoteForm } from "./QuoteForm";
@@ -607,6 +608,8 @@ export async function ItemDetail({ item }: { item: Item }) {
           ),
         }}
       />
+    {/* Canlı ziyaretçi rozeti — sayfanın altında, ortalanmış, kapatılabilir. */}
+      <LiveVisitorBadge pageKey={itemHref(item)} />
     </div>
   );
 }

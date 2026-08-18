@@ -14,6 +14,28 @@ import { useEffect } from "react";
  * gezinmeyi geciktirmez.
  */
 
+/**
+ * Sekmeye özel, kimliğe bağlanamayan oturum kimliği.
+ *
+ * "Şu anda kaç kişi bakıyor" sorusu için gerekli: onsuz bir kişinin beş kez
+ * yenilemesi ile beş kişinin bakması aynı görünür. `sessionStorage` olduğu için
+ * sekme kapanınca kaybolur — kalıcı çerez değil, cihaza ya da kişiye geri
+ * bağlanamaz.
+ */
+function oturumKimligi(): string | undefined {
+  try {
+    const ANAHTAR = "tavsiyehane:oturum";
+    let k = sessionStorage.getItem(ANAHTAR);
+    if (!k) {
+      k = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem(ANAHTAR, k);
+    }
+    return k;
+  } catch {
+    return undefined;
+  }
+}
+
 function gonder(veri: Record<string, unknown>) {
   try {
     const govde = JSON.stringify(veri);
@@ -31,7 +53,7 @@ export function EventTracker({ itemId }: { itemId?: string }) {
   const yol = usePathname();
 
   useEffect(() => {
-    gonder({ tur: "goruntuleme", yol, itemId });
+    gonder({ tur: "goruntuleme", yol, itemId, oturum: oturumKimligi() });
   }, [yol, itemId]);
 
   useEffect(() => {
@@ -42,7 +64,7 @@ export function EventTracker({ itemId }: { itemId?: string }) {
       // Yalnızca dış bağlantılar "çıkış" sayılır; iç gezinme zaten görüntülenme üretir.
       if (!/^https?:\/\//i.test(href)) return;
       if (href.includes(location.host)) return;
-      gonder({ tur: "cikis", yol, itemId, hedef: href });
+      gonder({ tur: "cikis", yol, itemId, hedef: href, oturum: oturumKimligi() });
     }
     document.addEventListener("click", tiklama, { capture: true });
     return () => document.removeEventListener("click", tiklama, { capture: true });

@@ -30,6 +30,7 @@ karşılaştırma tarayıcıda çalışır; üyelik/yorum yazma/panel yazma işl
    - `supabase/migrations/0009_quotes.sql` (teklif talepleri + saatlik sınır)
    - `supabase/migrations/0010_business_claims.sql` (işletme başvuruları + saatlik sınır)
    - `supabase/migrations/0011_score_snapshots.sql` (günlük puan anlık görüntüleri — Puan Günlüğü)
+   - `supabase/migrations/0012_event_session.sql` (olaylara oturum kimliği — canlı ziyaretçi sayımı)
 3. **Project Settings → API**'den değerleri alın; `.env.local` dosyasını doldurun:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → "anon public" anahtarı
