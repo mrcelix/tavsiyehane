@@ -169,8 +169,8 @@ export function ItemCard({ item, kisisel }: { item: Item; kisisel?: number }) {
         />
       </div>
       <div className="flex items-center justify-between border-t border-[var(--line)] px-4 py-1.5">
-        <CompareButton item={{ slug: item.slug, type: item.type, title: item.title }} />
-        <FavoriteButton item={{ slug: item.slug, type: item.type, title: item.title }} />
+        <CompareButton item={{ slug: item.slug, type: item.type, title: item.title }} itemId={item.id} />
+        <FavoriteButton item={{ slug: item.slug, type: item.type, title: item.title }} itemId={item.id} />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSupabasePublic } from "@/lib/supabase/config";
+import { createSupabaseService } from "@/lib/supabase/service";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   const yol = new URL(request.url).searchParams.get("yol");
   if (!yol) return NextResponse.json({ gercek: false, sayi: 0, sebep: "yol yok" });
 
-  const supabase = createSupabasePublic();
+  const supabase = createSupabaseService();
   if (!supabase) return NextResponse.json({ gercek: false, sayi: 0, sebep: "veritabanı yok" });
 
   const esik = new Date(Date.now() - 5 * 60_000).toISOString();

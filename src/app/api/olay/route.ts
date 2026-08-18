@@ -26,16 +26,27 @@ export async function POST(request: Request) {
   const tur = body?.tur;
   if (!tur || !GECERLI.has(tur)) return bos;
 
+  const satir: Record<string, unknown> = {
+    tur,
+    item_id: typeof body.itemId === "string" ? body.itemId.slice(0, 120) : null,
+    yol: typeof body.yol === "string" ? body.yol.slice(0, 200) : null,
+    hedef: typeof body.hedef === "string" ? body.hedef.slice(0, 300) : null,
+  };
+  // Sekmeye özel, kimliğe bağlanamayan dize (bkz. 0012). Canlı ziyaretçi
+  // sayımı bunsuz "kaç kişi" değil "kaç yenileme" sayardı.
+  const oturum = typeof body.oturum === "string" ? body.oturum.slice(0, 64) : null;
+
   try {
-    await (supabase as any).from("events").insert({
-      tur,
-      item_id: typeof body.itemId === "string" ? body.itemId.slice(0, 120) : null,
-      yol: typeof body.yol === "string" ? body.yol.slice(0, 200) : null,
-      hedef: typeof body.hedef === "string" ? body.hedef.slice(0, 300) : null,
-      // Sekmeye özel, kimliğe bağlanamayan dize (bkz. 0012). Canlı ziyaretçi
-      // sayımı bunsuz "kaç kişi" değil "kaç yenileme" sayardı.
-      oturum: typeof body.oturum === "string" ? body.oturum.slice(0, 64) : null,
-    });
+    const { error } = await (supabase as any).from("events").insert({ ...satir, oturum });
+    /*
+     * 0012 HENÜZ ÇALIŞTIRILMAMIŞ OLABİLİR. `oturum` kolonu yoksa insert komple
+     * reddedilir ve olay kaydı TAMAMEN durur — görüntülenme sayımı dahil.
+     * Migration'lar burada elle uygulandığı için bu ara durum gerçek: kolonsuz
+     * bir kez daha deniyoruz ki eski davranış hiç bozulmasın.
+     */
+    if (error && /oturum/i.test(error.message)) {
+      await (supabase as any).from("events").insert(satir);
+    }
   } catch {
     /* istatistik kaydı sitenin çalışmasını etkilemez */
   }

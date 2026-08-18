@@ -2,6 +2,7 @@
 
 import { Check, Scale } from "lucide-react";
 import { useEffect, useState } from "react";
+import { olayGonder } from "@/lib/olay";
 
 export interface CompareEntry {
   slug: string;
@@ -24,7 +25,7 @@ export function writeCompare(list: CompareEntry[]) {
   window.dispatchEvent(new Event("compare-changed"));
 }
 
-export function CompareButton({ item }: { item: CompareEntry }) {
+export function CompareButton({ item, itemId }: { item: CompareEntry; itemId?: string }) {
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
@@ -43,6 +44,9 @@ export function CompareButton({ item }: { item: CompareEntry }) {
       if (list.length && list[0].type !== item.type) list = [];
       if (list.length >= 4) list = list.slice(1);
       list = [...list, item];
+      // Yalnızca EKLEME sayılır: çıkarmayı da saymak "kaç kez karşılaştırıldı"
+      // sayacını iki katına çıkarır ve ilgiyi olduğundan büyük gösterirdi.
+      olayGonder({ tur: "karsilastirma", itemId, yol: `/${item.type}/${item.slug}` });
     }
     writeCompare(list);
   }

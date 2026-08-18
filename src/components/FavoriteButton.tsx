@@ -2,6 +2,7 @@
 
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
+import { olayGonder } from "@/lib/olay";
 
 export interface FavEntry {
   slug: string;
@@ -81,7 +82,7 @@ export async function favorileriEsitle(): Promise<void> {
   }
 }
 
-export function FavoriteButton({ item, large = false }: { item: FavEntry; large?: boolean }) {
+export function FavoriteButton({ item, itemId, large = false }: { item: FavEntry; itemId?: string; large?: boolean }) {
   const [fav, setFav] = useState(false);
 
   useEffect(() => {
@@ -93,6 +94,9 @@ export function FavoriteButton({ item, large = false }: { item: FavEntry; large?
 
   function toggle() {
     const list = readFavs();
+    // Yalnızca EKLEME olay üretir; favoriden çıkarmayı da saymak ilgiyi
+    // olduğundan büyük gösterirdi.
+    if (!fav) olayGonder({ tur: "favori", itemId, yol: `/${item.type}/${item.slug}` });
     writeFavs(fav ? list.filter((e) => e.slug !== item.slug) : [...list, item]);
   }
 

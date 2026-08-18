@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { olayGonder } from "@/lib/olay";
 
 /**
  * Sayfa görüntülenmelerini ve dış bağlantı tıklamalarını kaydeder.
@@ -14,46 +15,11 @@ import { useEffect } from "react";
  * gezinmeyi geciktirmez.
  */
 
-/**
- * Sekmeye özel, kimliğe bağlanamayan oturum kimliği.
- *
- * "Şu anda kaç kişi bakıyor" sorusu için gerekli: onsuz bir kişinin beş kez
- * yenilemesi ile beş kişinin bakması aynı görünür. `sessionStorage` olduğu için
- * sekme kapanınca kaybolur — kalıcı çerez değil, cihaza ya da kişiye geri
- * bağlanamaz.
- */
-function oturumKimligi(): string | undefined {
-  try {
-    const ANAHTAR = "tavsiyehane:oturum";
-    let k = sessionStorage.getItem(ANAHTAR);
-    if (!k) {
-      k = Math.random().toString(36).slice(2) + Date.now().toString(36);
-      sessionStorage.setItem(ANAHTAR, k);
-    }
-    return k;
-  } catch {
-    return undefined;
-  }
-}
-
-function gonder(veri: Record<string, unknown>) {
-  try {
-    const govde = JSON.stringify(veri);
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon("/api/olay", new Blob([govde], { type: "application/json" }));
-    } else {
-      void fetch("/api/olay", { method: "POST", body: govde, headers: { "Content-Type": "application/json" }, keepalive: true });
-    }
-  } catch {
-    /* ölçüm başarısız olursa kullanıcı bunu hissetmemeli */
-  }
-}
-
 export function EventTracker({ itemId }: { itemId?: string }) {
   const yol = usePathname();
 
   useEffect(() => {
-    gonder({ tur: "goruntuleme", yol, itemId, oturum: oturumKimligi() });
+    olayGonder({ tur: "goruntuleme", yol, itemId });
   }, [yol, itemId]);
 
   useEffect(() => {
@@ -64,7 +30,7 @@ export function EventTracker({ itemId }: { itemId?: string }) {
       // Yalnızca dış bağlantılar "çıkış" sayılır; iç gezinme zaten görüntülenme üretir.
       if (!/^https?:\/\//i.test(href)) return;
       if (href.includes(location.host)) return;
-      gonder({ tur: "cikis", yol, itemId, hedef: href, oturum: oturumKimligi() });
+      olayGonder({ tur: "cikis", yol, itemId, hedef: href });
     }
     document.addEventListener("click", tiklama, { capture: true });
     return () => document.removeEventListener("click", tiklama, { capture: true });

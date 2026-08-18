@@ -35,6 +35,8 @@ import { BreakdownBars } from "./BreakdownBars";
 import { PriceHistoryChart } from "./PriceHistoryChart";
 import { ScoreHistory } from "./ScoreHistory";
 import { LiveVisitorBadge } from "./LiveVisitorBadge";
+import { SocialProofBadge } from "./SocialProofBadge";
+import { BadgeStack } from "./BadgeStack";
 import { ItemGrid } from "./ItemGrid";
 import { ReviewForm } from "./ReviewForm";
 import { QuoteForm } from "./QuoteForm";
@@ -165,8 +167,8 @@ export async function ItemDetail({ item }: { item: Item }) {
               {priceSummary(item) && (
                 <span className="font-num text-lg font-bold text-[var(--brand)]">{priceSummary(item)}</span>
               )}
-              <CompareButton item={{ slug: item.slug, type: item.type, title: item.title }} />
-              <FavoriteButton item={{ slug: item.slug, type: item.type, title: item.title }} large />
+              <CompareButton item={{ slug: item.slug, type: item.type, title: item.title }} itemId={item.id} />
+              <FavoriteButton item={{ slug: item.slug, type: item.type, title: item.title }} itemId={item.id} large />
             </div>
           </div>
 
@@ -608,8 +610,13 @@ export async function ItemDetail({ item }: { item: Item }) {
           ),
         }}
       />
-    {/* Canlı ziyaretçi rozeti — sayfanın altında, ortalanmış, kapatılabilir. */}
-      <LiveVisitorBadge pageKey={itemHref(item)} />
+      {/* Sosyal kanıt rozetleri — altta ortalanmış, kapatılabilir. İkisi de
+          yalnızca gösterecek bir şey varken çizilir; yığın hangisi görünürse
+          ona göre yerleşir. */}
+      <BadgeStack>
+        <LiveVisitorBadge pageKey={itemHref(item)} />
+        <SocialProofBadge itemId={item.id} />
+      </BadgeStack>
     </div>
   );
 }

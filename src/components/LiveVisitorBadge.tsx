@@ -128,10 +128,10 @@ export function LiveVisitorBadge({ pageKey, label, tahminiGoster = true }: LiveV
     : `Şu anda ${sayi} kişi bu sayfayı görüntülüyor`;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
+    <>
       <div
         className={cn(
-          "pointer-events-auto flex items-center gap-2.5 rounded-full py-2 pl-3 pr-2",
+          "pointer-events-auto flex max-w-full items-center gap-2.5 rounded-full py-2 pl-3 pr-2",
           // Cam efekti: arkasındaki içerik bulanıklaşır, rozet sayfanın üstünde
           // yüzer. Açık ve koyu modda ayrı zemin — tek renk ikisinde de doğru
           // görünmüyordu.
@@ -169,7 +169,7 @@ export function LiveVisitorBadge({ pageKey, label, tahminiGoster = true }: LiveV
         <p
           aria-live="polite"
           aria-atomic="true"
-          className="whitespace-nowrap text-[13px] font-semibold text-[var(--ink-2)]"
+          className="min-w-0 text-[13px] font-semibold leading-snug text-[var(--ink-2)]"
         >
           {metin}
           {!gercek && (
@@ -191,6 +191,6 @@ export function LiveVisitorBadge({ pageKey, label, tahminiGoster = true }: LiveV
           <X size={14} />
         </button>
       </div>
-    </div>
+    </>
   );
 }
