@@ -4,6 +4,7 @@ import {
   BadgeCheck,
   Check,
   Clock,
+  LineChart,
   Map,
   MapPin,
   Minus,
@@ -24,6 +25,7 @@ import { formatDate, formatPrice, locationText, priceSummary, slugify } from "@/
 import { categoryHref } from "@/lib/menu";
 import { itemHref } from "@/lib/routes";
 import { breadcrumbLd, jsonLd } from "@/lib/seo";
+import { puanGecmisi } from "@/lib/score-history";
 import { cn } from "@/lib/cn";
 import { CoverArt } from "./CoverArt";
 import { ScoreRing } from "./ScoreRing";
@@ -31,6 +33,7 @@ import { BadgeChip } from "./BadgeChip";
 import { StarRating } from "./StarRating";
 import { BreakdownBars } from "./BreakdownBars";
 import { PriceHistoryChart } from "./PriceHistoryChart";
+import { ScoreHistory } from "./ScoreHistory";
 import { ItemGrid } from "./ItemGrid";
 import { ReviewForm } from "./ReviewForm";
 import { QuoteForm } from "./QuoteForm";
@@ -60,6 +63,11 @@ export async function ItemDetail({ item }: { item: Item }) {
     const vals = reviews.map((r) => r.criteria[c.key]).filter((v) => typeof v === "number");
     return { ...c, avg: vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : 0 };
   });
+
+  // Puan günlüğü: tablo yoksa ya da iki günden az ölçüm varsa `null` döner ve
+  // bölüm hiç çizilmez — henüz anlatacak bir değişim yokken boş grafik
+  // göstermek, olmayan bir hikâyeyi varmış gibi sunmak olurdu.
+  const gecmis = await puanGecmisi(item);
 
   const mapsQuery =
     item.type === "mekan" ? encodeURIComponent(`${item.attrs["Adres"] ?? item.title} ${item.city ?? ""}`) : "";
@@ -323,6 +331,15 @@ export async function ItemDetail({ item }: { item: Item }) {
           </section>
 
           {/* Tipe özel alanlar */}
+          {gecmis && (
+            <section className={PANEL}>
+              <h2 className="mb-3 flex items-center gap-1.5 text-base font-bold">
+                <LineChart size={17} className="text-[var(--brand)]" /> Puan Günlüğü
+              </h2>
+              <ScoreHistory gecmis={gecmis} />
+            </section>
+          )}
+
           <section className={PANEL}>
             <h2 className="mb-3 text-base font-bold">{ATTRS_TITLE[item.type]}</h2>
             <dl className="divide-y divide-[var(--line)] text-sm">
