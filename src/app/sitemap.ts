@@ -10,7 +10,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const bundle = await getBundle();
   const now = new Date();
 
-  const staticPages: MetadataRoute.Sitemap = ["", "/urunler", "/hizmetler", "/mekanlar", "/listeler", "/ara", "/karsilastir", "/isletme"].map((p) => ({
+  /*
+   * `/ara` LISTEDE DEGIL: robots.txt onu taramaya kapatiyor ve sayfa
+   * `noindex, nofollow` tasiyor (sihirbaz sonsuz sorgu uzayi ureten bir tarama
+   * tuzagiydi). Site haritasi "sunu indeksle" demektir; ayni adresi bir yandan
+   * yasaklayip bir yandan haritaya koymak celiski olurdu.
+   *
+   * `/metodoloji` ve `/seffaflik` eklendi: ikisi de sitenin iddiasini anlatan
+   * ve aranabilir sayfalar, haritada olmamalari eksiklikti.
+   */
+  const staticPages: MetadataRoute.Sitemap = ["", "/urunler", "/hizmetler", "/mekanlar", "/listeler", "/karsilastir", "/isletme", "/metodoloji", "/seffaflik", "/blog"].map((p) => ({
     url: `${BASE}${p}`,
     lastModified: now,
     changeFrequency: "daily",

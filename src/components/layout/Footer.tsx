@@ -19,6 +19,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/favoriler", label: "Favoriler" },
       { href: "/blog", label: "Blog" },
       { href: "/metodoloji", label: "Nasıl puanlıyoruz" },
+      { href: "/seffaflik", label: "Şeffaflık karnesi" },
       { href: "/isletme", label: "İşletmeniz için" },
     ],
   },
